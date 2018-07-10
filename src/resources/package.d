@@ -14,4 +14,6 @@ import resources.image.r32;
 import resources.data.lz4;
 import resources.data.pdc;
 
+import resources.sound.wav;
+
 import resources.hgt;

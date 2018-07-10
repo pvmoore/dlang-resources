@@ -12,7 +12,7 @@ import std.array    : Appender, appender;
 import std.format   : format;
 import std.conv     : to;
 import std.math     : abs;
-import std.stdio    : writefln, File;
+import std.stdio    : writefln, File, SEEK_CUR;
 import std.file     : exists, getSize;
 import std.path     : baseName, extension;
 import std.string   : toLower;
