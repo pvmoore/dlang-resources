@@ -379,17 +379,17 @@ private:
         ubyte* dest = unfiltered.ptr;
         for(auto i=0; i<lines; i++) {
 
-            pragma(inline,true) ubyte getA(int n) {
+            ubyte getA(int n) {
                 return n-bpp >= 0 ? dest[n-bpp] : 0;
             }
-            pragma(inline,true) ubyte getB(int n) {
+            ubyte getB(int n) {
                 return i>0 ? *((dest+n)-scanlineLen) : 0;
             }
-            pragma(inline,true) ubyte getC(int n) {
+            ubyte getC(int n) {
                 return (i>0 && n-bpp>=0) ?
                     *(((dest+n)-bpp)-scanlineLen) : 0;
             }
-            pragma(inline,true) uint paeth(int n) {
+            uint paeth(int n) {
                 import std.math : abs;
                 int a = getA(n);
                 int b = getB(n);

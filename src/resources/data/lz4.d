@@ -137,7 +137,7 @@ private:
         long length  = getLength(lo)+4;
         chat("Match offset=%s length=%s", offset, length);
 
-        pragma(inline, true) void copy() {
+        void copy() {
             long pos  = data.length;
             long from = pos-offset;
             long to   = min(from+length, pos);
