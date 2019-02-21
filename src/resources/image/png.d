@@ -13,12 +13,12 @@ module resources.image.png;
   *  y+
   */
 import resources.all;
-import std.uni : toLower;
-import core.bitop : bswap;
-import std.zlib : uncompress;
-import std.algorithm.iteration : filter, map;
-import std.range : array, join;
-import std.string : fromStringz;
+import std.uni                  : toLower;
+import core.bitop               : bswap;
+import std.zlib                 : uncompress;
+import std.algorithm.iteration  : filter, map;
+import std.range                : array, join;
+import std.string               : fromStringz;
 
 final class PNG : Image {
 
