@@ -374,7 +374,7 @@ private:
 //            }
 //        }
 
-        uint filterBitmap;
+        uint filterBitmap; 
         ubyte* src  = filtered.ptr;
         ubyte* dest = unfiltered.ptr;
         for(auto i=0; i<lines; i++) {
