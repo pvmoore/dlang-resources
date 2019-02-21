@@ -10,4 +10,4 @@
 - [x] WAV (Read only)
 
 ## Requirements
-- Dlang https://dlang.org/
+- Dlang https://dlang.org/ 

@@ -365,7 +365,7 @@ private:
         }
         unfiltered.length = lines*scanlineLen;
 
-//        if(bkgd) {
+//        if(bkgd) { 
 //            // assuming rgba
 //            for(auto i=0; i<unfiltered.length; i+=bpp) {
 //                unfiltered[i]   = cast(ubyte)bkgd.r;
