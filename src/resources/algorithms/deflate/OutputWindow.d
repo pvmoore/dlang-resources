@@ -1,6 +1,5 @@
 module resources.algorithms.deflate.OutputWindow;
 
-import resources.algorithms.deflate;
 import resources.all;
 
 final class OutputWindow {

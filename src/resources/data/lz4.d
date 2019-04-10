@@ -171,6 +171,7 @@ private struct FLG {
     bool blockChecksum;
     bool contentSize;
     bool contentChecksum;
+
     this(ubyte b) {
         version_          = (b>>6)&3;
         blockIndependence = (b>>5)&1;
@@ -191,6 +192,7 @@ private struct FLG {
 private struct BD {
     ubyte blockMaxSize;
     uint kb;
+    
     this(ubyte b) {
         blockMaxSize = (b>>4)&0b111;
         kb           = [0,0,0,0,64,256,1024,4096][blockMaxSize];

@@ -12,6 +12,8 @@ private:
     InternalEntry[string] entryByFilename; 
     EOCDRecord eocd;
     bool isModified; 
+    ulong totalCompressedSize;
+    ulong totalUncompressedSize;
 
     final static class InternalEntry {
         LocalFileHeader localHeader;
@@ -33,11 +35,11 @@ public:
             this.uncompressedSize = e.localHeader.uncompressedSize;
             this.compressedSize   = e.localHeader.compressedSize;
         }
-        bool isDecompressed() { 
+        bool hasBeenDecompressed() { 
             return internalEntry.uncompressedData.length > 0 || internalEntry.localHeader.uncompressedSize==0;
         }
         ubyte[] getUncompressed() {
-            if(isDecompressed()) {
+            if(hasBeenDecompressed()) {
                 return internalEntry.uncompressedData.dup;
             }
             
@@ -50,7 +52,7 @@ public:
 
             if(isCompressed(internalEntry.localHeader.compressionMethod)) {
                 if(isDeflate(internalEntry.localHeader.compressionMethod)) {
-                    internalEntry.uncompressedData = new DeflateDecompressor().decompress(byteReader);
+                    internalEntry.uncompressedData = new Inflate().decompress(byteReader);
                 } 
             } else {
                 internalEntry.uncompressedData = byteReader.readArray!ubyte(internalEntry.localHeader.uncompressedSize);
@@ -78,6 +80,12 @@ public:
     }
     string getComment() {
         return cast(string)eocd.comment;
+    }
+    ulong getCompressedSize() {
+        return totalCompressedSize;
+    }
+    ulong getUncompressedSize() {
+        return totalUncompressedSize;
     }
     ulong getNumEntries() { 
         return entryByOffset.length; 
@@ -154,10 +162,11 @@ private:
         h.filename = r.readArray!ubyte(h.filenameLength);
         h.extraField = r.readArray!ubyte(h.extraFieldLength);
 
-        // chat("versionNeeded = %s", h.versionNeeded);
-        // chat("compressionMethod = %s", h.compressionMethod);
+        //writefln("versionNeeded = %s", h.versionNeeded);
+        //writefln("compressionMethod = %s", h.compressionMethod);
         // chat("filename = %s", cast(char[])h.filename);
-        //chat("extra = %s", h.extraFieldLength);
+        //writefln("extra = %s", h.extraFieldLength);
+        //writefln("extra = %s", h.extraField);
         // chat("file pos = %s", r.position);
 
         ulong dataOffset = r.position;
@@ -192,6 +201,9 @@ private:
         entry.relativeDataOffset  = (dataOffset - offset).as!uint;
 
         entryByOffset[offset] = entry;
+
+        totalCompressedSize   += h.compressedSize;
+        totalUncompressedSize += h.uncompressedSize;
     }
     struct CentralDirectoryFileHeader {
         uint signature = 0x02014b50;
@@ -246,6 +258,8 @@ private:
         // chat("\tOffset: %s", h.relativeOffsetOfLFH);
         // chat("\tVer made by: %s.%s", (h.versionMadeBy&0xff)/10, (h.versionMadeBy&0xff)%10);
         // chat("\tVer needed: %s.%s", (h.versionNeeded&0xff)/10, (h.versionNeeded&0xff)%10);
+
+       // writefln("%s external = %s", cast(string)h.filename, h.externalFileAttributes);
 
         if(h.generalBitFlag&(1<<0)) {
             throw new Error("Encrypted archive not supported");

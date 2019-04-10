@@ -1,9 +1,9 @@
-module resources.algorithms.deflate.DeflateCompressor;
+module resources.algorithms.deflate.Deflate;
 
 import resources.algorithms.deflate;
 import resources.all;
 
-final class DeflateCompressor {
+final class Deflate {
 private:
 
 public:

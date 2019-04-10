@@ -1,11 +1,9 @@
-module resources.algorithms.deflate.DeflateDecompressor;
+module resources.algorithms.deflate.Inflate;
 
 import resources.algorithms.deflate;
 import resources.all;
 
-final class DeflateDecompressor {
-private:
-
+final class Inflate {
 public:
     ubyte[] decompress(ByteReader byteReader) {
         chat("Deflate.decompress");
@@ -50,9 +48,10 @@ private:
     }
     void decompressStoredBlock(BitReader r, OutputWindow output) {
         chat("\tStored block");
-        uint length    = r.read(16);
-        uint notLength = r.read(16);
-        if(length != ~notLength) throw new Error("Error in compressed data");
+        uint length      = r.read(16);
+        uint lengthCompl = r.read(16);
+        // Doesn't seem to work in some archives
+        //if(length != ~lengthCompl) throw new Error("Error in compressed data");
 
         chat("\tCopying %s bytes of data", length);
         // copy the raw data
@@ -62,7 +61,11 @@ private:
     }
     void decompressFixedHuffmanBlock(BitReader r, OutputWindow output) {
         chat("\tFixed Huffman");
-        todo("Implement Fixed Huffman block");
+
+        auto litTree  = MetaHuffman.getFixedLiteralTree();
+        auto distTree = MetaHuffman.getFixedDistanceTree();
+        
+        decompressBlock(r, litTree, distTree, output);
     }
     void decompressDynamicHuffmanBlock(BitReader r, OutputWindow output) {
         chat("\tDynamic Huffman");
@@ -108,12 +111,10 @@ private:
                 case 256:
                     return;
                 default:
-                    auto len = Lengths.decode(code, r);
-                    //chat("length = %s", len);
+                    auto len      = Lengths.decode(code, r);
                     auto distCode = distTree.decode(r);
-                    //chat("distCode = %s", distCode);
-                    auto dist = Distances.decode(distCode, r);
-                    //chat("dist = %s", dist);
+                    auto dist     = Distances.decode(distCode, r);
+
                     output.copy(dist, len);
                     break;
             }
