@@ -10,7 +10,10 @@ import maths;
 void main() {
     writefln("Testing resources");
 
-    testPDC();
+    //testPDC();
+
+    //testDeflate();
+    testZip();
 
     //
     //writefln("%s", r32.get(0,0));
@@ -141,7 +144,7 @@ void testLZ4() {
     assert(d4.length==bib.length);
     assert(d4[]==bib[]);
     w.stop();
-    writefln("Took %s millis", w.peek().total!"nsecs"/1000000.0);
+    writefln("Took %s millis", w.peek().total!"nsecs"/1_000_000.0);
 
     // 470 480 ms
 }
@@ -151,4 +154,55 @@ void testHGT() {
 void testPDC() {
     auto pdc = new PDC("testdata/geo");
 
+}
+void testDeflate() {
+    writefln("#######################################");
+    writefln("Testing Deflate");
+    writefln("#######################################");
+
+}
+void testZip() {
+    writefln("#######################################");
+    writefln("Testing Zip");
+    writefln("#######################################");
+
+    auto zip = new Zip("testdata/example.zip");
+
+    writefln("Num entries = %s", zip.getNumEntries);
+    writefln("Comment     = %s", zip.getComment);
+    writefln("Filenames   = %s", zip.getFilenames);
+
+    auto file1 = zip.get("file1.txt");
+    writefln("file1=%s", file1);
+    writefln("\tfilename          = %s", file1.filename);
+    writefln("\tuncompressed size = %s", file1.uncompressedSize);
+    writefln("\tcompressed size   = %s", file1.compressedSize);
+    writefln("\tis decompressed   = %s", file1.isDecompressed);
+    writefln("\tdata              = %s", cast(string)file1.getUncompressed());
+    writefln("\tis decompressed   = %s", file1.isDecompressed);
+
+    auto file2 = zip.get("file2.txt");
+    writefln("file2=%s", file2);
+    writefln("\tfilename          = %s", file2.filename);
+    writefln("\tuncompressed size = %s", file2.uncompressedSize);
+    writefln("\tcompressed size   = %s", file2.compressedSize);
+    writefln("\tis decompressed   = %s", file2.isDecompressed);
+    writefln("\tdata              = %s", cast(string)file2.getUncompressed());
+    writefln("\tis decompressed   = %s", file2.isDecompressed);
+
+    auto bib = zip.get("bib");
+    writefln("bib=%s", bib);
+    writefln("\tfilename          = %s", bib.filename);
+    writefln("\tuncompressed size = %s", bib.uncompressedSize);
+    writefln("\tcompressed size   = %s", bib.compressedSize);
+    writefln("\tis decompressed   = %s", bib.isDecompressed);
+    writefln("\tdata              = %s", bib.getUncompressed().length);
+    writefln("\tis decompressed   = %s", bib.isDecompressed);
+
+    // import common;
+    // auto f = new FileByteWriter("tempbib.txt");
+    // f.writeArray!ubyte(bib.getUncompressed());
+    // f.close();
+
+    zip.close();
 }

@@ -19,20 +19,22 @@ final class LZ4 {
 private final class LZ4Decompresor {
     ByteReader reader;
     Array!ubyte data;
+    string filename;
     File file;
     FLG flg;
     ulong uncompressedSize;
     ulong maxBlockSize;
 
     this(string filename) {
-        this.reader = new ByteReader(filename);
-        this.data   = new Array!ubyte;
+        this.filename = filename;
+        this.reader   = new FileByteReader(filename);
+        this.data     = new Array!ubyte;
     }
     void destroy() {
         file.close();
     }
     void decompress() {
-        chat("Decompressing LZ4 '%s' (%s bytes)", reader.filename, reader.length);
+        chat("Decompressing LZ4 '%s' (%s bytes)", filename, reader.length);
 
         while(!reader.eof()) {
             decodeFrame();

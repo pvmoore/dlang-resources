@@ -9,7 +9,7 @@ final class PDC {
     this(string filename) {
         this.srcFilename  = filename;
         this.destFilename = "testdata/test0.pdc";
-        this.reader       = new ByteReader(srcFilename);
+        this.reader       = new FileByteReader(srcFilename);
         this.writer       = new FileBitWriter(destFilename);
         encode();
     }

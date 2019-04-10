@@ -4,7 +4,14 @@ public:
 
 import resources;
 
-import common : expect, Array, ByteReader, FileBitWriter;
+import common : as, expect, flushConsole, todo, 
+				Array, ArrayByteWriter,
+				From,
+				BitReader, FileBitReader, 
+				ByteReader, FileByteReader, 
+				BitWriter, FileBitWriter, 
+				ByteWriter, FileByteWriter,
+				StringBuffer;
 import logging : log, flushLog;
 import maths;
 
@@ -23,8 +30,9 @@ import std.algorithm.iteration : each;
 __gshared const bool chatty = false;
 
 void chat(A...)(lazy string fmt, lazy A args) {
-	if(chatty) {
+	static  if(chatty) {
 	    log(fmt, args);
+		writefln(fmt, args);
 	    flushLog();
 	}
 }

@@ -10,7 +10,7 @@ buildType "release" {
 }
 
 configuration "test" {
-	#mainSourceFile "src/test.d"
+	mainSourceFile "src/test.d"
 	targetType "executable"
 	targetName "bin-test"
 }

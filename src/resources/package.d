@@ -11,8 +11,12 @@ import resources.image.png;
 import resources.image.r16;
 import resources.image.r32;
 
+import resources.algorithms.deflate;
+
 import resources.data.lz4;
+import resources.data.lzp;
 import resources.data.pdc;
+import resources.data.zip;
 
 import resources.sound.wav;
 
