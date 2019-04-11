@@ -5,14 +5,11 @@ import resources.all;
 /**
  *  A Huffman tree which is used to generate the literal and distance trees.
  */
-final class MetaHuffman : Huffman {
+final class MetaHuffman : HuffmanCoder {
 private:
     __gshared const uint[] BL_ORDER = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
-    static Huffman fixedLiteralTree, fixedDistanceTree;
+    static HuffmanCoder fixedLiteralTree, fixedDistanceTree;
 public:
-    this(uint[] bitLengths) {
-        super(bitLengths);
-    }
     /**
      *  Create from count x 3bit lengths.
      */
@@ -24,34 +21,35 @@ public:
             bitLengths[BL_ORDER[i]] = len; 
         }
 
-        return new MetaHuffman(bitLengths);
+        return new MetaHuffman().createFromBitLengths(bitLengths)
+                                .as!MetaHuffman;
     }
     /**
      *  Fixed Huffman literal/lengths tree for blocks with BTYPE = 01
      */
-    static Huffman getFixedLiteralTree() {
+    static HuffmanCoder getFixedLiteralTree() {
         if(fixedLiteralTree is null) {
             uint[288] bitLengths;
             bitLengths[  0..144] = 8;
             bitLengths[144..256] = 9;
             bitLengths[256..280] = 7;
             bitLengths[280..288] = 8;
-            fixedLiteralTree = new Huffman(bitLengths);
+            fixedLiteralTree = new HuffmanCoder().createFromBitLengths(bitLengths);
         }
         return fixedLiteralTree;
     }
     /**
      *  Fixed Huffman distances tree for blocks with BTYPE = 01
      */
-    static Huffman getFixedDistanceTree() {
+    static HuffmanCoder getFixedDistanceTree() {
         if(fixedDistanceTree is null) {
             uint[32] bitLengths;
             bitLengths[] = 5;
-            fixedDistanceTree = new Huffman(bitLengths);
+            fixedDistanceTree = new HuffmanCoder().createFromBitLengths(bitLengths);
         }
         return fixedDistanceTree;
     }
-    Huffman decodeTree(BitReader r, int count) {
+    HuffmanCoder decodeTree(BitReader r, int count) {
         uint[] lengths;
         uint prevLen = 0;
 
@@ -84,6 +82,6 @@ public:
             }
         }
         if(count!=0) throw new Error("Error in compressed data");
-        return new Huffman(lengths);
+        return new HuffmanCoder().createFromBitLengths(lengths);
     }
 }

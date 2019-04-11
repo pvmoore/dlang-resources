@@ -97,7 +97,7 @@ private:
 
         decompressBlock(r, litTree, distTree, output);
     }
-    void decompressBlock(BitReader r, Huffman litTree, Huffman distTree, OutputWindow output) {
+    void decompressBlock(BitReader r, HuffmanCoder litTree, HuffmanCoder distTree, OutputWindow output) {
         chat("decompressBlock");
 
         while(true) {

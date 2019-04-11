@@ -17,4 +17,4 @@ import resources.algorithms.deflate.Lengths;
 import resources.algorithms.deflate.OutputWindow;
 import resources.algorithms.deflate.Symbol;
 
-import resources.algorithms.entropy.Huffman;
+import resources.algorithms.entropy.HuffmanCoder;

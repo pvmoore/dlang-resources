@@ -4,7 +4,7 @@ public:
 
 import resources;
 
-import common : as, expect, flushConsole, todo, 
+import common : as, expect, flushConsole, todo, makeLowPriorityQueue,
 				Array, ArrayByteWriter,
 				From,
 				BitReader, FileBitReader, 
@@ -25,7 +25,7 @@ import std.path     : baseName, extension;
 import std.string   : toLower;
 import std.range    : appender;
 import std.regex    : matchFirst;
-import std.algorithm.iteration : each;
+import std.algorithm.iteration : each, map;
 
 __gshared const bool chatty = false;
 

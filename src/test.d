@@ -7,13 +7,17 @@ import resources;
 import std.random   : uniform01;
 import maths;
 
+import std.algorithm.searching : minElement, maxElement;
+
 void main() {
     writefln("Testing resources");
 
     //testPDC();
 
     //testDeflate();
-    testZip();
+    //testZip();
+
+    testEntropyCoders();
 
     //
     //writefln("%s", r32.get(0,0));
@@ -168,9 +172,6 @@ void testZip() {
 
     auto zip = new Zip("testdata/example.zip");
 
-   //auto zip = new Zip("/Program Files (x86)/Steam/SteamApps/common/Men of War Assault Squad 2/"~
-   //                     "mods/the rising sun v1.9.1/resource/entity/humanskin/05a_peta/sisaku.zip");
-
     writefln("Num entries       = %s", zip.getNumEntries);
     writefln("Comment           = %s", zip.getComment);
     writefln("Filenames         = %s", zip.getFilenames);
@@ -195,4 +196,43 @@ void testZip() {
     // f.close();
 
     zip.close();
+}
+void testEntropyCoders() {
+    writefln("Testing Huffman...");
+
+    ubyte[] bib = cast(ubyte[])read("testdata/bib");
+    writefln("bib length = %s", bib.length);
+
+    uint[256] frequencies;
+    foreach(b; bib) {
+        frequencies[b]++;
+    }
+    writefln("Lowest freq  = %s", bib.minElement);
+    writefln("Largest freq = %s", bib.maxElement);
+
+    // foreach(i, freq; frequencies) {
+    //     writefln("[%s] %s", i, freq);
+    // }
+
+    void testHuffmanCoder() {
+        auto tree = new HuffmanCoder().createFromFrequencies(frequencies);
+        writefln("%s", tree);
+        writefln("bit lengths = %s -> %s", tree.getSmallestBitLength, tree.getLargestBitLength);
+
+        // todo - Encode bib using tree and record length.
+        //        Time the operation
+
+
+    }
+    void testArithmeticCoder() {
+
+    }
+    void testRangeCoder() {
+
+    }
+    void testPennyDropCoder() {
+        
+    }
+
+    testHufftestHuffmanCoderman();
 }
