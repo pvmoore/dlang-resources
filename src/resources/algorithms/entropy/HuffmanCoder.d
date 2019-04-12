@@ -46,8 +46,8 @@ protected:
     uint shortestBitLength, longestBitLength;
 public:
     uint getNumLeafNodes()      { return valueToLeaf.length.as!uint; }
-    uint getSmallestBitLength() { return shortestBitLength; }
-    uint getLargestBitLength()  { return longestBitLength; }
+    uint getShortestBitLength() { return shortestBitLength; }
+    uint getLongestBitLength()  { return longestBitLength; }
 
     /**
      *  Construct a Huffman tree from bit lengths.
@@ -164,8 +164,28 @@ public:
             // Get 2 nodes with lowest freq
             auto left  = q.pop();
             auto right = q.pop();
+
+            // Apply DEFLATE rules to create a canonical tree:
+            // 1. Nodes with shorter codes are to the left of nodes with longer codes
+            // 2. Nodes with codes of the same length, lower values are to the left
+
+            bool swap = right.depth < left.depth;
+            if(!swap && left.value!=-1 && right.value!=-1) {
+                swap = right.value < left.value;
+            }
+            if(swap) {
+                auto temp = left;
+                left  = right;
+                right = temp;
+            }
+
             // Create a new branch node
-            q.push( new Node(left, right, left.freq + right.freq, -1) );
+            auto parent  = new Node(left, right, left.freq + right.freq, -1);
+
+            // Depth is actually inverted here. We'll re-set it later
+            parent.depth = max(left.depth, right.depth) + 1;
+
+            q.push(parent);
         }
         // The single remaining item in the queue is the top of the tree 
         this.top = q.pop();
@@ -178,6 +198,20 @@ public:
             if(leaf.depth > longestBitLength) longestBitLength = leaf.depth;
             if(leaf.depth < shortestBitLength) shortestBitLength = leaf.depth;
         });
+
+        return this;
+    }
+    /**
+     *  Modify a tree which has bit lengths > maxBitLength
+     */
+    HuffmanCoder enforceMaxBitLength(uint maxBitLength) {
+        if(longestBitLength <= maxBitLength) return this;
+
+        // while longestBitLength > maxBitLength
+        // leaf = a leaf where depth > maxBitLength
+        // move it up the tree -- ensure DEFLATE rules are not broken
+
+        todo();
 
         return this;
     }

@@ -4,6 +4,9 @@ import resources.all;
 /**
  *  https://en.wikipedia.org/wiki/Zip_(file_format)
  *  https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+ *
+ *  Todo:
+ *      - Support Zip64
  */
 final class Zip {
 private:

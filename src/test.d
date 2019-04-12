@@ -225,7 +225,7 @@ void testEntropyCoders() {
     void testHuffmanCoder() {
         auto tree = new HuffmanCoder().createFromFrequencies(frequencies);
         //writefln("%s", tree);
-        //writefln("bit lengths = %s -> %s", tree.getSmallestBitLength, tree.getLargestBitLength);
+        writefln("bit lengths = %s -> %s", tree.getShortestBitLength, tree.getLongestBitLength);
 
         // todo - Encode bib using tree and record length.
         //        Time the operation
