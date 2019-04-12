@@ -1,13 +1,16 @@
 
+import resources;
+import maths;
+import common : BitWriter, BitReader, ByteReader, From;
 
 import std.stdio    : writefln;
 import std.file     : read;
 import std.datetime.stopwatch : StopWatch;
-import resources;
 import std.random   : uniform01;
-import maths;
+import std.array    : appender;
 
 import std.algorithm.searching : minElement, maxElement;
+import std.algorithm.iteration : each, map, sum;
 
 void main() {
     writefln("Testing resources");
@@ -207,21 +210,44 @@ void testEntropyCoders() {
     foreach(b; bib) {
         frequencies[b]++;
     }
-    writefln("Lowest freq  = %s", bib.minElement);
-    writefln("Largest freq = %s", bib.maxElement);
 
-    // foreach(i, freq; frequencies) {
-    //     writefln("[%s] %s", i, freq);
+    /**
+     *  Return the number of bits required to store
+     *  _value_ given a total set of size _total_.
+     *  eg. entropy(1, 256) == 8 (bits)
+     *      entropy(1, 3)   == 1.58496 (bits)
+     */
+    // double entropyBits(double value, double total) {
+    //     import std.math : log2;
+    //     return log2(total/value);
     // }
 
     void testHuffmanCoder() {
         auto tree = new HuffmanCoder().createFromFrequencies(frequencies);
-        writefln("%s", tree);
-        writefln("bit lengths = %s -> %s", tree.getSmallestBitLength, tree.getLargestBitLength);
+        //writefln("%s", tree);
+        //writefln("bit lengths = %s -> %s", tree.getSmallestBitLength, tree.getLargestBitLength);
 
         // todo - Encode bib using tree and record length.
         //        Time the operation
+        ulong numBits;
+        auto outStream = appender!(ubyte[]);
+        auto w = new BitWriter((it) {numBits+=8; outStream~= it; });
+        foreach(b; bib) {
+            tree.encode(w, b);
+        }
+        w.flush();
 
+        // 582088 bits (72761 bytes)
+        writefln("Huffman entropy = %s bits (%s bytes)", numBits, numBits/8);
+
+        // check the encoded stream
+        auto br = new ByteReader(outStream.data);
+        auto r  = new BitReader(() { return br.read!ubyte; });
+        foreach(i; 0..bib.length) {
+            uint value = tree.decode(r);
+            assert(bib[i] == cast(ubyte)value);
+        }
+        writefln("Huffman decode succeeded");
 
     }
     void testArithmeticCoder() {
@@ -234,5 +260,16 @@ void testEntropyCoders() {
         
     }
 
-    testHufftestHuffmanCoderman();
+    // 578632 bits (72329.1 bytes)
+    auto optimalEntropy = bib.map!(it=>entropyBits(frequencies[it], bib.length)).sum();
+
+    // foreach(i, freq; frequencies) {
+    //     writefln("[%s] %s", i, freq);
+    // }
+
+    writefln("Lowest freq  = %s", bib.minElement);
+    writefln("Largest freq = %s", bib.maxElement);
+    writefln("Optimal entropy = %s bits (%s bytes)", optimalEntropy, optimalEntropy/8);
+
+    testHuffmanCoder();
 }

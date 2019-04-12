@@ -80,9 +80,9 @@ private:
 
         auto metaTree = MetaHuffman.readBitLengths(r, numBitLengthCodes);
     
-        static if(false && chatty) {
-            chat("Meta tree = {\n%s}", metaTree.toString);
-        }
+        //static if(false && chatty) {
+        //    writefln("Meta tree = {\n%s}", metaTree.toString);
+        //}
 
         auto litTree  = metaTree.decodeTree(r, numLiteralCodes);
         static if(false && chatty) {
