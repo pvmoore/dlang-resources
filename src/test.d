@@ -5,10 +5,11 @@ import common : BitWriter, BitReader, ByteReader, From;
 
 import std.stdio    : writefln;
 import std.file     : read;
-import std.datetime.stopwatch : StopWatch;
 import std.random   : uniform01;
 import std.array    : appender;
-
+import std.format   : format;
+import std.range    : array;
+import std.datetime.stopwatch  : StopWatch;
 import std.algorithm.searching : minElement, maxElement;
 import std.algorithm.iteration : each, map, sum;
 
@@ -244,18 +245,42 @@ void testEntropyCoders() {
         auto br = new ByteReader(outStream.data);
         auto r  = new BitReader(() { return br.read!ubyte; });
         foreach(i; 0..bib.length) {
-            uint value = tree.decode(r);
+            int value = tree.decode(r);
             assert(bib[i] == cast(ubyte)value);
         }
         writefln("Huffman decode succeeded");
 
     }
     void testArithmeticCoder() {
+        ulong[] freqL = frequencies.array.map!(it=>cast(ulong)it).array;
+        auto model    = new StaticOrder0Model(freqL);
+        auto ac       = new ArithmeticCoder(model);
 
+        ulong numBits;
+        auto outStream = appender!(ubyte[]);
+        auto w = new BitWriter((it) {numBits+=8; outStream~= it; });
+
+        ac.beginEncoding();
+        foreach(b; bib) {
+            ac.encode(w, b);
+        }
+        ac.endEncoding(w);
+        writefln("ArithmeticCoder entropy = %s bits (%s bytes)", numBits, numBits/8);
+
+        // check the encoded stream
+        auto br = new ByteReader(outStream.data);
+        auto r  = new BitReader(() { return br.read!ubyte; });
+        ac.beginDecoding(r);
+        foreach(i; 0..bib.length) {
+            int value = ac.decode(r);
+            assert(bib[i] == cast(ubyte)value, "i=%s".format(i));
+        }
+        ac.endDecoding();
+        writefln("ArithmeticCoder decode succeeded");
     }
     void testRangeCoder() {
 
-    }
+    } 
     void testPennyDropCoder() {
         
     }
@@ -272,4 +297,5 @@ void testEntropyCoders() {
     writefln("Optimal entropy = %s bits (%s bytes)", optimalEntropy, optimalEntropy/8);
 
     testHuffmanCoder();
+    testArithmeticCoder();
 }
