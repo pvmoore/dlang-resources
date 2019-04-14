@@ -20,3 +20,4 @@ import resources.algorithms.deflate.Symbol;
 import resources.algorithms.entropy.ArithmeticCoder;
 import resources.algorithms.entropy.EntropyModel;
 import resources.algorithms.entropy.HuffmanCoder;
+import resources.algorithms.entropy.PennyDropCoder;

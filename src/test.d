@@ -298,4 +298,6 @@ void testEntropyCoders() {
 
     testHuffmanCoder();
     testArithmeticCoder();
+    testRangeCoder();
+    testPennyDropCoder();
 }
