@@ -4,12 +4,12 @@ public:
 
 import resources;
 
-import common : as, expect, flushConsole, todo, makeLowPriorityQueue,
+import common : as, expect, flushConsole, todo, makeLowPriorityQueue, startsWith,
 				Array, ArrayByteWriter,
 				From,
-				BitReader, FileBitReader, 
-				ByteReader, FileByteReader, 
-				BitWriter, FileBitWriter, 
+				BitReader, FileBitReader,
+				ByteReader, FileByteReader,
+				BitWriter, FileBitWriter,
 				ByteWriter, FileByteWriter,
 				StringBuffer;
 import logging : log, flushLog;

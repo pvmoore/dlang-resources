@@ -21,7 +21,9 @@ void main() {
     //testDeflate();
     //testZip();
 
-    testEntropyCoders();
+    //testEntropyCoders();
+
+    testPE();
 
     //
     //writefln("%s", r32.get(0,0));
@@ -280,9 +282,9 @@ void testEntropyCoders() {
     }
     void testRangeCoder() {
 
-    } 
+    }
     void testPennyDropCoder() {
-        
+
     }
 
     // 578632 bits (72329.1 bytes)
@@ -300,4 +302,15 @@ void testEntropyCoders() {
     testArithmeticCoder();
     testRangeCoder();
     testPennyDropCoder();
+}
+void testPE() {
+    writefln("#######################################");
+    writefln("Testing PE");
+    writefln("#######################################");
+
+    auto pe = new PE("bin-test.exe");
+    pe.read();
+
+    auto code = pe.getCode();
+    writefln("code = %s", code.length);
 }

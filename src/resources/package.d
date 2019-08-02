@@ -21,3 +21,5 @@ import resources.data.zip;
 import resources.sound.wav;
 
 import resources.hgt;
+
+import resources.code.PE;
