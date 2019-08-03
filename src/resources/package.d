@@ -22,4 +22,5 @@ import resources.sound.wav;
 
 import resources.hgt;
 
+import resources.code.PDB;
 import resources.code.PE;

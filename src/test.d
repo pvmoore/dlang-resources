@@ -23,7 +23,8 @@ void main() {
 
     //testEntropyCoders();
 
-    testPE();
+    testPDB();
+    //testPE();
 
     //
     //writefln("%s", r32.get(0,0));
@@ -313,4 +314,14 @@ void testPE() {
 
     auto code = pe.getCode();
     writefln("code = %s", code.length);
+}
+void testPDB() {
+    writefln("#######################################");
+    writefln("Testing PDB");
+    writefln("#######################################");
+
+    //auto pdb = new PDB("testdata/test.pdb");
+    auto pdb = new PDB("testdata/core.pdb");
+    pdb.read();
+
 }
