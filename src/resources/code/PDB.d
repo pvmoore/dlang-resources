@@ -17,6 +17,7 @@ private:
     MSFHeader msfHeader;
     PdbStreamHeader pdbHeader;      // stream 1
     TPIStreamHeader tpiHeader;      // stream 2
+    DbiStreamHeader dbiHeader;      // stream 3
     NamedStreamMap namedStreamMap;
     Directory directory;
     uint[] directoryBlocks;
@@ -168,10 +169,78 @@ private:
     /** DBI Stream (stream 3)*/
     void readStream3() {
         chat("stream 3 size = %s, blocks = %s", directory.streamSizes[3], directory.streamBlocks[3]);
-        //moveToBlock(directory.streamBlocks[3][0]);
+        moveToBlock(directory.streamBlocks[3][0]);
+
+        /* Header */
+        dbiHeader.read(reader);
+        chat("%s", dbiHeader);
+
+        /* ModuleInfo substream */
+        if(dbiHeader.modInfoSize > 0) {
+            struct SectionContribEntry { align(1):
+                ushort Section;
+                byte[2] Padding1;
+                int Offset;
+                int Size;
+                uint Characteristics;
+                ushort ModuleIndex;
+                byte[2] Padding2;
+                uint DataCrc;
+                uint RelocCrc;
+            }
+            struct ModInfo { align(1):
+                uint Unused1;
+                SectionContribEntry SectionContr;
+                ushort Flags;
+                ushort ModuleSymStream;
+                uint SymByteSize;
+                uint C11ByteSize;
+                uint C13ByteSize;
+                ushort SourceFileCount;
+                byte[2] Padding;
+                uint Unused2;
+                uint SourceFileNameIndex;
+                uint PdbFilePathNameIndex;
+
+                string toString() const {
+                    return "[ModInfo flags: %s, symbolStream: %s, srcFiles: %s]".format(
+                        Flags, ModuleSymStream, SourceFileCount);
+                }
+            }
+            byte[] ModuleName;
+            byte[] ObjFileName;
+
+            ModInfo modInfo = reader.read!ModInfo;
+            chat("ModInfo = %s", modInfo);
+
+            while(true) {
+                auto b = reader.read!ubyte;
+                if(b==0) break;
+
+                ModuleName ~= b;
+            }
+            while(true) {
+                auto b = reader.read!ubyte;
+                if(b==0) break;
+
+                ObjFileName ~= b;
+            }
+
+            chat("ModuleName=%s", cast(string)ModuleName);
+            chat("ObjFileName=%s", cast(string)ObjFileName);
+
+        }
+        /* Section contribution substream */
+        /* Section map substream */
+        /* File info substream */
+        /* Type server map substream */
+        /* Optional debug header stream */
+        /* EC substream */
 
     }
 }
+
+//####################################################################################################
 
 private:
 
@@ -339,4 +408,62 @@ enum TpiStreamVersion : uint {
   V50 = 19961031,
   V70 = 19990903,
   V80 = 20040203,
+}
+
+struct DbiStreamHeader {
+    int versionSignature;           // always -1
+    DbiStreamVersion versionHeader;
+    uint age;
+    ushort globalStreamIndex;
+    ushort buildNumber;
+    ushort publicStreamIndex;
+    ushort pdbDllVersion;
+    ushort symRecordStream;
+    ushort pdbDllRbld;
+    int modInfoSize;
+    int sectionContributionSize;
+    int sectionMapSize;
+    int sourceInfoSize;
+    int typeServerMapSize;
+    uint mfcTypeServerIndex;
+    int optionalDbgHeaderSize;
+    int ecSubstreamSize;
+    DbiFlags flags;
+    ushort machine;
+    uint padding;
+
+    void read(ByteReader r) {
+        versionSignature        = r.read!int;
+        versionHeader           = cast(DbiStreamVersion)r.read!uint;
+        age                     = r.read!uint;
+        globalStreamIndex       = r.read!ushort;
+        buildNumber             = r.read!ushort;
+        publicStreamIndex       = r.read!ushort;
+        pdbDllVersion           = r.read!ushort;
+        symRecordStream         = r.read!ushort;
+        pdbDllRbld              = r.read!ushort;
+        modInfoSize             = r.read!int;
+        sectionContributionSize = r.read!int;
+        sectionMapSize          = r.read!int;
+        sourceInfoSize          = r.read!int;
+        typeServerMapSize       = r.read!int;
+        mfcTypeServerIndex      = r.read!uint;
+        optionalDbgHeaderSize   = r.read!int;
+        ecSubstreamSize         = r.read!int;
+        flags                   = cast(DbiFlags)r.read!ushort;
+        machine                 = r.read!ushort;
+        padding                 = r.read!uint;
+    }
+}
+enum DbiStreamVersion : uint {
+  VC41 = 930803,
+  V50 = 19960307,
+  V60 = 19970606,
+  V70 = 19990903,
+  V110 = 20091201
+}
+enum DbiFlags : ushort {
+    WasIncrementallyLinked      = 1,
+    ArePrivateSymbolsStripped   = 1<<1,
+    HasConflictingTypes         = 1<<2
 }

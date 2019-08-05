@@ -23,8 +23,9 @@ void main() {
 
     //testEntropyCoders();
 
-    testPDB();
+    //testPDB();
     //testPE();
+    testCOFF();
 
     //
     //writefln("%s", r32.get(0,0));
@@ -320,8 +321,17 @@ void testPDB() {
     writefln("Testing PDB");
     writefln("#######################################");
 
-    //auto pdb = new PDB("testdata/test.pdb");
-    auto pdb = new PDB("testdata/core.pdb");
+    auto pdb = new PDB("testdata/test.pdb");
+    //auto pdb = new PDB("testdata/core.pdb");
     pdb.read();
+}
+void testCOFF() {
+    writefln("#######################################");
+    writefln("Testing COFF");
+    writefln("#######################################");
 
+    auto coff = new COFF("testdata/statics.obj");
+    coff.read();
+    auto code = coff.getCode();
+    writefln("code = %s bytes", code.length);
 }

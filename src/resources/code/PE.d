@@ -14,6 +14,7 @@ private:
     COFF coff;
     IMAGE_PE32_Plus image;
     SectionHeader[] sections;
+    bool finishedReading;
 public:
     this(string filename) {
         this.filename = filename;
@@ -33,16 +34,16 @@ public:
         /* Skip to the signature */
         reader.skip(offset-reader.position);
 
-        // 272
-
         readSignature();
         readCOFFHeader();
 
-        // 13 sections
-
         readImageHeader();
+
+        finishedReading = true;
     }
     ubyte[] getCode() {
+        if(!finishedReading) read();
+
         auto section = getSectionByName(".text");
         if(section) {
             auto start = section.ptrToRawData;
@@ -55,6 +56,9 @@ public:
             return r.readArray!ubyte(size);
         }
         return null;
+    }
+    uint getEntryPoint() {
+        return image.entryPointAddr;
     }
 private:
     /** Calculate the actual file position of the data for a particular data directory */
