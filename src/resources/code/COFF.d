@@ -6,39 +6,64 @@ final class COFF {
 private:
     string filename;
     ByteReader reader;
-    COFFHeader coff;
-    SectionHeader[] sections;
-    bool finishedReading;
+    bool isBorrowedReader;
+    bool haveHeader, haveSections;
 public:
+    COFFHeader header;
+    COFFSectionHeader[] sections;
+
     this(string filename) {
         this.filename = filename;
+        this.reader   = new FileByteReader(filename);
     }
-    void read() {
-        this.reader = new FileByteReader(filename);
-        scope(exit) reader.close();
+    this(string filename, ByteReader reader) {
+        this.filename         = filename;
+        this.reader           = reader;
+        this.isBorrowedReader = true;
+    }
+    void close() {
+        if(reader) {
+            if(!isBorrowedReader) reader.close();
+            reader = null;
+        }
+    }
+    void readHeader() {
+        assert(reader);
+        scope(failure) close();
 
-        chat("Reading object %s", filename);
+        header = reader.read!COFFHeader;
+        chat("%s", header);
 
-        coff = reader.read!COFFHeader;
-
-        chat("%s", coff);
-
-        if(coff.machine != 0x8664) {
+        if(header.machine != 0x8664) {
             bail("Only x8664 object files are supported");
         }
+        haveHeader = true;
+    }
+    void readSections() {
+        assert(reader);
+        assert(haveHeader, "Read the header first");
+        scope(exit) close();
 
-        for(auto i=0; i<coff.numSections; i++) {
-            sections ~= reader.read!SectionHeader;
+        for(auto i=0; i<header.numSections; i++) {
+            sections ~= reader.read!COFFSectionHeader;
         }
 
         foreach(ref s; sections) {
             chat("%s", s.toString());
         }
 
-        finishedReading = true;
+        haveSections = true;
+    }
+    COFFSectionHeader* getSectionByName(string name) {
+        foreach(ref s; sections) {
+            if((cast(string)s.name[0..8]).startsWith(name)) {
+                return &s;
+            }
+        }
+        return null;
     }
     ubyte[] getCode() {
-        if(!finishedReading) read();
+        assert(haveHeader && haveSections, "Read the header and sections first");
 
         ubyte[] code;
         auto r = new FileByteReader(filename);
@@ -85,8 +110,6 @@ private:
     }
 }
 
-private:
-
 struct COFFHeader { align(1):
     ushort machine;
     ushort numSections;
@@ -94,7 +117,7 @@ struct COFFHeader { align(1):
     uint symbolTablePtr;    // expected to be 0, coff debugging info is deprecated
     uint numSymbols;        // expected to be 0, coff debugging info is deprecated
     ushort optHeaderSize;
-    ushort characteristics; // Characteristics
+    ushort characteristics; // COFFCharacteristics
 
     string toString() const {
         return "[COFF machine: 0x%x, numSections: %s, timestamp: %s, symbolTablePtr: %s, numSymbols: %s, characteristics: 0x%x]".format(
@@ -104,7 +127,7 @@ struct COFFHeader { align(1):
     }
 }
 
-enum Characteristics {
+enum COFFCharacteristics : ushort {
     IMAGE_FILE_RELOCS_STRIPPED          = 1,
     IMAGE_FILE_EXECUTABLE_IMAGE         = 2,
     IMAGE_FILE_LINE_NUMS_STRIPPED       = 4,
@@ -123,7 +146,7 @@ enum Characteristics {
     IMAGE_FILE_BYTES_REVERSED_HI        = 0x8000
 }
 
-struct SectionHeader { align(1):
+struct COFFSectionHeader { align(1):
     ubyte[8] name;
     uint virtualSize;
     uint virtualAddr;
@@ -133,7 +156,7 @@ struct SectionHeader { align(1):
     uint ptrToLineNumbers;
     ushort numRelocations;
     ushort numLineNumbers;
-    SectionFlags characteristics;
+    COFFSectionFlags characteristics;
 
     string toString() const {
         return "[Section '%s' (%s bytes @ %s), raw: (%s bytes @ %s)] reloc: (%s @ %s) lineNums: (%s @ %s) flags:0x%x".format(
@@ -151,7 +174,7 @@ struct SectionHeader { align(1):
     }
 }
 
-enum SectionFlags : uint {
+enum COFFSectionFlags : uint {
     TYPE_NO_PAD             = 8,
     CNT_CODE                = 0x20,
     CNT_INITIALIZED_DATA    = 0x40,

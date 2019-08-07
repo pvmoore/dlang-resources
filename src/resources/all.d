@@ -27,7 +27,7 @@ import std.range    : appender;
 import std.regex    : matchFirst;
 import std.algorithm.iteration : each, map;
 
-enum chatty = false;
+enum chatty = true;
 
 void chat(A...)(lazy string fmt, lazy A args) {
 	static  if(chatty) {

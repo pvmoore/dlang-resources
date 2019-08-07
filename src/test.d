@@ -24,8 +24,8 @@ void main() {
     //testEntropyCoders();
 
     //testPDB();
-    //testPE();
-    testCOFF();
+    testPE();
+    //testCOFF();
 
     //
     //writefln("%s", r32.get(0,0));
@@ -305,17 +305,6 @@ void testEntropyCoders() {
     testRangeCoder();
     testPennyDropCoder();
 }
-void testPE() {
-    writefln("#######################################");
-    writefln("Testing PE");
-    writefln("#######################################");
-
-    auto pe = new PE("bin-test.exe");
-    pe.read();
-
-    auto code = pe.getCode();
-    writefln("code = %s", code.length);
-}
 void testPDB() {
     writefln("#######################################");
     writefln("Testing PDB");
@@ -330,8 +319,21 @@ void testCOFF() {
     writefln("Testing COFF");
     writefln("#######################################");
 
+    import common : FileByteReader;
     auto coff = new COFF("testdata/statics.obj");
-    coff.read();
+    coff.readHeader();
+    coff.readSections();
     auto code = coff.getCode();
     writefln("code = %s bytes", code.length);
+}
+void testPE() {
+    writefln("#######################################");
+    writefln("Testing PE");
+    writefln("#######################################");
+
+    auto pe = new PE("bin-test.exe");
+    pe.read();
+
+    auto code = pe.getCode();
+    writefln("code = %s", code.length);
 }
