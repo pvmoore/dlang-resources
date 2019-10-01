@@ -24,7 +24,7 @@ void main() {
     //testEntropyCoders();
 
     //testPDB();
-    testPE();
+    //testPE();
     //testCOFF();
 
     //
@@ -38,7 +38,7 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-//    testPNG();
+    testPNG();
 //    testPerlin();
 //    testLZ4();
     //testHGT();
@@ -117,6 +117,9 @@ void testBMP() {
     //abgr.write("goddess.bmp");
 }
 void testPNG() {
+
+    auto rock3 = PNG.read("/pvmoore/_assets/images/png/rock3.png");
+
     auto png = PNG.read("/pvmoore/_assets/images/png/tile.png");
 
     //auto png = PNG.read("/pvmoore/d/libs/opengl3/images/skybox2/front.png");
@@ -331,8 +334,17 @@ void testPE() {
     writefln("Testing PE");
     writefln("#######################################");
 
-    auto pe = new PE("bin-test.exe");
+    //auto pe = new PE("C:/pvmoore/cpp/Core/x64/Debug/Test.exe");
+    auto pe = new PE("C:/pvmoore/cpp/Core/x64/Release/Test.exe");
+    //auto pe = new PE("bin-test.exe");
     pe.read();
+
+    auto codeSections = pe.getCodeSectionsInOrder();
+    writefln("Found %s code sections:", codeSections.length);
+    foreach(ref s; codeSections) {
+        writefln("    %s", s);
+    }
+    writefln("Entry point = %s", pe.getEntryPoint());
 
     auto code = pe.getCode();
     writefln("code = %s", code.length);

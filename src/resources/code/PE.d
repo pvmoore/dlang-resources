@@ -41,17 +41,23 @@ public:
 
         finishedReading = true;
     }
+    COFFSectionHeader[] getCodeSectionsInOrder() {
+        return coff.getCodeSectionsInOrder();
+    }
     ubyte[] getCode() {
         if(!finishedReading) read();
 
         return coff.getCode();
+    }
+    uint getCodeBase() {
+        return image.codeBase;
     }
     uint getEntryPoint() {
         return image.entryPointAddr;
     }
 private:
     /** Calculate the actual file position of the data for a particular data directory */
-    long calcFilePosition(uint dataDirectoryIndex) {
+    long getActualDDPosition(uint dataDirectoryIndex) {
         assert(dataDirectoryIndex < 16);
         auto vaddr = image.dataDirectories[dataDirectoryIndex].virtualAddr;
         foreach(i, ref section; coff.sections) {
@@ -78,29 +84,6 @@ private:
     }
     void readCOFFSections() {
         chat("Reading COFF sections ...");
-
-        /*
-            .text   - code
-            .data   - initialised data
-            .rdata  - readonly initialised data
-            .idata  - import tables
-            .pdata  - exception info
-            .rsrc   - resource info
-            .bss    - uninitialised data
-            .reloc  - image relocations
-            .tls    - thread local storage
-
-            .minfo  -
-            .tp
-            .dp
-            _RDATA
-        */
-
-        /*
-        idata
-            4381184
-            4394500
-        */
 
         coff.readSections();
     }
@@ -139,11 +122,16 @@ private:
         image.numRvaAndSizes = reader.read!uint;
         chat("IMAGE = %s", image);
 
+        chat("codeSize = %s", image.codeSize);
+        chat("codeBase = %s", image.codeBase);
+        chat("imageBase = 0x%x", image.imageBase);
+        chat("entryPointAddr = %d", image.entryPointAddr);
+        chat("entrypoint - codeBase = %s", image.entryPointAddr-image.codeBase);
+
         if(!image.isPE32Plus()) {
             bail("Can only handle PE32+ images, not PE32");
         }
 
-        chat("imageBase = 0x%x", image.imageBase);
 
         chat("num data directories = %s", image.numRvaAndSizes);
 

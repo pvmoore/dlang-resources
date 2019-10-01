@@ -104,7 +104,7 @@ final class PNG : Image {
         chat("Reading PNG '%s'", filename);
         try{
             auto png   = new PNG();
-            scope file = File(filename, "rb");
+            auto file = File(filename, "rb");
 
             ubyte[8] sig;
             file.rawRead(sig);
@@ -365,7 +365,7 @@ private:
         }
         unfiltered.length = lines*scanlineLen;
 
-//        if(bkgd) { 
+//        if(bkgd) {
 //            // assuming rgba
 //            for(auto i=0; i<unfiltered.length; i+=bpp) {
 //                unfiltered[i]   = cast(ubyte)bkgd.r;
@@ -374,7 +374,7 @@ private:
 //            }
 //        }
 
-        uint filterBitmap; 
+        uint filterBitmap;
         ubyte* src  = filtered.ptr;
         ubyte* dest = unfiltered.ptr;
         for(auto i=0; i<lines; i++) {

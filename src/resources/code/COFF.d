@@ -39,6 +39,22 @@ public:
         }
         haveHeader = true;
     }
+    /**
+        .text   - code
+        .data   - initialised data
+        .rdata  - readonly initialised data
+        .idata  - import tables
+        .pdata  - exception info
+        .rsrc   - resource info
+        .bss    - uninitialised data
+        .reloc  - image relocations
+        .tls    - thread local storage
+
+        .minfo  -
+        .tp
+        .dp
+        _RDATA
+    */
     void readSections() {
         assert(reader);
         assert(haveHeader, "Read the header first");
@@ -62,24 +78,15 @@ public:
         }
         return null;
     }
-    ubyte[] getCode() {
+    COFFSectionHeader[] getCodeSectionsInOrder() {
         assert(haveHeader && haveSections, "Read the header and sections first");
 
-        ubyte[] code;
-        auto r = new FileByteReader(filename);
-        scope(exit) r.close();
-
-        struct S { string name; uint start; uint size; }
-
-        S[] codeSections;
+        COFFSectionHeader[] codeSections;
 
         /* Gather all .text$? sections */
         foreach(ref s; sections) {
             if(s.name[0..5] == ".text") {
-                auto start = s.ptrToRawData;
-                auto size  = s.sizeofRawData;
-
-                codeSections ~= S(cast(string)s.name, start, size);
+                codeSections ~= s;
             }
         }
 
@@ -88,18 +95,27 @@ public:
         import std.algorithm.sorting : sort;
         import std.algorithm.comparison : cmp;
 
-        alias sorter = (S a, S b) => cmp(a.name, b.name) < 0;
+        alias sorter = (COFFSectionHeader a, COFFSectionHeader b) => cmp(cast(string)a.name, cast(string)b.name) < 0;
 
         codeSections.sort!(sorter, SwapStrategy.stable);
 
-        foreach(ref s; codeSections) {
+        return codeSections;
+    }
+    ubyte[] getCode() {
+        assert(haveHeader && haveSections, "Read the header and sections first");
 
-            //chat("==> %s %s %s", s.name, s.start, s.size);
+        ubyte[] code;
+        auto r = new FileByteReader(filename);
+        scope(exit) r.close();
+
+        foreach(ref s; getCodeSectionsInOrder()) {
+
+            chat("==> %s %s %s", cast(string)s.name, s.ptrToRawData, s.sizeofRawData);
 
             r.rewind();
-            r.skip(s.start);
+            r.skip(s.ptrToRawData);
 
-            code ~= r.readArray!ubyte(s.size);
+            code ~= r.readArray!ubyte(s.sizeofRawData);
         }
 
         return code;

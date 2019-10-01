@@ -11,7 +11,8 @@ import common : as, expect, flushConsole, todo, makeLowPriorityQueue, startsWith
 				ByteReader, FileByteReader,
 				BitWriter, FileBitWriter,
 				ByteWriter, FileByteWriter,
-				StringBuffer;
+				StringBuffer,
+				dbg;
 import logging : log, flushLog;
 import maths;
 
@@ -27,12 +28,12 @@ import std.range    : appender;
 import std.regex    : matchFirst;
 import std.algorithm.iteration : each, map;
 
-enum chatty = true;
+enum chatty = false;
 
 void chat(A...)(lazy string fmt, lazy A args) {
-	static  if(chatty) {
+	static if(chatty) {
 	    log(fmt, args);
-		writefln(fmt, args);
 	    flushLog();
+		writefln(fmt, args);
 	}
 }
