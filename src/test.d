@@ -21,6 +21,9 @@ void main() {
     //testDeflate();
     //testZip();
 
+    test7Zip();
+    //testLZMA();
+
     //testEntropyCoders();
 
     //testPDB();
@@ -38,7 +41,7 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    testPNG();
+    //testPNG();
 //    testPerlin();
 //    testLZ4();
     //testHGT();
@@ -207,6 +210,22 @@ void testZip() {
     // f.close();
 
     zip.close();
+}
+void test7Zip() {
+    writefln("#######################################");
+    writefln("Testing 7Zip");
+    writefln("#######################################");
+
+    auto _7z = new _7ZipDecompressor("testdata/bib.7z");
+    _7z.decompress();
+
+}
+void testLZMA() {
+    writefln("#######################################");
+    writefln("Testing LZMA");
+    writefln("#######################################");
+
+
 }
 void testEntropyCoders() {
     writefln("Testing Huffman...");

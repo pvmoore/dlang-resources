@@ -16,7 +16,7 @@ import common : as, expect, flushConsole, todo, makeLowPriorityQueue, startsWith
 import logging : log, flushLog;
 import maths;
 
-import std.array    : Appender, appender;
+import std.array    : Appender, appender, split;
 import std.format   : format;
 import std.conv     : to;
 import std.math     : abs;
@@ -28,9 +28,9 @@ import std.range    : appender;
 import std.regex    : matchFirst;
 import std.algorithm.iteration : each, map;
 
-enum chatty = false;
+enum chatty = true;
 
-void chat(A...)(lazy string fmt, lazy A args) {
+void chat(A...)(string fmt, A args) {
 	static if(chatty) {
 	    log(fmt, args);
 	    flushLog();
