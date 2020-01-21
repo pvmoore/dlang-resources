@@ -17,6 +17,7 @@ import resources.algorithms.lzma;
 import resources.data.lz4;
 import resources.data.lzp;
 import resources.data.pdc;
+import resources.data.pdc2;
 import resources.data.zip;
 import resources.data._7z;
 import resources.data.lzma;

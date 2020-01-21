@@ -17,11 +17,12 @@ void main() {
     writefln("Testing resources");
 
     //testPDC();
+    testPDC2();
 
     //testDeflate();
     //testZip();
 
-    test7Zip();
+    //test7Zip();
     //testLZMA();
 
     //testEntropyCoders();
@@ -170,7 +171,21 @@ void testHGT() {
     auto hgt = HGT.read("/temp/heightmaps/N47E006.hgt");
 }
 void testPDC() {
+    writefln("#######################################");
+    writefln("Testing PDC");
+    writefln("#######################################");
     auto pdc = new PDC("testdata/geo");
+
+}
+void testPDC2() {
+    writefln("#######################################");
+    writefln("Testing PDC2");
+    writefln("#######################################");
+    auto pdc2 = new PDC2("testdata/bib");
+    auto bytes = pdc2.encode();
+
+    
+
 
 }
 void testDeflate() {

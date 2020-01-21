@@ -20,10 +20,10 @@
             "problemMatcher": []
         },
         {
-            "label": "**** Test (LDC)****",
+            "label": "**** Test release (LDC)****",
             "type": "shell",
             "windows": {
-                "command": "dub run --build=debug --config=test --compiler=ldc2 --arch=x86_64",
+                "command": "dub run --build=release --config=test --compiler=ldc2 --arch=x86_64",
             },
             "presentation": {
                 "reveal": "always",
