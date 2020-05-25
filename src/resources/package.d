@@ -7,6 +7,7 @@ public:
 import resources.image.image;
 import resources.image.converter;
 import resources.image.bmp;
+import resources.image.dds;
 import resources.image.png;
 import resources.image.r16;
 import resources.image.r32;

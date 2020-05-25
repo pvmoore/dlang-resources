@@ -16,8 +16,10 @@ import std.algorithm.iteration : each, map, sum;
 void main() {
     writefln("Testing resources");
 
+    testDDS();
+
     //testPDC();
-    testPDC2();
+    //testPDC2();
 
     //testDeflate();
     //testZip();
@@ -141,6 +143,11 @@ void testPNG() {
     assert(alpha.width==128 && alpha.height==128 &&
            alpha.bytesPerPixel==1 && alpha.data.length==128*128);
 }
+void testDDS() {
+    writefln("Testing DDS");
+
+    auto rock3 = DDS.read("/pvmoore/_assets/images/dds/brick.dds");
+}
 void testLZ4() {
     ubyte[] test1 = cast(ubyte[])read("testdata/test1.txt");
     ubyte[] test2 = cast(ubyte[])read("testdata/test2.txt");
@@ -184,7 +191,7 @@ void testPDC2() {
     auto pdc2 = new PDC2("testdata/bib");
     auto bytes = pdc2.encode();
 
-    
+
 
 
 }

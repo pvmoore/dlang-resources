@@ -8,6 +8,8 @@ import common : as, dbg, expect, flushConsole, makeLowPriorityQueue, startsWith,
 				Array, ArrayByteWriter,
 				BitReader, FileBitReader, ByteReader, FileByteReader,
 				BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
+				toArray,
+				isSet, isUnset,
 				From, StringBuffer;
 
 import logging : log, flushLog;
@@ -27,7 +29,7 @@ import std.typecons 			: tuple;
 import std.algorithm.iteration  : each, map;
 import std.algorithm.sorting    : sort;
 
-enum chatty = true;
+enum chatty = false;
 
 void chat(A...)(string fmt, A args) {
 	static if(chatty) {
