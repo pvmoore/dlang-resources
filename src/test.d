@@ -16,7 +16,9 @@ import std.algorithm.iteration : each, map, sum;
 void main() {
     writefln("Testing resources");
 
-    testDDS();
+    testObj();
+
+    //testDDS();
 
     //testPDC();
     //testPDC2();
@@ -389,4 +391,13 @@ void testPE() {
 
     auto code = pe.getCode();
     writefln("code = %s", code.length);
+}
+void testObj() {
+    writefln("#######################################");
+    writefln("Testing Obj");
+    writefln("#######################################");
+
+    auto obj = Obj.read("testdata/suzanne.obj.txt");
+
+
 }
