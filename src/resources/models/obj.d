@@ -19,7 +19,8 @@ public:
         string[] tokens;
 
         void _addVertex() {
-            model.vertices ~= float3(tokens[1].to!float, tokens[2].to!float, tokens[3].to!float);
+            // Flip the y-axis
+            model.vertices ~= float3(tokens[1].to!float, tokens[2].to!float * -1f, tokens[3].to!float);
         }
         void _addNormal() {
             model.normals ~= float3(tokens[1].to!float, tokens[2].to!float, tokens[3].to!float);
