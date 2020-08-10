@@ -12,7 +12,7 @@ protected:
         Node right;
         uint freq;
         uint depth; // num bits
-        uint bits; 
+        uint bits;
         int value;
 
         this(uint freq = 0, int value = -1) {
@@ -32,17 +32,17 @@ protected:
             if(right) right.write(to, indent~"1");
         }
 
-        // Comparison and equality based on frequency 
+        // Comparison and equality based on frequency
         override int opCmp(Object other) const {
             uint o = other.as!Node.freq;
             return freq == o ? 0 : freq < o ? -1 : 1;
         }
-        override bool opEquals(Object other) const { 
+        override bool opEquals(Object other) const {
             return freq == other.as!Node.freq;
         }
     }
     Node top;
-    Node[int] valueToLeaf;  
+    Node[int] valueToLeaf;
     uint shortestBitLength, longestBitLength;
 public:
     uint getNumLeafNodes()      { return valueToLeaf.length.as!uint; }
@@ -53,14 +53,14 @@ public:
      *  Construct a Huffman tree from bit lengths.
      *  (https://tools.ietf.org/html/rfc1951 Section 3.2.2)
      */
-    HuffmanCoder createFromBitLengths(uint[] bitLengths) { 
-        
+    HuffmanCoder createFromBitLengths(uint[] bitLengths) {
+
         uint[] bitCodes = new uint[bitLengths.length];
-     
+
         auto maxBits = bitLengths.maxElement();
 
         this.longestBitLength  = 0;
-        this.shortestBitLength = uint.max; 
+        this.shortestBitLength = uint.max;
 
         // bl_count <- the number of codes at each bit length
         uint[] bl_count = new uint[maxBits+1];
@@ -77,7 +77,7 @@ public:
             code = (code + bl_count[bits-1]) << 1;
             nextCode[bits] = code;
         }
-        //chat("nextCode = %s", nextCode); 
+        //chat("nextCode = %s", nextCode);
 
         for(long n = 0;  n < bitLengths.length; n++) {
             auto len = bitLengths[n];
@@ -86,7 +86,7 @@ public:
                 nextCode[len]++;
             }
         }
-        
+
         static if(false && chatty) {
             chat("bitCodes = %s", bitCodes);
             foreach(i, c; bitCodes) {
@@ -96,11 +96,11 @@ public:
                     bits = bits[32-bitLengths[i]..$];
                 }
                 writefln("[%02s] bitlen=%s -> % 8s %04x", i, bitLengths[i], bits, c);
-            }  
+            }
             writefln("====\n");
         }
 
-        // Create a new Huffman tree using the bit code and length 
+        // Create a new Huffman tree using the bit code and length
         top       = new Node();
         valueToLeaf.clear();
 
@@ -125,8 +125,8 @@ public:
                         node.right.depth = j+1;
                     }
                     node = node.right;
-                }  
-                bit<<=1;     
+                }
+                bit<<=1;
             }
 
             // Leaf
@@ -141,7 +141,7 @@ public:
 
         this.top               = null;
         this.longestBitLength  = 0;
-        this.shortestBitLength = uint.max; 
+        this.shortestBitLength = uint.max;
         this.valueToLeaf.clear();
 
         // Handle empty tree
@@ -152,7 +152,7 @@ public:
 
         auto q = makeLowPriorityQueue!Node;
 
-        // Populate priority queue based on frequency 
+        // Populate priority queue based on frequency
         foreach(i, freq; frequencies) {
             if(freq>0) {
                 q.push( new Node(freq, i.as!int) );
@@ -187,13 +187,13 @@ public:
 
             q.push(parent);
         }
-        // The single remaining item in the queue is the top of the tree 
+        // The single remaining item in the queue is the top of the tree
         this.top = q.pop();
 
         // Calculate stats, set bits, depth and valueToLeaf mapping
         _recurse(top, 0, 0, (Node leaf, uint bits, uint depth) {
             valueToLeaf[leaf.value] = leaf;
-            leaf.bits  = bits; 
+            leaf.bits  = bits;
             leaf.depth = depth;
             if(leaf.depth > longestBitLength) longestBitLength = leaf.depth;
             if(leaf.depth < shortestBitLength) shortestBitLength = leaf.depth;
@@ -215,8 +215,8 @@ public:
 
         return this;
     }
-    /** 
-     *  Read bits until a leaf is found. 
+    /**
+     *  Read bits until a leaf is found.
      */
     int decode(BitReader r) {
         auto node = top;
@@ -236,7 +236,7 @@ public:
      */
     void encode(BitWriter w, int value) {
         auto node = valueToLeaf[value];
-        return w.write(node.bits, node.depth);
+        w.write(node.bits, node.depth);
     }
     override string toString() {
         auto buf = new StringBuffer;
@@ -250,8 +250,8 @@ private:
     void _recurse(Node n, uint bits, uint depth, void delegate(Node n, uint bits, uint depth) functor) {
         if(n.isLeaf) functor(n, bits, depth);
         else {
-            if(n.left) _recurse(n.left,   bits,              depth+1, functor); 
-            if(n.right) _recurse(n.right, bits | (1<<depth), depth+1, functor);  
+            if(n.left) _recurse(n.left,   bits,              depth+1, functor);
+            if(n.right) _recurse(n.right, bits | (1<<depth), depth+1, functor);
         }
     }
 }
