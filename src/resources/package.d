@@ -28,8 +28,11 @@ import resources.sound.wav;
 import resources.hgt;
 
 import resources.code.COFF;
+import resources.code.DLL;
 import resources.code.PDB;
 import resources.code.PE;
 
 import resources.models.model_data;
 import resources.models.obj;
+
+import resources.json5;

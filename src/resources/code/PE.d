@@ -128,6 +128,9 @@ private:
         chat("entryPointAddr = %d", image.entryPointAddr);
         chat("entrypoint - codeBase = %s", image.entryPointAddr-image.codeBase);
 
+        chat("subsystem = %s", cast(Subsystem)(image.subsystem));
+        chat("dllCharacteristics = %s",  toArray!DLLCharacteristics(image.dllCharacteristics));
+
         if(!image.isPE32Plus()) {
             bail("Can only handle PE32+ images, not PE32");
         }

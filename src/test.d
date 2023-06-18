@@ -16,7 +16,9 @@ import std.algorithm.iteration : each, map, sum;
 void main() {
     writefln("Testing resources");
 
-    testObj();
+    //testObj();
+
+    //testDLL();
 
     //testDDS();
 
@@ -46,10 +48,12 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    //testPNG();
+//    testPNG();
 //    testPerlin();
 //    testLZ4();
     //testHGT();
+
+    testJson5();
 }
 void testPerlin() {
     /*import std.math : sin,cos,fmod;
@@ -372,6 +376,26 @@ void testCOFF() {
     auto code = coff.getCode();
     writefln("code = %s bytes", code.length);
 }
+void testDLL() {
+    writefln("#######################################");
+    writefln("Testing DLL");
+    writefln("#######################################");
+
+    //auto pe = new PE("C:/pvmoore/cpp/Core/x64/Debug/Test.exe");
+    auto dll = new PE("C:/pvmoore/_dlls/glfw3.3.7.dll");
+    //auto pe = new PE("bin-test.exe");
+    dll.read();
+
+    auto codeSections = dll.getCodeSectionsInOrder();
+    writefln("Found %s code sections:", codeSections.length);
+    foreach(ref s; codeSections) {
+        writefln("    %s", s);
+    }
+    writefln("Entry point = %s", dll.getEntryPoint());
+
+    auto code = dll.getCode();
+    writefln("code = %s", code.length);
+}
 void testPE() {
     writefln("#######################################");
     writefln("Testing PE");
@@ -400,4 +424,9 @@ void testObj() {
     auto obj = Obj.read("testdata/suzanne.obj.txt");
 
 
+}
+void testJson5() {
+    writefln("Testing JSON5");
+
+     
 }
