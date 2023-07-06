@@ -1,7 +1,7 @@
 
 import resources;
 import maths;
-import common : BitWriter, BitReader, ByteReader, From;
+import common : BitWriter, BitReader, ByteReader, From, StringBuffer, as, isA;
 
 import std.stdio    : writefln;
 import std.file     : read;
@@ -428,5 +428,35 @@ void testObj() {
 void testJson5() {
     writefln("Testing JSON5");
 
-     
+    auto buf = new StringBuffer();
+    // Go through the json5-tests folder
+
+    {
+        auto j = JSON5.fromFile("json5-tests/objects/empty-object.json");
+        buf.clear();
+        j.serialise(buf);
+        writefln("%s", buf.toString());
+
+        assert(j.isA!J5Object);
+        assert(j.as!J5Object.isEmpty());
+    }
+    {
+        auto j = JSON5.fromFile("json5-tests/objects/no-comma-object.txt");
+        buf.clear();
+        j.serialise(buf);
+        writefln("%s", buf.toString());
+
+        assert(j.isA!J5Object);
+        assert(!j.as!J5Object.isEmpty());
+        assert(j.as!J5Object.get("foo").as!J5String == "bar");
+        assert(j.as!J5Object.get("hello"));
+    }
+
+
+    // auto j1 = JSON5.fromFile("json5-tests/objects/single-quoted-key.json5");
+    // auto j2 = JSON5.fromFile("json5-tests/objects/trailing-comma-object.json5");
+    // auto j3 = JSON5.fromFile("json5-tests/objects/unquoted-keys.json5");
+
+
+
 }
