@@ -19,10 +19,28 @@ import common : isA, as, isOneOf, StringBuffer, toHash;
 bool isDigit(char c) {
     return c >= '0' && c <= '9';
 }
+bool isHexDigit(char c) {
+    return isDigit(c) || isBetween(c, 'a', 'f') || isBetween(c, 'A', 'F'); 
+}
+bool isBetween(char c, char a, char b) {
+    return c >= a && c <= b;
+}
 bool isInteger(string s) {
-    foreach(ch; s) {
-        if(!isDigit(ch)) return false;
+    int n = 0;
+    if(s.length > 0) {
+        if(s[0] == '-' || s[0] == '+') n++;
+    }
+    if(isHexadecimal(s)) return true;
+    foreach(i; n..s.length) {
+        if(!isDigit(s[i])) return false;
     }
     return true;
 }
-
+bool isHexadecimal(string s) {
+    if(s.length < 3) return false;
+    if(s[0] != '0' || (s[1] != 'x' && s[1] != 'X')) return false;
+    foreach(c; s[2..$]) {
+        if(!isHexDigit(c)) return false; 
+    } 
+    return true;
+}

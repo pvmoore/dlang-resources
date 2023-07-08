@@ -20,6 +20,9 @@ public:
     }
     bool opEquals(long other) {
         return this.isA!J5Number && this.as!J5Number.opEquals(other);
+    }  
+    bool opEquals(double other) {
+        return this.isA!J5Number && this.as!J5Number.opEquals(other);
     }
 protected:
     Kind kind;
@@ -36,6 +39,7 @@ public:
     bool hasKey(string key) { return (key in map) !is null; }
     J5Value get(string key) { return map.get(key, null); }
 
+    alias opEquals = J5Value.opEquals;
     override bool opEquals(Object other) {
         J5Object otherObject = other.as!J5Object;
         if(otherObject is null || map.length != otherObject.map.length) return false;
@@ -73,6 +77,7 @@ public:
     uint length() { return array.length.as!uint; }
     J5Value opIndex(int i) { return array[i]; }
 
+    alias opEquals = J5Value.opEquals;
     override bool opEquals(Object other) {
         J5Array otherArray = other.as!J5Array;
         if(otherArray is null || otherArray.length() != length()) return false;
@@ -86,13 +91,13 @@ public:
 
     override void serialise(StringBuffer buf, string prefix) {
         buf.add("[");
-        prefix ~= "  ";
+        string prefix2 = prefix ~ "  ";
 
         foreach(i, v; array) {
-            if(i>0) buf.add(",");
-            buf.add("\n").add(prefix);
-            v.serialise(buf, prefix);
+            buf.add("\n").add(prefix2);
+            v.serialise(buf, prefix2);
         }
+        if(!isEmpty()) buf.add("\n").add(prefix);
         buf.add("]");
     }
 private:
@@ -106,16 +111,17 @@ public:
     bool isInteger() { return .isInteger(value); }
 
     override bool opEquals(long other) {
+        if(isHexadecimal(value)) return value.to!long(16) == other;
         return isInteger() && value.to!long == other;
+    }
+    override bool opEquals(double other) {
+        return value.to!double == other;
     }
     override bool opEquals(string other) {
         return value == other;
     }
     override bool opEquals(Object other) {
         return other.isA!J5Number && other.as!J5Number.value == value;
-    }
-    override ulong toHash() {
-        return value.toHash();
     }
 
     override void serialise(StringBuffer buf, string prefix) {
@@ -134,14 +140,12 @@ public:
         this.value = value;
     }
 
+    alias opEquals = J5Value.opEquals;
     override bool opEquals(string other) {
         return value == other;
     }
     override bool opEquals(Object other) {
         return other.isA!J5String && other.as!J5String.value == value;
-    }
-    override ulong toHash() {
-        return value.toHash();
     }
     override void serialise(StringBuffer buf, string prefix) {
         buf.add(value);
@@ -153,11 +157,9 @@ public:
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Null : J5Value {
 public:
+    alias opEquals = J5Value.opEquals;
     override bool opEquals(Object other) {
         return other.isA!J5Null;
-    }
-    override ulong toHash() {
-        return 0;
     }
     override void serialise(StringBuffer buf, string prefix) {
         buf.add("null");
@@ -175,14 +177,12 @@ public:
         this.value = value;
     }
 
+    alias opEquals = J5Value.opEquals;
     bool opEquals(bool other) {
         return value == other;
     }
     override bool opEquals(Object other) {
         return other.isA!J5Boolean && other.as!J5Boolean.value == value;
-    }
-    override ulong toHash() {
-        return value ? 1 : 0;
     }
     override void serialise(StringBuffer buf, string prefix) {
         buf.add("%s", value);
@@ -200,14 +200,12 @@ public:
         this.value = value;
     }
 
+    alias opEquals = J5Value.opEquals;
     override bool opEquals(string other) {
         return value == other;
     }
     override bool opEquals(Object other) {
         return other.isA!J5Comment && other.as!J5Comment.value == value;
-    }
-    override ulong toHash() {
-        return value.toHash();
     }
 
     override void serialise(StringBuffer buf, string prefix) {

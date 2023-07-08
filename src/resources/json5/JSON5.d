@@ -14,6 +14,11 @@ public:
         JSON5 j = new JSON5(str);
         return j.root;
     }
+    static string stringify(J5Value root) {
+        auto buf = new StringBuffer();
+        root.serialise(buf);
+        return buf.toString();
+    }
 private:
     string src;
     J5Token[] tokens;

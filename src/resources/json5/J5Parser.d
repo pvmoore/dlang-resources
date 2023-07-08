@@ -206,6 +206,7 @@ final class Tokens {
     this(J5Token[] tokens, string src) {
         this.tokens = tokens;
         this.src = src;
+        this.pos = 0;
     }
     bool eof() {
         return pos >= tokens.length;

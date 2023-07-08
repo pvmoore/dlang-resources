@@ -10,35 +10,29 @@ void testJson5() {
     writefln("Testing JSON5");
     testJson5Object();
     testJson5Array();
+    testJson5Number();
 }
 
 private:
 
 void testJson5Object() {
-    auto buf = new StringBuffer();
     {
         auto j = JSON5.fromFile("testdata2/json5/object/empty.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
         assert(j.as!J5Object.isEmpty());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object1.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
         assert(j.as!J5Object.isEmpty());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object2.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
         assert(!j.as!J5Object.isEmpty());
@@ -46,9 +40,7 @@ void testJson5Object() {
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object2a.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
         assert(!j.as!J5Object.isEmpty());
@@ -57,9 +49,7 @@ void testJson5Object() {
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object3.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
         assert(!j.as!J5Object.isEmpty());
@@ -70,9 +60,7 @@ void testJson5Object() {
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object3a.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
         assert(!j.as!J5Object.isEmpty());
@@ -84,21 +72,16 @@ void testJson5Object() {
 }
 
 void testJson5Array() {
-    auto buf = new StringBuffer();
     {
         auto j = JSON5.fromFile("testdata2/json5/array/array1.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Array);
         assert(j.as!J5Array.isEmpty());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/array/array2.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Array);
         assert(!j.as!J5Array.isEmpty());
@@ -107,14 +90,29 @@ void testJson5Array() {
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/array/array3.json5");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
+        writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Array);
         assert(!j.as!J5Array.isEmpty());
         assert(j.as!J5Array.length() == 2);
         assert(j.as!J5Array[0] == "hello");
         assert(j.as!J5Array[1] == 3);
+    }
+}
+
+void testJson5Number() {
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number1.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j == 4);
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number2.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j == 3.14);
     }
 }
