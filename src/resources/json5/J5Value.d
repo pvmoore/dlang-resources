@@ -15,16 +15,25 @@ private enum Kind {
 abstract class J5Value {
 public:
     abstract void serialise(StringBuffer buf, string prefix = "");
+    bool opEquals(string other) {
+        return this.isA!J5String && this.as!J5String.opEquals(other);
+    }
+    bool opEquals(long other) {
+        return this.isA!J5Number && this.as!J5Number.opEquals(other);
+    }
 protected:
     Kind kind;
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Object : J5Value {
 public:
-    J5Value[string] map;
+    this() {}
+    this(J5Value[string] map) {
+        this.map = map;
+    }
 
     bool isEmpty() { return map.length ==0; }
-
+    bool hasKey(string key) { return (key in map) !is null; }
     J5Value get(string key) { return map.get(key, null); }
 
     override bool opEquals(Object other) {
@@ -50,13 +59,19 @@ public:
         if(!isEmpty()) buf.add("\n").add(prefix);
         buf.add("}");
     }
+private:
+    J5Value[string] map;    
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Array : J5Value {
-public:
-    J5Array[] array;
+public: 
+    this(J5Value[] array) {
+        this.array = array;
+    }
 
+    bool isEmpty() { return array.length==0; }
     uint length() { return array.length.as!uint; }
+    J5Value opIndex(int i) { return array[i]; }
 
     override bool opEquals(Object other) {
         J5Array otherArray = other.as!J5Array;
@@ -80,13 +95,20 @@ public:
         }
         buf.add("]");
     }
+private:
+    J5Value[] array;    
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Number : J5Value {
 public:
     string value;
 
-    bool opEquals(string other) {
+    bool isInteger() { return .isInteger(value); }
+
+    override bool opEquals(long other) {
+        return isInteger() && value.to!long == other;
+    }
+    override bool opEquals(string other) {
         return value == other;
     }
     override bool opEquals(Object other) {
@@ -112,7 +134,7 @@ public:
         this.value = value;
     }
 
-    bool opEquals(string other) {
+    override bool opEquals(string other) {
         return value == other;
     }
     override bool opEquals(Object other) {
@@ -178,7 +200,7 @@ public:
         this.value = value;
     }
 
-    bool opEquals(string other) {
+    override bool opEquals(string other) {
         return value == other;
     }
     override bool opEquals(Object other) {

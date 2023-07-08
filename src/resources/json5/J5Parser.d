@@ -66,14 +66,15 @@ private:
     }
     J5Object parseObject() {
         // only one or more [id : value] allowed here
-        auto obj = new J5Object();
+        J5Value[string] map;
 
         // {
         tokens.next();
 
         // Members
         while(tokens.kind() != J5TokenKind.RCURLY) {
-            parseObjectMember(obj);
+            auto kv = parseObjectMember();
+            map[kv.key] = kv.value;
 
             // optional comma
             if(tokens.kind() == J5TokenKind.COMMA) tokens.next();
@@ -82,29 +83,44 @@ private:
         // }
         tokens.next();
 
-        return obj;
+        return new J5Object(map);
     }
     J5Array parseArray() {
         // zero or more of (Number, Boolean, Null, Array, Object)
-        auto array = new J5Array();
+        J5Value[] values;
 
-        return array;
+        // [
+        tokens.next();    
+
+        while(tokens.kind() != J5TokenKind.RSQUARE) {
+            values ~= parseValue();
+
+            // optional comma
+            if(tokens.kind() == J5TokenKind.COMMA) tokens.next();
+        }
+
+        // ]    
+        tokens.next();
+
+        return new J5Array(values);
     }
     /**
      * key : value
      */
-    void parseObjectMember(J5Object obj) {
+    ObjectMember parseObjectMember() {
+        // key
         string key = tokens.value();
         if(tokens.kind() == J5TokenKind.STRING) {
             key = key[1..$-1];
         }
         tokens.next();
 
+        // :
         if(tokens.kind() != J5TokenKind.COLON) syntaxError();
         tokens.next();
 
-        J5Value value = parseValue();
-        obj.map[key] = value;
+        // value
+        return ObjectMember(key, parseValue());
     }
     /**
      * 'null'
@@ -175,6 +191,11 @@ __gshared {
             "try" : true
         ];
     }
+}
+
+struct ObjectMember {
+    string key; 
+    J5Value value;
 }
 
 final class Tokens {
