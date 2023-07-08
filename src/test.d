@@ -1,3 +1,4 @@
+module test;
 
 import resources;
 import maths;
@@ -12,6 +13,7 @@ import std.range    : array;
 import std.datetime.stopwatch  : StopWatch;
 import std.algorithm.searching : minElement, maxElement;
 import std.algorithm.iteration : each, map, sum;
+import test_json5;
 
 void main() {
     writefln("Testing resources");
@@ -422,41 +424,6 @@ void testObj() {
     writefln("#######################################");
 
     auto obj = Obj.read("testdata/suzanne.obj.txt");
-
-
-}
-void testJson5() {
-    writefln("Testing JSON5");
-
-    auto buf = new StringBuffer();
-    // Go through the json5-tests folder
-
-    {
-        auto j = JSON5.fromFile("json5-tests/objects/empty-object.json");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
-
-        assert(j.isA!J5Object);
-        assert(j.as!J5Object.isEmpty());
-    }
-    {
-        auto j = JSON5.fromFile("json5-tests/objects/no-comma-object.txt");
-        buf.clear();
-        j.serialise(buf);
-        writefln("%s", buf.toString());
-
-        assert(j.isA!J5Object);
-        assert(!j.as!J5Object.isEmpty());
-        assert(j.as!J5Object.get("foo").as!J5String == "bar");
-        assert(j.as!J5Object.get("hello"));
-    }
-
-
-    // auto j1 = JSON5.fromFile("json5-tests/objects/single-quoted-key.json5");
-    // auto j2 = JSON5.fromFile("json5-tests/objects/trailing-comma-object.json5");
-    // auto j3 = JSON5.fromFile("json5-tests/objects/unquoted-keys.json5");
-
 
 
 }
