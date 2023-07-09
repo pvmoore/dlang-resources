@@ -126,12 +126,15 @@ private:
         return ObjectMember(key, parseValue());
     }
     /**
-     * Infinity, Nan, NumericLiteral
+     * Infinity, NaN, NumericLiteral
      */
     J5Number parseNumber() {
-        auto n = new J5Number(tokens.value());
+        string value = tokens.value();
         tokens.next();
-        return n;
+        if(value.length==1) {
+            return J5NUMBERS[value[0]-'0'];
+        }
+        return new J5Number(value);
     }
     /**
      * "value" or 'value'

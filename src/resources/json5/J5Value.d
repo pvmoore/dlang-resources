@@ -2,11 +2,25 @@ module resources.json5.J5Value;
 
 import resources.json5.all;
 
-__gshared J5Null J5NULL = new J5Null();
-__gshared J5Boolean J5TRUE = new J5Boolean(true);
-__gshared J5Boolean J5FALSE = new J5Boolean(false);
-__gshared J5Number J5INFINITY = new J5Number("Infinity");
-__gshared J5Number J5NAN = new J5Number("NaN");
+__gshared {
+J5Null J5NULL = new J5Null();
+J5Boolean J5TRUE = new J5Boolean(true);
+J5Boolean J5FALSE = new J5Boolean(false);
+J5Number J5INFINITY = new J5Number("Infinity");
+J5Number J5NAN = new J5Number("NaN");
+J5Number[10] J5NUMBERS = [
+    new J5Number("0"),
+    new J5Number("1"),
+    new J5Number("2"),
+    new J5Number("3"),
+    new J5Number("4"),
+    new J5Number("5"),
+    new J5Number("6"),
+    new J5Number("7"),
+    new J5Number("8"),
+    new J5Number("9")
+];
+}
 
 private enum Kind {
     OBJECT,
