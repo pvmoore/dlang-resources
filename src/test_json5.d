@@ -2,7 +2,7 @@ module test_json5;
 
 import resources.json5;
 
-import common : StringBuffer, as, isA;
+import common : StringBuffer, as, isA, throwIfNotEqual;
 
 import std.stdio    : writefln;
 
@@ -12,6 +12,9 @@ void testJson5() {
     testJson5Array();
     testJson5Number();
     testJson5String();
+    testJson5Boolean();
+    testJson5Null();
+    testJson5Comment();
 }
 
 private:
@@ -133,11 +136,54 @@ void testJson5String() {
         assert(j.isA!J5String);
         assert(j == "string");
     }
-    // {
-    //     auto j = JSON5.fromFile("testdata2/json5/string/string3.json5");
-    //     writefln("%s", JSON5.stringify(j));
+    {
+        auto j = JSON5.fromFile("testdata2/json5/string/string3.json5");
+        writefln("%s", JSON5.stringify(j));
 
-    //     assert(j.isA!J5String);
-    //     assert(j == "one\\ntwo");
-    // }
+        assert(j.isA!J5String);
+        assert(j == "one\\\\ntwo");
+    }
+}
+
+void testJson5Boolean() {
+    {
+        auto j = JSON5.fromFile("testdata2/json5/boolean/boolean1.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Boolean);
+        assert(j == true);
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/boolean/boolean2.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Boolean);
+        assert(j == false);
+    }
+}
+
+void testJson5Null() {
+    {
+        auto j = JSON5.fromFile("testdata2/json5/null/null1.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Null);
+    }
+}
+
+void testJson5Comment() {
+    {
+        auto j = JSON5.fromFile("testdata2/json5/comment/comment1.json5", true);
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Comment);
+        assert(j == "// This is a comment");
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/comment/comment2.json5", true);
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Comment);
+        assert(j == "/*\r\n This is a comment\r\n*/");
+    }
 }

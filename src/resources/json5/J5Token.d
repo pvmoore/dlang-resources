@@ -10,15 +10,13 @@ struct J5Token {
     int length;
     int line;
     int column;
-
-    string value(string src) {
-        return src[pos..pos+length];
-    }
+    string text;    // This is mostly a substring of the original src
+                    // but can be a newly allocated string if the value
+                    // contained a '\' continuation   
 
     string toString(string src) {
         if(lengthOf(kind)==0) {
-            string value = value(src);
-            return "J5Token(%s %s, pos:%s len:%s line:%s)".format(stringOf(kind), value, pos, value.length, line);
+            return "J5Token(%s %s, pos:%s len:%s line:%s)".format(stringOf(kind), text, pos, text.length, line);
         }
         return toString();
     }

@@ -2,8 +2,6 @@ module resources.json5.J5Lexer;
 
 import resources.json5.all;
 
-import std.stdio : writefln;
-
 /**
  * https://spec.json5.org/#grammar
  */
@@ -20,6 +18,7 @@ public:
 
         while(pos < src.length) {
             char ch = peek();
+            //writefln("[%s] = %s (%s)", pos, ch.as!int, tokenStart);
 
             if(ch<33) {
                 addToken();
@@ -29,9 +28,11 @@ public:
                     if(peek(1)=='/') {
                         addToken();
                         lineComment();
+                        break;
                     } else if(peek(1)=='*') {
                         addToken();
                         multiLineComment();
+                        break;
                     }
                     syntaxError("Unexpected character '/'");
                     break;    
@@ -78,6 +79,7 @@ private:
     int lineStart;
     int tokenStart;
     J5Token[] tokens;
+    char[] tempChars;
 
     char peek(int offset = 0) {
         if(pos+offset>=src.length) return 0;
@@ -112,12 +114,10 @@ private:
     void lineComment() {
         while(pos<src.length) {
             if(isEol()) {
-                eol();
                 break;
             }
             pos++;
         }
-        addToken(J5TokenKind.COMMENT);
     }
     void multiLineComment() {
         while(pos<src.length) {
@@ -125,39 +125,42 @@ private:
                 eol();
             } else if(peek(0)=='*' && peek(1)=='/') {
                 pos+=2;
-                break;
+                addToken();
+                return;
             } else {
                 pos++;
             }
         }
-        addToken(J5TokenKind.COMMENT);
+        syntaxError("EOF looking for '*/'");
     }
     void quoted(char quote) {
         // 'string'
         // "string"
         pos++;
+        tempChars.length = 0;
         while(pos<src.length) {
-            if(peek(0)=='\\' && peek(1)=='\\') {
+            char ch = peek(0);
+            if(ch=='\\' && peek(1)==quote) {
                 pos+=2;
-            } else if(peek(0)=='\\' && peek(1)==quote) {
-                pos+=2;
-            } else if(peek(0)==quote) {
+                tempChars ~= '\\';
+                tempChars ~= quote;
+            } else if(ch==quote) {
                 pos++;
-                addToken();
-                break;
-            } else if(peek(0)=='\\' && peek(1).isOneOf(10,13)) {
+                addToken(tempChars.idup);
+                return;
+            } else if(ch=='\\' && peek(1).isOneOf(10,13)) {
                 pos++;
-                // Todo - Remove some chars here
+                eol();
             } else {
+                tempChars ~= ch;
                 pos++;
             }
         }
+        syntaxError("EOF looking for " ~ quote);
     }                   
 
     J5TokenKind determineKind(string s) {
         if(s.length==0) return J5TokenKind.ID;
-        if(s[0]=='\'') return J5TokenKind.STRING;
-        if(s[0]=='"') return J5TokenKind.STRING;
         if(isDigit(s[0])) return J5TokenKind.NUMBER;
         if(s.length>1) {
             if(s[0]=='/' && s[1]=='/') return J5TokenKind.COMMENT;
@@ -168,13 +171,18 @@ private:
         }
         return J5TokenKind.ID;
     }
+    void addToken(string text) {
+        int column = tokenStart-lineStart;
+        tokens ~= J5Token(J5TokenKind.STRING, tokenStart, text.length.as!int, line, column, text);
+        tokenStart = pos;
+    }
     void addToken(J5TokenKind k = J5TokenKind.NONE) {
         //writefln("addToken %s %s %s", k, tokenStart, pos);
         if(tokenStart < pos) {
             string value = src[tokenStart..pos];
             J5TokenKind tk2 = determineKind(value);
             int column = tokenStart-lineStart;
-            tokens ~= J5Token(tk2, tokenStart, pos-tokenStart, line, column);
+            tokens ~= J5Token(tk2, tokenStart, pos-tokenStart, line, column, value);
         }
         if(k != J5TokenKind.NONE) {
             int column = pos-lineStart;

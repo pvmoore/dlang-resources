@@ -24,6 +24,9 @@ public:
     bool opEquals(double other) {
         return this.isA!J5Number && this.as!J5Number.opEquals(other);
     }
+    bool opEquals(bool other) {
+        return this.isA!J5Boolean && this.as!J5Boolean.value == other;
+    }
 protected:
     Kind kind;
 }
@@ -110,6 +113,7 @@ public:
 
     bool isInteger() { return .isInteger(value); }
 
+    alias opEquals = J5Value.opEquals;
     override bool opEquals(long other) {
         if(isHexadecimal(value)) return value.to!long(16) == other;
         return isInteger() && value.to!long == other;
@@ -178,7 +182,7 @@ public:
     }
 
     alias opEquals = J5Value.opEquals;
-    bool opEquals(bool other) {
+    override bool opEquals(bool other) {
         return value == other;
     }
     override bool opEquals(Object other) {

@@ -9,8 +9,9 @@ public:
     this(J5Token[] tokens, string src) {
         this.tokens = new Tokens(tokens, src);
     }
-    J5Value getRoot() {
-        // If there are no tokens return empty J5Object
+    J5Value parse(bool includeComments) {
+        this.includeComments = includeComments;
+        // // If there are no tokens return empty J5Object
         if(tokens.eof()) {
             return new J5Object();
         }
@@ -18,6 +19,7 @@ public:
     }
 private:
     Tokens tokens;
+    bool includeComments;
 
     J5Value parseValue() {
         J5Value v;
@@ -58,9 +60,19 @@ private:
             case STRING:
                 v = parseString();
                 break;
+            case COMMENT:
+                if(includeComments) {
+                    v = parseComment();
+                } else {
+                    tokens.next();
+                }
+                break;    
             default:
                 syntaxError();
                 break;
+        }
+        if(v is null) {
+            return new J5Object();
         }
         return v;
     }
@@ -110,9 +122,6 @@ private:
     ObjectMember parseObjectMember() {
         // key
         string key = tokens.value();
-        if(tokens.kind() == J5TokenKind.STRING) {
-            key = key[1..$-1];
-        }
         tokens.next();
 
         // :
@@ -142,9 +151,14 @@ private:
      * "value" or 'value'
      */
     J5String parseString() {
-        auto s = new J5String(tokens.value()[1..$-1]);
+        auto s = new J5String(tokens.value());
         tokens.next();
         return s;
+    }
+    J5Comment parseComment() {
+        auto c = new J5Comment(tokens.value());
+        tokens.next();
+        return c;
     }
     void syntaxError(string msg = null) {
         auto t = tokens.get();
@@ -221,6 +235,6 @@ final class Tokens {
         return get(offset).kind;
     }
     string value(int offset = 0) {
-        return get(offset).value(src);
+        return get(offset).text;
     }
 }

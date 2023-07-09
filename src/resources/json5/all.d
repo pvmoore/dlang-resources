@@ -7,6 +7,7 @@ import std.string   : startsWith;
 import std.file     : read;
 import std.typecons : Tuple, tuple;
 import std.conv     : to;
+import std.stdio    : writefln;
 
 import resources.json5;
 
