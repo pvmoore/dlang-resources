@@ -25,41 +25,41 @@ void testJson5Object() {
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
-        assert(j.as!J5Object.isEmpty());
+        assert(j.isEmpty());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object1.json5");
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
-        assert(j.as!J5Object.isEmpty());
+        assert(j.isEmpty());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object2.json5");
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
-        assert(!j.as!J5Object.isEmpty());
-        assert(j.as!J5Object.get("key") == "value");
+        assert(!j.isEmpty());
+        assert(j["key"] == "value");
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object2a.json5");
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
-        assert(!j.as!J5Object.isEmpty());
+        assert(!j.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
-        assert(j.as!J5Object.get("key") == "value");
+        assert(j["key"] == "value");
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object3.json5");
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Object);
-        assert(!j.as!J5Object.isEmpty());
+        assert(!j.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
         assert(j.as!J5Object.hasKey("key2"));
-        assert(j.as!J5Object.get("key") == "value");
+        assert(j["key"] == "value");
         assert(j.as!J5Object.get("key2") == "value2");
     }
     {
@@ -67,18 +67,18 @@ void testJson5Object() {
         writefln("%s", JSON5.stringify(j));
         
         assert(j.isA!J5Object);
-        assert(!j.as!J5Object.isEmpty());
+        assert(!j.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
         assert(j.as!J5Object.hasKey("key2"));
         assert(j.as!J5Object.get("key") == "value");
-        assert(j.as!J5Object.get("key2") == "value2");
+        assert(j["key2"] == "value2");
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object4.json5");
         writefln("%s", JSON5.stringify(j));
         
         assert(j.isA!J5Object);
-        assert(!j.as!J5Object.isEmpty());
+        assert(!j.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
         assert(j.as!J5Object.get("key").isA!J5Array);
         assert(j["key"].isA!J5Array);
@@ -94,26 +94,26 @@ void testJson5Array() {
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Array);
-        assert(j.as!J5Array.isEmpty());
+        assert(j.isEmpty());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/array/array2.json5");
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Array);
-        assert(!j.as!J5Array.isEmpty());
-        assert(j.as!J5Array.length() == 1);
-        assert(j.as!J5Array[0] == "hello");
+        assert(!j.isEmpty());
+        assert(j.length() == 1);
+        assert(j[0] == "hello");
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/array/array3.json5");
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Array);
-        assert(!j.as!J5Array.isEmpty());
-        assert(j.as!J5Array.length() == 2);
-        assert(j.as!J5Array[0] == "hello");
-        assert(j.as!J5Array[1] == 3);
+        assert(!j.isEmpty());
+        assert(j.length() == 2);
+        assert(j[0] == "hello");
+        assert(j[1] == 3);
     }
 }
 
@@ -140,6 +140,8 @@ void testJson5String() {
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5String);
+        assert(!j.isEmpty());
+        assert(j.length()==6);
         assert(j == "string");
     }
     {
@@ -164,6 +166,8 @@ void testJson5Boolean() {
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Boolean);
+        assert(!j.isEmpty());
+        assert(j.length()==1);
         assert(j == true);
     }
     {
@@ -181,5 +185,7 @@ void testJson5Null() {
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Null);
+        assert(j.isEmpty());
+        assert(j.length()==0);
     }
 }

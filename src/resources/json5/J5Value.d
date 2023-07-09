@@ -50,6 +50,20 @@ public:
         }
         return new J5Null();
     }
+    // Only makes sense for J5Object and J5Array
+    bool isEmpty() {
+        if(isObject()) return this.as!J5Object.isEmpty();
+        if(isArray()) return this.as!J5Array.isEmpty();
+        if(isString()) return this.as!J5String.value.length == 0;
+        return isNull();
+    }
+    uint length() {
+        if(isObject()) return this.as!J5Object.map.length.as!uint;
+        if(isArray()) return this.as!J5Array.length();
+        if(isString()) return this.as!J5String.value.length.as!uint;
+        if(isNull()) return 0;
+        return 1;
+    }
 protected:
     Kind kind;
 }
@@ -61,7 +75,7 @@ public:
         this.map = map;
     }
 
-    bool isEmpty() { return map.length ==0; }
+    override bool isEmpty() { return map.length ==0; }
     bool hasKey(string key) { return (key in map) !is null; }
     J5Value get(string key) { return map.get(key, null); }
 
@@ -99,8 +113,8 @@ public:
         this.array = array;
     }
 
-    bool isEmpty() { return array.length==0; }
-    uint length() { return array.length.as!uint; }
+    override bool isEmpty() { return array.length==0; }
+    override uint length() { return array.length.as!uint; }
     override J5Value opIndex(int i) { return array[i]; }
 
     alias opEquals = J5Value.opEquals;
