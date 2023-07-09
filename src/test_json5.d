@@ -169,6 +169,20 @@ void testJson5Number() {
         assert(j.as!J5Number.isInfinity());
         assert(!j.as!J5Number.isInteger());
     }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number7.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j == 0.34);
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number8.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j == 5.0);
+    }
 }
 
 void testJson5String() {
