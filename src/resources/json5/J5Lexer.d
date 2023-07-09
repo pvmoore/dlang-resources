@@ -5,7 +5,6 @@ import resources.json5.all;
 /**
  * https://spec.json5.org/#grammar
  */
-
 final class J5Lexer {
 public:
     J5Token[] getTokens(string src) {
@@ -18,7 +17,6 @@ public:
 
         while(pos < src.length) {
             char ch = peek();
-            //writefln("[%s] = %s (%s)", pos, ch.as!int, tokenStart);
 
             if(ch<33) {
                 addToken();
@@ -112,26 +110,29 @@ private:
         tokenStart = pos;
     }
     void lineComment() {
+        pos += 2;
         while(pos<src.length) {
             if(isEol()) {
                 break;
             }
             pos++;
         }
+        tokenStart = pos;
     }
     void multiLineComment() {
+        pos += 2;
         while(pos<src.length) {
             if(isEol()) {
                 eol();
             } else if(peek(0)=='*' && peek(1)=='/') {
                 pos+=2;
-                addToken();
+                tokenStart = pos;
                 return;
             } else {
                 pos++;
             }
         }
-        syntaxError("EOF looking for '*/'");
+        syntaxError("EOF looking for */");
     }
     void quoted(char quote) {
         // 'string'
@@ -163,8 +164,6 @@ private:
         if(s.length==0) return J5TokenKind.ID;
         if(isDigit(s[0])) return J5TokenKind.NUMBER;
         if(s.length>1) {
-            if(s[0]=='/' && s[1]=='/') return J5TokenKind.COMMENT;
-            if(s[0]=='/' && s[1]=='*') return J5TokenKind.COMMENT;
             if(s[0]=='-' && isDigit(s[1])) return J5TokenKind.NUMBER;
             if(s[0]=='+' && isDigit(s[1])) return J5TokenKind.NUMBER;
             if(s[0]=='.' && isDigit(s[1])) return J5TokenKind.NUMBER;
@@ -177,7 +176,6 @@ private:
         tokenStart = pos;
     }
     void addToken(J5TokenKind k = J5TokenKind.NONE) {
-        //writefln("addToken %s %s %s", k, tokenStart, pos);
         if(tokenStart < pos) {
             string value = src[tokenStart..pos];
             J5TokenKind tk2 = determineKind(value);

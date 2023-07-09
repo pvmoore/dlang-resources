@@ -28,7 +28,6 @@ struct J5Token {
 enum J5TokenKind {
     NONE,
     ID,
-    COMMENT,
     STRING,
     NUMBER,
 
@@ -46,7 +45,6 @@ string stringOf(J5TokenKind t) {
     final switch(t) with(J5TokenKind) {
         case NONE:
         case ID:
-        case COMMENT:
         case STRING:
         case NUMBER:
             return "%s".format(t);
@@ -65,7 +63,6 @@ int lengthOf(J5TokenKind t) {
     final switch(t) with(J5TokenKind) {
         case NONE:
         case ID:
-        case COMMENT:
         case STRING:
         case NUMBER:
             return 0;

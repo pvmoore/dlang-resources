@@ -15,6 +15,14 @@ private enum Kind {
 abstract class J5Value {
 public:
     abstract void serialise(StringBuffer buf, string prefix = "");
+    
+    final bool isObject() { return this.isA!J5Object; }
+    final bool isArray() { return this.isA!J5Array; }
+    final bool isNull() { return this.isA!J5Null; }
+    final bool isString() { return this.isA!J5String; }
+    final bool isNumber() { return this.isA!J5Number; }
+    final bool isBoolean() { return this.isA!J5Boolean; }
+
     bool opEquals(string other) {
         return this.isA!J5String && this.as!J5String.opEquals(other);
     }
@@ -25,7 +33,22 @@ public:
         return this.isA!J5Number && this.as!J5Number.opEquals(other);
     }
     bool opEquals(bool other) {
-        return this.isA!J5Boolean && this.as!J5Boolean.value == other;
+        if(isNumber()) return this.as!J5Number.opEquals(other.as!int);
+        return isBoolean() && this.as!J5Boolean.value == other;
+    }
+    // Only useful for J5Array
+    J5Value opIndex(int index) {
+        if(isArray()) {
+            return this.as!J5Array.array[index];
+        }
+        return new J5Null();
+    }
+    // Only useful for J5Object
+    J5Value opIndex(string key) {
+        if(isObject()) {
+            return this.as!J5Object.get(key);
+        }
+        return new J5Null();
     }
 protected:
     Kind kind;
@@ -78,7 +101,7 @@ public:
 
     bool isEmpty() { return array.length==0; }
     uint length() { return array.length.as!uint; }
-    J5Value opIndex(int i) { return array[i]; }
+    override J5Value opIndex(int i) { return array[i]; }
 
     alias opEquals = J5Value.opEquals;
     override bool opEquals(Object other) {
@@ -193,29 +216,5 @@ public:
     }
     override string toString() {
         return value ? "true" : "false";
-    }
-}
-//──────────────────────────────────────────────────────────────────────────────────────────────────
-final class J5Comment : J5Value {
-public:
-    string value;
-
-    this(string value) {
-        this.value = value;
-    }
-
-    alias opEquals = J5Value.opEquals;
-    override bool opEquals(string other) {
-        return value == other;
-    }
-    override bool opEquals(Object other) {
-        return other.isA!J5Comment && other.as!J5Comment.value == value;
-    }
-
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add(value);
-    }
-    override string toString() {
-        return value;
     }
 }

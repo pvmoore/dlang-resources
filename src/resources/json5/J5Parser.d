@@ -10,7 +10,6 @@ public:
         this.tokens = new Tokens(tokens, src);
     }
     J5Value parse(bool includeComments) {
-        this.includeComments = includeComments;
         // // If there are no tokens return empty J5Object
         if(tokens.eof()) {
             return new J5Object();
@@ -19,7 +18,6 @@ public:
     }
 private:
     Tokens tokens;
-    bool includeComments;
 
     J5Value parseValue() {
         J5Value v;
@@ -59,13 +57,6 @@ private:
                 break;
             case STRING:
                 v = parseString();
-                break;
-            case COMMENT:
-                if(includeComments) {
-                    v = parseComment();
-                } else {
-                    tokens.next();
-                }
                 break;    
             default:
                 syntaxError();
@@ -154,11 +145,6 @@ private:
         auto s = new J5String(tokens.value());
         tokens.next();
         return s;
-    }
-    J5Comment parseComment() {
-        auto c = new J5Comment(tokens.value());
-        tokens.next();
-        return c;
     }
     void syntaxError(string msg = null) {
         auto t = tokens.get();

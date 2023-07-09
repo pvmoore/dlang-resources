@@ -4,7 +4,8 @@ import resources.json5;
 
 import common : StringBuffer, as, isA, throwIfNotEqual;
 
-import std.stdio    : writefln;
+import std.stdio  : writefln;
+import std.format : format;
 
 void testJson5() {
     writefln("Testing JSON5");
@@ -14,7 +15,6 @@ void testJson5() {
     testJson5String();
     testJson5Boolean();
     testJson5Null();
-    testJson5Comment();
 }
 
 private:
@@ -65,13 +65,26 @@ void testJson5Object() {
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object3a.json5");
         writefln("%s", JSON5.stringify(j));
-
+        
         assert(j.isA!J5Object);
         assert(!j.as!J5Object.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
         assert(j.as!J5Object.hasKey("key2"));
         assert(j.as!J5Object.get("key") == "value");
         assert(j.as!J5Object.get("key2") == "value2");
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/object/object4.json5");
+        writefln("%s", JSON5.stringify(j));
+        
+        assert(j.isA!J5Object);
+        assert(!j.as!J5Object.isEmpty());
+        assert(j.as!J5Object.hasKey("key"));
+        assert(j.as!J5Object.get("key").isA!J5Array);
+        assert(j["key"].isA!J5Array);
+        assert(j["key"][0] == 1);
+        assert(j["key"][1] == 2);
+        assert(j["key"][2] == 3);
     }
 }
 
@@ -168,22 +181,5 @@ void testJson5Null() {
         writefln("%s", JSON5.stringify(j));
 
         assert(j.isA!J5Null);
-    }
-}
-
-void testJson5Comment() {
-    {
-        auto j = JSON5.fromFile("testdata2/json5/comment/comment1.json5", true);
-        writefln("%s", JSON5.stringify(j));
-
-        assert(j.isA!J5Comment);
-        assert(j == "// This is a comment");
-    }
-    {
-        auto j = JSON5.fromFile("testdata2/json5/comment/comment2.json5", true);
-        writefln("%s", JSON5.stringify(j));
-
-        assert(j.isA!J5Comment);
-        assert(j == "/*\r\n This is a comment\r\n*/");
     }
 }
