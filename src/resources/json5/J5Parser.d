@@ -31,29 +31,32 @@ private:
             case NUMBER:
                 v = parseNumber();
                 break;
-            case ID: {
-                    string val = tokens.value();
-                    if("null" == val) {
-                        v = parseNull();
+            case ID: 
+                switch(tokens.value()) {
+                    case "null": 
+                        v = J5NULL;
+                        tokens.next();
                         break;
-                    }
-                    if("true" == val) {
-                        v = new J5Boolean(true);
+                    case "true":
+                        v = J5TRUE;
+                        tokens.next();
                         break;
-                    }
-                    if("false" == val) {
-                        v = new J5Boolean(false);
+                    case "false":
+                        v = J5FALSE;
+                        tokens.next();
                         break;
-                    }
-                    val = toLower(val);
-                    if("infinity" == val || "nan" == val) {
-                        J5Number num = new J5Number();
-                        v = num;
-                        num.value = val;
+                    case "NaN":
+                        v = J5NAN;
+                        tokens.next();
                         break;
-                    }
+                    case "Infinity":
+                        v = J5INFINITY;
+                        tokens.next();
+                        break;
+                    default:
+                        syntaxError(); 
+                        break;
                 }
-                syntaxError();
                 break;
             case STRING:
                 v = parseString();
@@ -123,18 +126,10 @@ private:
         return ObjectMember(key, parseValue());
     }
     /**
-     * 'null'
-     */
-    J5Null parseNull() {
-        tokens.next();
-        return new J5Null();
-    }
-    /**
      * Infinity, Nan, NumericLiteral
      */
     J5Number parseNumber() {
-        auto n = new J5Number();
-        n.value = tokens.value();
+        auto n = new J5Number(tokens.value());
         tokens.next();
         return n;
     }

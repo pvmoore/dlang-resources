@@ -60,7 +60,7 @@ void testJson5Object() {
         assert(j.as!J5Object.hasKey("key"));
         assert(j.as!J5Object.hasKey("key2"));
         assert(j["key"] == "value");
-        assert(j.as!J5Object.get("key2") == "value2");
+        assert(j["key2"] == "value2");
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object3a.json5");
@@ -70,7 +70,7 @@ void testJson5Object() {
         assert(!j.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
         assert(j.as!J5Object.hasKey("key2"));
-        assert(j.as!J5Object.get("key") == "value");
+        assert(j["key"] == "value");
         assert(j["key2"] == "value2");
     }
     {
@@ -80,7 +80,6 @@ void testJson5Object() {
         assert(j.isA!J5Object);
         assert(!j.isEmpty());
         assert(j.as!J5Object.hasKey("key"));
-        assert(j.as!J5Object.get("key").isA!J5Array);
         assert(j["key"].isA!J5Array);
         assert(j["key"][0] == 1);
         assert(j["key"][1] == 2);

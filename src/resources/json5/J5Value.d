@@ -2,14 +2,19 @@ module resources.json5.J5Value;
 
 import resources.json5.all;
 
+__gshared J5Null J5NULL = new J5Null();
+__gshared J5Boolean J5TRUE = new J5Boolean(true);
+__gshared J5Boolean J5FALSE = new J5Boolean(false);
+__gshared J5Number J5INFINITY = new J5Number("Infinity");
+__gshared J5Number J5NAN = new J5Number("NaN");
+
 private enum Kind {
     OBJECT,
-    NUMBER,
-    STRING,
     ARRAY,
-    NULL,
+    STRING,
+    NUMBER,
     BOOLEAN,
-    COMMENT
+    NULL
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 abstract class J5Value {
@@ -41,14 +46,14 @@ public:
         if(isArray()) {
             return this.as!J5Array.array[index];
         }
-        return new J5Null();
+        return J5NULL;
     }
     // Only useful for J5Object
     J5Value opIndex(string key) {
         if(isObject()) {
-            return this.as!J5Object.get(key);
+            return this.as!J5Object.map.get(key, J5NULL);
         }
-        return new J5Null();
+        return J5NULL;
     }
     // Only makes sense for J5Object and J5Array
     bool isEmpty() {
@@ -77,7 +82,8 @@ public:
 
     override bool isEmpty() { return map.length ==0; }
     bool hasKey(string key) { return (key in map) !is null; }
-    J5Value get(string key) { return map.get(key, null); }
+
+    override J5Value opIndex(string key) { return map.get(key, null); }
 
     alias opEquals = J5Value.opEquals;
     override bool opEquals(Object other) {
@@ -85,7 +91,7 @@ public:
         if(otherObject is null || map.length != otherObject.map.length) return false;
 
         foreach(e; map.byKeyValue()) {
-            J5Value v = otherObject.get(e.key);
+            J5Value v = otherObject.map.get(e.key, null);
             if(v is null || e.value != v) return false;
         }
 
@@ -147,6 +153,10 @@ private:
 final class J5Number : J5Value {
 public:
     string value;
+
+    this(string value) {
+        this.value = value;
+    }
 
     bool isInteger() { return .isInteger(value); }
 
