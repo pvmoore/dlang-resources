@@ -155,20 +155,28 @@ public:
     string value;
 
     this(string value) {
-        this.value = value;
+        this.isHex = isHexadecimal(value);
+        if(isHex) {
+            this.value = value.toLower();
+        } else {
+            this.value = value;
+        }
     }
 
-    bool isInteger() { return .isInteger(value); }
+    bool isInteger() { return this !is J5NAN && this !is J5INFINITY && .isInteger(value); }
+    bool isNaN() { return this is J5NAN; }
+    bool isInfinity() { return this is J5INFINITY; }
 
     alias opEquals = J5Value.opEquals;
     override bool opEquals(long other) {
-        if(isHexadecimal(value)) return value.to!long(16) == other;
+        if(isHex) return value[2..$].to!long(16) == other;
         return isInteger() && value.to!long == other;
     }
     override bool opEquals(double other) {
         return value.to!double == other;
     }
     override bool opEquals(string other) {
+        if(isHex) return value == other.toLower();
         return value == other;
     }
     override bool opEquals(Object other) {
@@ -181,6 +189,8 @@ public:
     override string toString() {
         return value;
     }
+private:
+    bool isHex;
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5String : J5Value {

@@ -3,7 +3,7 @@ module resources.json5.all;
 public:
 
 import std.format   : format;
-import std.string   : startsWith;
+import std.string   : startsWith, toLower;
 import std.file     : read;
 import std.typecons : Tuple, tuple;
 import std.conv     : to;

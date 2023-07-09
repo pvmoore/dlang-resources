@@ -123,6 +123,7 @@ void testJson5Number() {
 
         assert(j.isA!J5Number);
         assert(j == 4);
+        assert(j.as!J5Number.isInteger());
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/number/number2.json5");
@@ -130,6 +131,43 @@ void testJson5Number() {
 
         assert(j.isA!J5Number);
         assert(j == 3.14);
+        assert(!j.as!J5Number.isInteger());
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number3.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j == 0xffff);
+        assert(j == "0xffff");
+        assert(j == "0XFFFF");
+        assert(j.as!J5Number.isInteger());
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number4.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j == -3.14);
+        assert(!j.as!J5Number.isInteger());
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number5.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(j.as!J5Number.isNaN());
+        assert(!j.as!J5Number.isInfinity());
+        assert(!j.as!J5Number.isInteger());
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/number/number6.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5Number);
+        assert(!j.as!J5Number.isNaN());
+        assert(j.as!J5Number.isInfinity());
+        assert(!j.as!J5Number.isInteger());
     }
 }
 
