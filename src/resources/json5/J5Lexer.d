@@ -34,7 +34,7 @@ public:
                         multiLineComment();
                     }
                     syntaxError("Unexpected character '/'");
-                    break;
+                    break;    
                 case '\'':
                     addToken();
                     quoted('\'');
@@ -145,6 +145,9 @@ private:
                 pos++;
                 addToken();
                 break;
+            } else if(peek(0)=='\\' && peek(1).isOneOf(10,13)) {
+                pos++;
+                // Todo - Remove some chars here
             } else {
                 pos++;
             }

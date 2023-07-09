@@ -11,6 +11,7 @@ void testJson5() {
     testJson5Object();
     testJson5Array();
     testJson5Number();
+    testJson5String();
 }
 
 private:
@@ -115,4 +116,28 @@ void testJson5Number() {
         assert(j.isA!J5Number);
         assert(j == 3.14);
     }
+}
+
+void testJson5String() {
+    {
+        auto j = JSON5.fromFile("testdata2/json5/string/string1.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5String);
+        assert(j == "string");
+    }
+    {
+        auto j = JSON5.fromFile("testdata2/json5/string/string2.json5");
+        writefln("%s", JSON5.stringify(j));
+
+        assert(j.isA!J5String);
+        assert(j == "string");
+    }
+    // {
+    //     auto j = JSON5.fromFile("testdata2/json5/string/string3.json5");
+    //     writefln("%s", JSON5.stringify(j));
+
+    //     assert(j.isA!J5String);
+    //     assert(j == "one\\ntwo");
+    // }
 }
