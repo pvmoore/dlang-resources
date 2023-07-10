@@ -9,5 +9,7 @@
 
 - [x] WAV (Read only)
 
+- [x] JSON5
+
 ## Requirements
 - Dlang https://dlang.org/ 
