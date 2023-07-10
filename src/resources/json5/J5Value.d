@@ -91,6 +91,7 @@ public:
         this.kind = Kind.OBJECT;
     }
     this(J5Value[string] map) {
+        this();   
         this.map = map;
     }
 
@@ -122,9 +123,12 @@ private:
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Array : J5Value {
 public: 
-    this(J5Value[] array) {
-        this.array = array;
+    this() {
         this.kind = Kind.ARRAY;
+    }
+    this(J5Value[] array) {
+        this();
+        this.array = array;
     }
 
     J5Array add(J5Value value) {

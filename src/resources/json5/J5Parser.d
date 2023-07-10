@@ -72,7 +72,7 @@ private:
     }
     J5Object parseObject() {
         // only one or more [id : value] allowed here
-        J5Value[string] map;
+        auto obj = new J5Object();
 
         // {
         tokens.next();
@@ -80,7 +80,7 @@ private:
         // Members
         while(tokens.kind() != J5TokenKind.RCURLY) {
             auto kv = parseObjectMember();
-            map[kv.key] = kv.value;
+            obj.add(kv.key, kv.value);
 
             // optional comma
             if(tokens.kind() == J5TokenKind.COMMA) tokens.next();
@@ -89,17 +89,17 @@ private:
         // }
         tokens.next();
 
-        return new J5Object(map);
+        return obj;
     }
     J5Array parseArray() {
         // zero or more of (Number, Boolean, Null, Array, Object)
-        J5Value[] values;
+        auto array = new J5Array();
 
         // [
         tokens.next();    
 
         while(tokens.kind() != J5TokenKind.RSQUARE) {
-            values ~= parseValue();
+            array.add(parseValue());
 
             // optional comma
             if(tokens.kind() == J5TokenKind.COMMA) tokens.next();
@@ -108,7 +108,7 @@ private:
         // ]    
         tokens.next();
 
-        return new J5Array(values);
+        return array;
     }
     /**
      * key : value
