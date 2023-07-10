@@ -14,10 +14,8 @@ public:
         JSON5 j = new JSON5(str, includeComments);
         return j.root;
     }
-    static string stringify(J5Value root) {
-        auto buf = new StringBuffer();
-        root.serialise(buf);
-        return buf.toString();
+    static string stringify(J5Value root, bool pretty = false) {
+        return new J5Serialiser(pretty).stringify(root);
     }
 private:
     string src;
@@ -28,12 +26,10 @@ private:
         auto lexer = new J5Lexer();
         this.tokens = lexer.getTokens(src);
 
-        import std.stdio;
-
-        writefln("tokens:");
-        foreach(t; tokens) {
-            writefln("  %s", t.toString(src));
-        }
+        // writefln("tokens:");
+        // foreach(t; tokens) {
+        //     writefln("  %s", t.toString(src));
+        // }
 
         auto parser = new J5Parser(tokens, src);
         this.root = parser.parse(includeComments);

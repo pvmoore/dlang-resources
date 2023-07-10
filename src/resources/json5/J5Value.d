@@ -33,14 +33,12 @@ private enum Kind {
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 abstract class J5Value {
 public:
-    abstract void serialise(StringBuffer buf, string prefix = "");
-    
-    final bool isObject() { return this.isA!J5Object; }
-    final bool isArray() { return this.isA!J5Array; }
-    final bool isNull() { return this.isA!J5Null; }
-    final bool isString() { return this.isA!J5String; }
-    final bool isNumber() { return this.isA!J5Number; }
-    final bool isBoolean() { return this.isA!J5Boolean; }
+    final bool isObject() { return kind == Kind.OBJECT; }
+    final bool isArray() { return kind == Kind.ARRAY; }
+    final bool isNull() { return kind == Kind.NULL; }
+    final bool isString() { return kind == Kind.STRING; }
+    final bool isNumber() { return kind == Kind.NUMBER; }
+    final bool isBoolean() { return kind == Kind.BOOLEAN; }
 
     bool opEquals(string other) {
         return this.isA!J5String && this.as!J5String.opEquals(other);
@@ -89,9 +87,16 @@ protected:
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Object : J5Value {
 public:
-    this() {}
+    this() {
+        this.kind = Kind.OBJECT;
+    }
     this(J5Value[string] map) {
         this.map = map;
+    }
+
+    J5Object add(string key, J5Value value) {
+        map[key] = value;
+        return this;
     }
 
     override bool isEmpty() { return map.length ==0; }
@@ -111,18 +116,6 @@ public:
 
         return true;
     }
-
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add("{");
-        string prefix2 = prefix ~ "  ";
-        foreach(e; map.byKeyValue()) {
-            buf.add("\n").add(prefix2);
-            buf.add(e.key).add(" : ");
-            e.value.serialise(buf, prefix2);
-        }
-        if(!isEmpty()) buf.add("\n").add(prefix);
-        buf.add("}");
-    }
 private:
     J5Value[string] map;    
 }
@@ -131,6 +124,12 @@ final class J5Array : J5Value {
 public: 
     this(J5Value[] array) {
         this.array = array;
+        this.kind = Kind.ARRAY;
+    }
+
+    J5Array add(J5Value value) {
+        array ~= value;
+        return this;
     }
 
     override bool isEmpty() { return array.length==0; }
@@ -148,18 +147,6 @@ public:
 
         return true;
     }
-
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add("[");
-        string prefix2 = prefix ~ "  ";
-
-        foreach(i, v; array) {
-            buf.add("\n").add(prefix2);
-            v.serialise(buf, prefix2);
-        }
-        if(!isEmpty()) buf.add("\n").add(prefix);
-        buf.add("]");
-    }
 private:
     J5Value[] array;    
 }
@@ -169,6 +156,7 @@ public:
     string value;
 
     this(string value) {
+        this.kind = Kind.NUMBER;
         this.isHex = isHexadecimal(value);
         if(isHex) {
             this.value = value.toLower();
@@ -196,10 +184,6 @@ public:
     override bool opEquals(Object other) {
         return other.isA!J5Number && other.as!J5Number.value == value;
     }
-
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add(value);
-    }
     override string toString() {
         return value;
     }
@@ -212,6 +196,7 @@ public:
     string value;
 
     this(string value) {
+        this.kind = Kind.STRING;
         this.value = value;
     }
 
@@ -222,25 +207,8 @@ public:
     override bool opEquals(Object other) {
         return other.isA!J5String && other.as!J5String.value == value;
     }
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add(value);
-    }
     override string toString() {
         return value;
-    }
-}
-//──────────────────────────────────────────────────────────────────────────────────────────────────
-final class J5Null : J5Value {
-public:
-    alias opEquals = J5Value.opEquals;
-    override bool opEquals(Object other) {
-        return other.isA!J5Null;
-    }
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add("null");
-    }
-    override string toString() {
-        return "null";
     }
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -249,6 +217,7 @@ public:
     bool value;
 
     this(bool value) {
+        this.kind = Kind.BOOLEAN;
         this.value = value;
     }
 
@@ -259,10 +228,116 @@ public:
     override bool opEquals(Object other) {
         return other.isA!J5Boolean && other.as!J5Boolean.value == value;
     }
-    override void serialise(StringBuffer buf, string prefix) {
-        buf.add("%s", value);
-    }
     override string toString() {
         return value ? "true" : "false";
+    }
+}
+//──────────────────────────────────────────────────────────────────────────────────────────────────
+final class J5Null : J5Value {
+public:
+    this() {
+        this.kind = Kind.NULL;
+    }
+    alias opEquals = J5Value.opEquals;
+    override bool opEquals(Object other) {
+        return other.isA!J5Null;
+    }
+    override string toString() {
+        return "null";
+    }
+}
+//──────────────────────────────────────────────────────────────────────────────────────────────────
+final class J5Serialiser {
+public:
+    this(bool pretty) {
+        this.buf = new StringBuffer();
+        this.stack = new Stack!string;
+        this.pretty = pretty;
+    }
+    string stringify(J5Value v) {
+        buf.clear();
+        stack.clear();
+        process(v);
+        return buf.toString();
+    }
+private:
+    StringBuffer buf;
+    Stack!string stack;
+    bool pretty;
+    string prefix;
+
+    void push() {
+        stack.push(prefix);
+        prefix = prefix ~ "  ";
+    }
+    void pop() {
+        prefix = stack.pop();
+    }
+    void process(J5Value v) {
+        final switch(v.kind) with(Kind) {
+            case OBJECT: process(v.as!J5Object); break;
+            case ARRAY: process(v.as!J5Array); break;
+            case STRING: process(v.as!J5String); break;
+            case NUMBER: process(v.as!J5Number); break;
+            case BOOLEAN: process(v.as!J5Boolean); break;
+            case NULL: process(v.as!J5Null); break;
+        }
+    }
+    void process(J5Object obj) {
+        buf.add("{");
+        int i = 0;
+        if(pretty) {
+            push();
+            foreach(e; obj.map.byKeyValue()) {
+                if(i++>0) buf.add(",");
+                buf.add("\n").add(prefix);
+                buf.add("\"").add(e.key).add("\" : ");
+                process(e.value);
+            }
+            pop();
+            if(!obj.isEmpty()) buf.add("\n").add(prefix);
+        } else {
+            foreach(e; obj.map.byKeyValue()) {
+                if(i++>0) buf.add(",");
+                buf.add("\"").add(e.key).add("\":");
+                process(e.value);
+            }    
+        }
+        buf.add("}");
+    }
+    void process(J5Array obj) {
+        buf.add("[");
+        if(pretty) {
+            push();
+            foreach(i, v; obj.array) {
+                if(i>0) buf.add(",");
+                buf.add("\n").add(prefix);
+                process(v);
+            }
+            pop();
+            if(!obj.isEmpty()) buf.add("\n").add(prefix);
+        } else {
+            foreach(i, v; obj.array) {
+                if(i>0) buf.add(",");
+                process(v);
+            }
+        }
+        buf.add("]");       
+    }
+    void process(J5String obj) {
+        if(obj.value.contains("\"")) {
+            buf.add("'").add(obj.value).add("'");
+        } else {
+            buf.add("\"").add(obj.value).add("\"");
+        }
+    }
+    void process(J5Number obj) {
+        buf.add(obj.value);
+    }
+    void process(J5Boolean obj) {
+        buf.add(obj.value ? "true" : "false");
+    }
+    void process(J5Null obj) {
+        buf.add("null");
     }
 }
