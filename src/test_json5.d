@@ -197,7 +197,7 @@ void testJson5String() {
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/string/string2.json5");
-        expectStringify(j, "\"string\"");
+        expectStringify(j, "'string'");
 
         assert(j.isA!J5String);
         assert(j == "string");

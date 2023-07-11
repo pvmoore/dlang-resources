@@ -139,6 +139,7 @@ private:
         // "string"
         pos++;
         tempChars.length = 0;
+        tempChars ~= quote;
         while(pos<src.length) {
             char ch = peek(0);
             if(ch=='\\' && peek(1)==quote) {
@@ -147,6 +148,7 @@ private:
                 tempChars ~= quote;
             } else if(ch==quote) {
                 pos++;
+                tempChars ~= quote;
                 addToken(tempChars.idup);
                 return;
             } else if(ch=='\\' && peek(1).isOneOf(10,13)) {

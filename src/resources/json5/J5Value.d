@@ -198,10 +198,12 @@ private:
 final class J5String : J5Value {
 public:
     string value;
+    char quote;
 
     this(string value) {
         this.kind = Kind.STRING;
-        this.value = value;
+        this.value = value[1..$-1];
+        this.quote = value[0];
     }
 
     alias opEquals = J5Value.opEquals;
@@ -329,11 +331,7 @@ private:
         buf.add("]");       
     }
     void process(J5String obj) {
-        if(obj.value.contains("\"")) {
-            buf.add("'").add(obj.value).add("'");
-        } else {
-            buf.add("\"").add(obj.value).add("\"");
-        }
+        buf.add(obj.quote).add(obj.value).add(obj.quote);
     }
     void process(J5Number obj) {
         buf.add(obj.value);

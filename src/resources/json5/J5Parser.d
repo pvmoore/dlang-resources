@@ -117,6 +117,9 @@ private:
         // key
         string key = tokens.value();
         tokens.next();
+        if(key[0]=='\"' || key[0]=='\'') {
+            key = key[1..$-1];
+        }
 
         // :
         if(tokens.kind() != J5TokenKind.COLON) syntaxError();
