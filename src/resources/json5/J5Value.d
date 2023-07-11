@@ -198,7 +198,6 @@ private:
 final class J5String : J5Value {
 public:
     string value;
-    char quote;
 
     this(string value) {
         this.kind = Kind.STRING;
@@ -216,6 +215,8 @@ public:
     override string toString() {
         return value;
     }
+private:
+    char quote;
 }
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 final class J5Boolean : J5Value {
