@@ -42,6 +42,9 @@ void testJson5Object() {
         assert(!j.isEmpty());
         assert(j.hasKey("key"));
         assert(j["key"] == "value");
+
+        auto value = j["key"].toString();
+        assert(value == "value");
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object2a.json5");
