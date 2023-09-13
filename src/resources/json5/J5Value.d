@@ -74,6 +74,11 @@ public:
         if(isString()) return this.as!J5String.value.length == 0;
         return isNull();
     }
+    // Only makes sense for J5Object
+    bool hasKey(string key) {
+        if(isObject()) return this.as!J5Object.hasKey(key);
+        return false;
+    }
     uint length() {
         if(isObject()) return this.as!J5Object.map.length.as!uint;
         if(isArray()) return this.as!J5Array.length();
@@ -101,7 +106,7 @@ public:
     }
 
     override bool isEmpty() { return map.length ==0; }
-    bool hasKey(string key) { return (key in map) !is null; }
+    override bool hasKey(string key) { return (key in map) !is null; }
 
     override J5Value opIndex(string key) { return map.get(key, null); }
 
