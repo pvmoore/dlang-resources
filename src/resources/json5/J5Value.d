@@ -62,10 +62,24 @@ public:
     }
     // Only useful for J5Object
     J5Value opIndex(string key) {
-        if(isObject()) {
-            return this.as!J5Object.map.get(key, J5NULL);
-        }
+        if(isObject()) return this.as!J5Object.map.get(key, J5NULL);
         return J5NULL;
+    }
+    // Only useful for J5Object
+    // foreach(k,v; j.byKeyValue()) {}
+    auto byKeyValue() {
+        if(isObject()) return this.as!J5Object;
+        return null;
+    }
+    // Only useful for J5Array
+    int opApply(int delegate(J5Value) dg) {
+        if(isArray()) return this.as!J5Array.opApply(dg);
+        return 0;
+    }
+    // Only useful for J5Array
+    int opApply(int delegate(ulong, J5Value) dg) {
+        if(isArray()) return this.as!J5Array.opApply(dg);
+        return 0;
     }
     // Only makes sense for J5Object and J5Array
     bool isEmpty() {
@@ -105,6 +119,18 @@ public:
         return this;
     }
 
+    /**
+     * foreach(k,v; o.as!J5Object) {}
+     */
+    int opApply(int delegate(string key, J5Value) dg) {
+        int result = 0;
+        foreach(e; map.byKeyValue()) {
+            result = dg(e.key, e.value); 
+            if(result) break;
+        }
+        return result;
+    }
+
     override bool isEmpty() { return map.length ==0; }
     override bool hasKey(string key) { return (key in map) !is null; }
 
@@ -139,6 +165,29 @@ public:
     J5Array add(J5Value value) {
         array ~= value;
         return this;
+    }
+
+    /**
+     * foreach(v; o.as!J5Array) {}
+     */
+    override int opApply(int delegate(J5Value) dg) {
+        int result = 0;
+        foreach(i; array) {
+            result = dg(i); 
+            if(result) break;
+        }
+        return result;
+    }
+    /**
+     * foreach(i, v; o.as!J5Array) {}
+     */
+    override int opApply(int delegate(ulong n, J5Value) dg) {
+        int result = 0;
+        foreach(i, val; array) {
+            result = dg(i, val); 
+            if(result) break;
+        }
+        return result;
     }
 
     override bool isEmpty() { return array.length==0; }

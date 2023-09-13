@@ -65,6 +65,10 @@ void testJson5Object() {
         assert(j.hasKey("key2"));
         assert(j["key"] == "value");
         assert(j["key2"] == "value2");
+
+        foreach(k, v; j.byKeyValue()) {
+            writefln("%s = %s", k, v);
+        }
     }
     {
         auto j = JSON5.fromFile("testdata2/json5/object/object3a.json5");
@@ -118,6 +122,13 @@ void testJson5Array() {
         assert(j.length() == 2);
         assert(j[0] == "hello");
         assert(j[1] == 3);
+
+        foreach(v; j.as!J5Array) {
+            writefln("%s", v);
+        }
+        foreach(i, v; j.as!J5Array) {
+            writefln("[%s] %s", i, v);
+        }
     }
 }
 
