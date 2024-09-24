@@ -27,5 +27,8 @@ abstract class Image {
         }
         assert(false);
     }
+    void write(string filename) {
+        throw new Exception("write is not yet supported for this Image type");
+    }
 }
 

@@ -159,7 +159,7 @@ final class BMP : Image {
     }
 
     // writes as BGR888 or BGRA8888 format with the height inverted.
-    void write(string filename) {
+    override void write(string filename) {
         HEADER header;
         DIBHEADER dib;
 

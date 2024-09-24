@@ -29,7 +29,7 @@ final class R32 : Image {
         auto ptr = cast(float*)data.ptr;
         return ptr[i];
     }
-    void write(string filename) {
+    override void write(string filename) {
         scope f = File(filename, "wb");
         uint[2] header = [width,height];
         f.rawWrite(header);

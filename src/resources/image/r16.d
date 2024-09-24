@@ -29,7 +29,7 @@ final class R16 : Image {
         auto ptr = cast(HalfFloat*)data.ptr;
         return ptr[i].getFloat();
     }
-    void write(string filename) {
+    override void write(string filename) {
         scope f = File(filename, "wb");
         uint[2] header = [width,height];
         f.rawWrite(header);
