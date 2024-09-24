@@ -18,6 +18,10 @@ abstract class Image {
                 return PNG.read(filename);
             case ".bmp" :
                 return BMP.read(filename);
+            case ".r32":
+                return R32.read(filename);
+            case ".dds":
+                return DDS.read(filename);    
             default :
                 throw new Exception("Unable to read image file with extension '%s'".format(ext));
         }
