@@ -139,14 +139,18 @@ final class BMP : Image {
     	return bmp;
     }
 
-    void set(uint x, uint y, uvec4 value) {
+    void set(uint x, uint y, ubyte r, ubyte g, ubyte b, ubyte a) {
         uint i = (x + (y*width)) * bytesPerPixel;
-        data[i+0] = cast(ubyte)(value.r&0xff);
-        data[i+1] = cast(ubyte)(value.g&0xff);
-        data[i+2] = cast(ubyte)(value.b&0xff);
+        data[i+0] = r;
+        data[i+1] = g;
+        data[i+2] = b;
         if(bytesPerPixel>3) {
-            data[i+3] = cast(ubyte)(value.a&0xff);
+            data[i+3] = a;
         }
+    }
+
+    void set(uint x, uint y, uvec4 value) {
+        set(x, y, cast(ubyte)(value.r&0xff), cast(ubyte)(value.g&0xff), cast(ubyte)(value.b&0xff), cast(ubyte)(value.a&0xff));
     }
     uvec4 get(uint x, uint y) {
         uint i = (x + (y*width))*bytesPerPixel;
