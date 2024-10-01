@@ -4,13 +4,14 @@ public:
 
 import resources;
 
-import common : as, dbg, expect, flushConsole, makeLowPriorityQueue, startsWith, todo,
-				Array, ArrayByteWriter,
+import common : Array, ArrayByteWriter, as, 
+				dbg, expect, flushConsole, makeLowPriorityQueue, 
 				BitReader, FileBitReader, ByteReader, FileByteReader,
 				BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
-				toArray,
 				isSet, isUnset,
-				From, StringBuffer;
+				From, 
+				startsWith, StringBuffer,
+				throwIf, toArray, todo;
 
 import logging : log, flushLog;
 import maths;
@@ -19,7 +20,7 @@ import std.array    			: Appender, appender, split;
 import std.format   			: format;
 import std.conv     			: to;
 import std.math     			: abs;
-import std.stdio    			: writefln, File, SEEK_CUR;
+import std.stdio    			: writef, writefln, File, SEEK_CUR;
 import std.file     			: exists, getSize;
 import std.path     			: baseName, extension;
 import std.string   			: splitLines, strip, toLower;

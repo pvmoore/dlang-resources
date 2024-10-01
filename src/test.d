@@ -50,12 +50,12 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-//    testPNG();
+    testPNG();
 //    testPerlin();
 //    testLZ4();
     //testHGT();
 
-    testJson5();
+//    testJson5();
 }
 void testPerlin() {
     /*import std.math : sin,cos,fmod;
@@ -131,25 +131,33 @@ void testBMP() {
     //abgr.write("goddess.bmp");
 }
 void testPNG() {
+    writefln("Testing PNG");
 
-    auto rock3 = PNG.read("/pvmoore/_assets/images/png/rock3.png");
+    // Read
+    writefln("Reading logo.png");
+    auto logo = PNG.read("testdata/logo.png");
+    writefln("logo = %s", logo);
+    
+    assert(logo.width==128);
+    assert(logo.height==128);
+    assert(logo.bytesPerPixel==4);
+    assert(logo.data.length==128*128*4);
 
-    auto png = PNG.read("/pvmoore/_assets/images/png/tile.png");
-
-    //auto png = PNG.read("/pvmoore/d/libs/opengl3/images/skybox2/front.png");
-
-
-    assert(png.width==128);
-    assert(png.height==128);
-    assert(png.bytesPerPixel==4);
-    assert(png.data.length==128*128*4);
-
-    auto bmp = png.getBMP();
-    bmp.write("tile.bmp");
-
-    auto alpha = png.getAlpha();
+    auto alpha = logo.getAlpha();
     assert(alpha.width==128 && alpha.height==128 &&
            alpha.bytesPerPixel==1 && alpha.data.length==128*128);
+
+    // write
+    writefln("Writing png to logo1.png ...");
+    logo.write("testdata/logo1.png");
+
+    auto logo1 = PNG.read("testdata/logo1.png");
+
+    writefln("Checking data");
+    foreach(i; 0..logo.data.length) {
+        assert(logo.data[i] == logo1.data[i]);
+    }
+    writefln("OK");   
 }
 void testDDS() {
     writefln("Testing DDS");
