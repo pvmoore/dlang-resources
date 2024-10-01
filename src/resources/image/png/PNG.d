@@ -77,10 +77,26 @@ public:
         data = data2;
     }
 
+    void set(uint x, uint y, ubyte r, ubyte g, ubyte b, ubyte a) {
+        uint i = (x + (y*width)) * bytesPerPixel;
+        data[i+0] = r;
+        data[i+1] = g;
+        data[i+2] = b;
+        if(bytesPerPixel>3) {
+            data[i+3] = a;
+        }
+    }
+
     override void write(string filename) {
         new PNGWriter().write(this, filename);
     }
 
+    static auto create_RGB(uint w, uint h) {
+        return create_RGB(w, h, new ubyte[w*h*3]);
+    }
+    static auto create_RGBA(uint w, uint h) {
+        return create_RGBA(w, h, new ubyte[w*h*4]);
+    }
     static auto create_RGB(uint w, uint h, ubyte[] data) {
         expect(w*h*3==data.length);
         auto png = new PNG;
