@@ -6,6 +6,7 @@ import resources.all;
 import resources.image.converter;
 
 abstract class Image {
+public:
     uint width;
     uint height;
     uint bytesPerPixel;

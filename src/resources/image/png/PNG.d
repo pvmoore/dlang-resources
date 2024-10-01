@@ -1,4 +1,5 @@
 module resources.image.png.PNG;
+
  /**
   *  https://www.w3.org/TR/PNG/
   *

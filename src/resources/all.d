@@ -30,7 +30,7 @@ import std.typecons 			: tuple;
 import std.algorithm.iteration  : each, map;
 import std.algorithm.sorting    : sort;
 
-enum chatty = false;
+enum chatty = true;
 
 void chat(A...)(string fmt, A args) {
 	static if(chatty) {

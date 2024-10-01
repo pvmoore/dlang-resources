@@ -22,7 +22,7 @@ void main() {
 
     //testDLL();
 
-    //testDDS();
+    testDDS();
 
     //testPDC();
     //testPDC2();
@@ -50,7 +50,7 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    testPNG();
+//    testPNG();
 //    testPerlin();
 //    testLZ4();
     //testHGT();
@@ -162,7 +162,14 @@ void testPNG() {
 void testDDS() {
     writefln("Testing DDS");
 
-    auto rock3 = DDS.read("/pvmoore/_assets/images/dds/brick.dds");
+    writefln("Reading brick.dds (BC1)");
+    auto brick = DDS.read("testdata/brick.dds");
+    writefln("brick = %s", brick);
+
+    writefln("Reading logo.dds (BC7)");
+    auto logo = DDS.read("testdata/logo-bc7.dds");
+    writefln("logo = %s", logo);
+
 }
 void testLZ4() {
     ubyte[] test1 = cast(ubyte[])read("testdata/test1.txt");
