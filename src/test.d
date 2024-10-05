@@ -203,6 +203,7 @@ void testHGT() {
     auto hgt = HGT.read("/temp/heightmaps/N47E006.hgt");
 }
 void testPDC() {
+    import resources.data.experimental.pdc;
     writefln("#######################################");
     writefln("Testing PDC");
     writefln("#######################################");
@@ -210,6 +211,7 @@ void testPDC() {
 
 }
 void testPDC2() {
+    import resources.data.experimental.pdc2;
     writefln("#######################################");
     writefln("Testing PDC2");
     writefln("#######################################");

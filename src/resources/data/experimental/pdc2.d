@@ -1,4 +1,4 @@
-module resources.data.pdc2;
+module resources.data.experimental.pdc2;
 
 import resources.all;
 

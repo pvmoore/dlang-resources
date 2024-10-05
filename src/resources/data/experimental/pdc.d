@@ -1,4 +1,4 @@
-module resources.data.pdc;
+module resources.data.experimental.pdc;
 /**
  *  Peter's Data Compression.
  */
