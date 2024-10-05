@@ -5,7 +5,8 @@ public:
 import resources;
 
 import common : Array, ArrayByteWriter, as, 
-				dbg, expect, flushConsole, makeLowPriorityQueue, 
+				dbg, expect,  
+				flushConsole, makeLowPriorityQueue, 
 				BitReader, FileBitReader, ByteReader, FileByteReader,
 				BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
 				isSet, isUnset,

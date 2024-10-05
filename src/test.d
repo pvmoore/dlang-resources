@@ -18,11 +18,13 @@ import test_json5;
 void main() {
     writefln("Testing resources");
 
+    testDedupe();
+
     //testObj();
 
     //testDLL();
 
-    testDDS();
+    //testDDS();
 
     //testPDC();
     //testPDC2();
@@ -439,6 +441,15 @@ void testObj() {
     writefln("#######################################");
 
     auto obj = Obj.read("testdata/suzanne.obj.txt");
+}
 
+//──────────────────────────────────────────────────────────────────────────────────────────────────
 
+void testDedupe() {
+    import resources.data.dedupe;
+
+    DeDupe dd = new DeDupe();
+    dd.run("testdata/bib");
+
+    writefln("done");
 }
