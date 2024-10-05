@@ -1,4 +1,4 @@
-module resources.data.dedupe;
+module resources.data.experimental.dedupe;
 
 import resources.all;
 import common;

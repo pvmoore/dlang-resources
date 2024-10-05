@@ -446,7 +446,7 @@ void testObj() {
 //──────────────────────────────────────────────────────────────────────────────────────────────────
 
 void testDedupe() {
-    import resources.data.dedupe;
+    import resources.data.experimental.dedupe;
 
     DeDupe dd = new DeDupe();
     dd.run("testdata/bib");
