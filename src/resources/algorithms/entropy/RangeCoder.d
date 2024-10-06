@@ -5,7 +5,7 @@ module resources.algorithms.entropy.RangeCoder;
  */
 import resources.all;
 
-final class RangerCoder {
+final class RangeCoder {
 private:
 
 public:
