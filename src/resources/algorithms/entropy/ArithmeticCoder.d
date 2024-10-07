@@ -39,8 +39,8 @@ public:
         auto s = model.getSymbolFromValue(value);
 
         ulong range = ( high-low ) + 1L;
-		high  	    = (low + (( range * s.high ) / model.getScale() - 1L) & MASK);
-		low   	    = (low + (( range * s.low )  / model.getScale()     ) & MASK);
+		high  	    = (low + (( range * s.high ) / s.scale - 1L) & MASK);
+		low   	    = (low + (( range * s.low )  / s.scale     ) & MASK);
    
         while(true) {
             if(( high & FULL ) == ( low & FULL )) {
@@ -98,10 +98,12 @@ public:
         assert(state == State.DECODING);
         ulong range = ( high - low ) + 1L;
 		ulong count = (((( ( code - low ) +1L) * model.getScale() - 1L) / range) & MASK);
-        auto s      = model.getSymbolFromRange(count);
+        MSymbol s   = model.getSymbolFromRange(count);
 
-		high      	= (low + (( range * s.high ) / model.getScale() -1L) & MASK);
-		low       	= (low + (( range * s.low )  / model.getScale()    ) & MASK);
+        // Note that the scale used here must be the one from the symbol because in the case of the
+        // dynamic model the previous scale will change after we get a symbol.
+		high      	= (low + (( range * s.high ) / s.scale -1L) & MASK);
+		low       	= (low + (( range * s.low )  / s.scale    ) & MASK);
 
         while(true) {
             if((high & FULL) == (low & FULL)) {

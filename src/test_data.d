@@ -9,7 +9,7 @@ import std.range                : array;
 import std.algorithm            : minElement, maxElement, each, map, sum;
 
 import maths    : entropyBits;
-import common   : BitWriter, BitReader, ByteReader;
+import common   : as, BitWriter, BitReader, ByteReader;
 
 import resources;
 
@@ -24,8 +24,9 @@ void testData() {
     //testZip();
     //testDedupe();
 
+    testEntropyModel();
     testArithmeticCoder();
-    testHuffmanCoder();
+    //testHuffmanCoder();
 }
 
 private:
@@ -139,6 +140,55 @@ void testZip() {
 
     zip.close();
 }
+void testEntropyModel() {
+    writefln("Testing testEntropyModel ---------------------------------");
+    ulong[] frequencies = [1,1,1,1, 1,1,1,1, 1,1,1];
+    auto staticModel = new Order0StaticModel(frequencies);
+    auto dynamicModel = new Order0DynamicModel(11);
+    staticModel.dumpRanges();
+    dynamicModel.dumpRanges();
+
+    auto s0 = staticModel.getSymbolFromValue(0);
+    auto s1 = staticModel.getSymbolFromValue(1);
+    auto s2 = staticModel.getSymbolFromValue(2);
+    auto s3 = staticModel.getSymbolFromValue(3);
+    auto s4 = staticModel.getSymbolFromValue(4);
+    auto s5 = staticModel.getSymbolFromValue(5);
+    auto s6 = staticModel.getSymbolFromValue(6);
+    auto s7 = staticModel.getSymbolFromValue(7);
+    auto s8 = staticModel.getSymbolFromValue(8);
+    auto s9 = staticModel.getSymbolFromValue(9);
+    auto s10 = staticModel.getSymbolFromValue(10);
+
+    auto d0 = dynamicModel.peekSymbolFromValue(0);
+    auto d1 = dynamicModel.peekSymbolFromValue(1);
+    auto d2 = dynamicModel.peekSymbolFromValue(2);
+    auto d3 = dynamicModel.peekSymbolFromValue(3);
+    auto d4 = dynamicModel.peekSymbolFromValue(4);
+    auto d5 = dynamicModel.peekSymbolFromValue(5);
+    auto d6 = dynamicModel.peekSymbolFromValue(6);
+    auto d7 = dynamicModel.peekSymbolFromValue(7);
+    auto d8 = dynamicModel.peekSymbolFromValue(8);
+    auto d9 = dynamicModel.peekSymbolFromValue(9);
+    auto d10 = dynamicModel.peekSymbolFromValue(10);
+
+    assert(s0 == d0);
+    assert(s1 == d1);
+    assert(s2 == d2);
+    assert(s3 == d3);
+    assert(s4 == d4);
+    assert(s5 == d5);
+    assert(s6 == d6);
+    assert(s7 == d7);
+    assert(s8 == d8);
+    assert(s9 == d9);
+    assert(s10 == d10);
+
+    auto sr0 = staticModel.getSymbolFromRange(0);
+    auto dr0 = dynamicModel.peekSymbolFromRange(0);
+
+    assert(sr0 == dr0);
+}
 void testArithmeticCoder() {
     writefln("Testing ArithmeticCoder ---------------------------------");
 
@@ -170,34 +220,58 @@ void testArithmeticCoder() {
         coder.beginDecoding(r);
         foreach(i; 0..originalData.length) {
             int value = coder.decode(r);
-            assert(originalData[i] == cast(ubyte)value, "i=%s".format(i));
+            assert(originalData[i] == cast(ubyte)value, "i=%s expected = %s, actual = %s".format(i, originalData[i], value));
         }
         coder.endDecoding();
         writefln("    decode succeeded");
     }
-    void _doTest(string name, ubyte[] data) {
-        writefln("  Testing %s", name);
-        ulong[] frequencies = _calcFrequences(data, 256);
+    void _doTest(T : EntropyModel)(string name, ubyte[] data) {
 
-        writefln("    length       = %s", data.length);
-        writefln("    Lowest freq  = %s", frequencies.minElement);
-        writefln("    Largest freq = %s", frequencies.maxElement);
+        static if(is(T==Order0StaticModel)) {
+            EntropyModel encodeModel = new Order0StaticModel(_calcFrequences(data, 256));
+            EntropyModel decodeModel = new Order0StaticModel(_calcFrequences(data, 256));
+        } else {
+            EntropyModel encodeModel = new Order0DynamicModel(256);
+            EntropyModel decodeModel = new Order0DynamicModel(256);
+        }
 
-        auto coder = new ArithmeticCoder(new Order0StaticModel(frequencies));
+        ArithmeticCoder encoder = new ArithmeticCoder(encodeModel);
+        ArithmeticCoder decoder = new ArithmeticCoder(decodeModel);
+
+        writefln("  '%s'", name);
+        writefln("    length = %s", data.length);
 
         ubyte[] encodedData;
-        auto numBits = _encode(coder, data, encodedData);
-        auto optimalEntropy = data.map!(it=>entropyBits(frequencies[it], data.length)).sum();
+        auto numBits = _encode(encoder, data, encodedData);
 
         writefln("    coder entropy   = %s bits (%s bytes)", numBits, numBits/8);
-        writefln("    optimal entropy = %s bits", optimalEntropy);
 
-        _decode(coder, data, encodedData);
+        _decode(decoder, data, encodedData);
     }
-    _doTest("empty stream", []);
-    _doTest("single byte", [0]);
-    _doTest("short sequence", [0,1,2,3]);
-    _doTest("bib", cast(ubyte[])read("testdata/bib"));
+    void _doStaticModelTests() {
+        writefln("Order0StaticModel");
+        ubyte[] data = [];
+        _doTest!Order0StaticModel("empty stream", data);
+        data = [0];
+        _doTest!Order0StaticModel("single byte", data);
+        data = [0,1,2,3];
+        _doTest!Order0StaticModel("short sequence", data);
+        data = cast(ubyte[])read("testdata/bib");
+        _doTest!Order0StaticModel("bib", data);
+    }
+    void _doDynamicModelTests() {
+        writefln("Order0DynamicModel");
+        ubyte[] data = [];
+        _doTest!Order0DynamicModel("empty stream", data);
+        data = [0];
+        _doTest!Order0DynamicModel("single byte", data);
+        data = [0,1,2,3];
+        _doTest!Order0DynamicModel("short sequence", data);
+        data = cast(ubyte[])read("testdata/bib");
+        _doTest!Order0DynamicModel("bib", data);
+    }
+    _doStaticModelTests();
+    _doDynamicModelTests();
 }
 void testHuffmanCoder() {
     writefln("Testing HuffmanCoder ---------------------------------");

@@ -13,18 +13,30 @@ public:
         }
         cumulativeWeights[$-1] = weight;
     }
-    MSymbol getSymbolFromValue(int value) {
-        return MSymbol(cumulativeWeights[value], cumulativeWeights[value+1], value);
+    override MSymbol getSymbolFromValue(int value) {
+        return MSymbol(cumulativeWeights[value], cumulativeWeights[value+1], getScale(), value);
     }
-    MSymbol getSymbolFromRange(ulong range) {
+    override MSymbol getSymbolFromRange(ulong range) {
         // naive implementation
-        for(int i = 0 ;i < cumulativeWeights.length ;i++) {
-            if(range < cumulativeWeights[i+1]) return MSymbol(cumulativeWeights[i], cumulativeWeights[i+1], i);
+        for(int i = 0; i < cumulativeWeights.length; i++) {
+            if(range < cumulativeWeights[i+1]) {
+                return MSymbol(cumulativeWeights[i], cumulativeWeights[i+1], getScale(), i);
+            }
         }
         assert(false);
     }
-    ulong getScale() {
+    override ulong getScale() {
         return cumulativeWeights[$-1];
+    }
+    void dumpRanges() {
+        writefln("Ranges {");
+
+        foreach(i; 0..cumulativeWeights.length) {
+            ulong w0 = i > 0 ? cumulativeWeights[i-1] : 0;
+            ulong w1 = cumulativeWeights[i];
+            writefln(" '%s'\t%s..<%s (freq = %s) cumulativeWeights[%s] = %s", i, w0, w1, w1-w0, i, cumulativeWeights[i]);
+        }
+        writefln("} scale = %s", cumulativeWeights[$-1]);
     }
 private:
     ulong[] cumulativeWeights;    

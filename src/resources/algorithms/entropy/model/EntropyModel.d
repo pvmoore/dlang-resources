@@ -8,11 +8,12 @@ public import resources.algorithms.entropy.model.Order0DynamicModel;
 struct MSymbol {
 	ulong low;
 	ulong high;
+    ulong scale;
     int value;
 }
 
 interface EntropyModel {
     MSymbol getSymbolFromValue(int value);
     MSymbol getSymbolFromRange(ulong range);
-    ulong   getScale();
+    ulong getScale();
 }
