@@ -23,7 +23,7 @@
             "label": "**** Test release (LDC)****",
             "type": "shell",
             "windows": {
-                "command": "dub run --build=release --config=test --compiler=ldc2 --arch=x86_64",
+                "command": "run_release_build.bat test",
             },
             "presentation": {
                 "reveal": "always",

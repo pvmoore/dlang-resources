@@ -18,8 +18,11 @@ public:
         updateFrequencies(value);
         return symbol;
     }
+    /**
+     * This currently uses a naive implementation.
+     * Improvement - change to a binary search
+     */
     override MSymbol getSymbolFromRange(ulong range) {
-        // naive implementation
         MSymbol symbol;
         for(int i = 0; i < cumulativeWeights.length; i++) {
             if(range < cumulativeWeights[i+1]) { 
@@ -43,7 +46,6 @@ public:
         return symbol;
     }
     MSymbol peekSymbolFromRange(ulong range) {
-        // naive implementation
         MSymbol symbol;
         for(int i = 0; i < cumulativeWeights.length; i++) {
             if(range < cumulativeWeights[i+1]) { 
@@ -66,6 +68,9 @@ public:
 private:
     ulong[] cumulativeWeights;
 
+    /**
+     * Improvement - change this to a hierarchical count algorithm.
+     */
     void updateFrequencies(int value) {
         foreach(i; value+1..cumulativeWeights.length) {
             cumulativeWeights[i]++;

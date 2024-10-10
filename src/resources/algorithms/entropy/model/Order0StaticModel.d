@@ -16,8 +16,11 @@ public:
     override MSymbol getSymbolFromValue(int value) {
         return MSymbol(cumulativeWeights[value], cumulativeWeights[value+1], getScale(), value);
     }
+    /**
+     * This currently uses a naive implementation.
+     * Improvement - change to a binary search
+     */
     override MSymbol getSymbolFromRange(ulong range) {
-        // naive implementation
         for(int i = 0; i < cumulativeWeights.length; i++) {
             if(range < cumulativeWeights[i+1]) {
                 return MSymbol(cumulativeWeights[i], cumulativeWeights[i+1], getScale(), i);
@@ -39,5 +42,5 @@ public:
         writefln("} scale = %s", cumulativeWeights[$-1]);
     }
 private:
-    ulong[] cumulativeWeights;    
+    ulong[] cumulativeWeights;   
 }

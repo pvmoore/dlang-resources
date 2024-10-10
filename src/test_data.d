@@ -4,9 +4,11 @@ import std.stdio                : writefln;
 import std.format               : format;
 import std.file                 : read;
 import std.array                : appender;
-import std.datetime.stopwatch   : StopWatch;
+import std.datetime.stopwatch   : StopWatch, AutoStart;
 import std.range                : array;
 import std.algorithm            : minElement, maxElement, each, map, sum;
+import std.random               : uniform;
+import std.typecons             : tuple, Tuple;
 
 import maths    : entropyBits;
 import common   : as, BitWriter, BitReader, ByteReader;
@@ -24,8 +26,10 @@ void testData() {
     //testZip();
     //testDedupe();
 
-    testEntropyModel();
+    //testCumulativeCounts();
+    //testEntropyModel();
     testArithmeticCoder();
+
     //testHuffmanCoder();
 }
 
@@ -140,11 +144,140 @@ void testZip() {
 
     zip.close();
 }
+void testCumulativeCounts() {
+    writefln("Testing CumulativeCounts ---------------------------------");
+    {
+        auto c = new CumulativeCounts(16); 
+        c.add(11);
+        c.add(6);
+        c.add(8);
+        c.add(7);
+        c.add(15);
+
+        c.dumpTree();
+
+        assert(c.getCountByIndex(5) == 0);
+        assert(c.getCountByIndex(6) == 1);
+        assert(c.getCountByIndex(7) == 2);
+        assert(c.getCountByIndex(8) == 3);
+        assert(c.getCountByIndex(11) == 4);
+        assert(c.getCountByIndex(13) == 4);
+        assert(c.getCountByIndex(15) == 5);   
+    }
+    {
+        auto c = new CumulativeCounts(16); 
+        foreach(i; 0..16) {
+            c.add(i);
+        }
+        c.add(11);
+        c.add(6);
+        c.add(8);
+        c.add(7);
+        c.add(15);
+
+        assert(c.getCountByRange(0) == 0);
+        assert(c.getCountByRange(1) == 1);
+        assert(c.getCountByRange(2) == 2);
+        assert(c.getCountByRange(3) == 3);
+        assert(c.getCountByRange(4) == 4);
+        assert(c.getCountByRange(5) == 5);
+        assert(c.getCountByRange(6) == 6);
+        assert(c.getCountByRange(7) == 6);
+        assert(c.getCountByRange(8) == 7);
+        assert(c.getCountByRange(9) == 7);
+        assert(c.getCountByRange(10) == 8);
+        assert(c.getCountByRange(11) == 8);
+        assert(c.getCountByRange(12) == 9);
+        assert(c.getCountByRange(13) == 10);
+        assert(c.getCountByRange(14) == 11);
+        assert(c.getCountByRange(15) == 11);
+        assert(c.getCountByRange(16) == 12);
+        assert(c.getCountByRange(17) == 13);
+        assert(c.getCountByRange(18) == 14);
+        assert(c.getCountByRange(19) == 15);
+        assert(c.getCountByRange(20) == 15);
+
+        c.dumpTree();
+    }
+    {   // check initialCount
+        auto c1 = new CumulativeCounts(8);
+        foreach(i; 0..8) {
+            c1.add(i);
+        }
+
+        auto c2 = new CumulativeCounts(8, 1);
+        c1.dumpTree();
+        c2.dumpTree();
+
+        assert(c1.peekCounts() == c2.peekCounts());
+    }
+    {   // check add() count > 1
+        auto c1 = new CumulativeCounts(8);
+        auto c2 = new CumulativeCounts(8);
+        c1.add(3, 2);
+        c2.add(3);
+        c2.add(3);
+        c1.dumpTree();
+        c2.dumpTree();
+
+        assert(c1.peekCounts() == c2.peekCounts());
+    }
+    {   // total
+        auto c0 = new CumulativeCounts(8);
+        assert(c0.getTotal() == 0);
+
+        auto c1 = new CumulativeCounts(8, 1);
+        assert(c1.getTotal() == 8);
+
+        auto c2 = new CumulativeCounts(8, 1);
+        c2.add(3, 7);
+        assert(c2.getTotal() == 8+7);
+    }
+    {
+        // fuzz test
+        writefln("################ Fuzz test ################");
+        
+        void _run(uint num) {
+            ulong[] counts = new ulong[num];
+            auto c = new CumulativeCounts(num); 
+            foreach(i; 0..num*uniform(1,10)) {
+                uint index = uniform(0,num);
+                counts[index]++;
+                c.add(index);
+            }
+            c.dumpTree();
+
+            writefln("counts:  %s", counts);
+            ulong total = 0;
+            foreach(i; 0..num) {
+                total += counts[i];
+                counts[i] = total;
+            }
+            writefln("weights: %s", counts);
+            writefln("Checking ...");
+            foreach(i; 0..num) {
+                assert(counts[i] == c.getCountByIndex(i));
+            }
+            writefln("Correct");
+        }
+
+        _run(16);
+        _run(33);
+        _run(128);
+    }
+   
+}
 void testEntropyModel() {
     writefln("Testing testEntropyModel ---------------------------------");
-    ulong[] frequencies = [1,1,1,1, 1,1,1,1, 1,1,1];
+    ulong[] frequencies = [1,1,1,1,1,1,2,2, 2,1,1,2,1,1,1,2];
     auto staticModel = new Order0StaticModel(frequencies);
-    auto dynamicModel = new Order0DynamicModel(11);
+    auto dynamicModel = new Order0DynamicModel(16);
+
+    dynamicModel.getSymbolFromValue(11);
+    dynamicModel.getSymbolFromValue(6);
+    dynamicModel.getSymbolFromValue(15);
+    dynamicModel.getSymbolFromValue(8);
+    dynamicModel.getSymbolFromValue(7);
     staticModel.dumpRanges();
     dynamicModel.dumpRanges();
 
@@ -159,38 +292,120 @@ void testEntropyModel() {
     auto s8 = staticModel.getSymbolFromValue(8);
     auto s9 = staticModel.getSymbolFromValue(9);
     auto s10 = staticModel.getSymbolFromValue(10);
+    auto s11 = staticModel.getSymbolFromValue(11);
+    auto s12 = staticModel.getSymbolFromValue(12);
+    auto s13 = staticModel.getSymbolFromValue(13);
+    auto s14 = staticModel.getSymbolFromValue(14);
+    auto s15 = staticModel.getSymbolFromValue(15);
 
-    auto d0 = dynamicModel.peekSymbolFromValue(0);
-    auto d1 = dynamicModel.peekSymbolFromValue(1);
-    auto d2 = dynamicModel.peekSymbolFromValue(2);
-    auto d3 = dynamicModel.peekSymbolFromValue(3);
-    auto d4 = dynamicModel.peekSymbolFromValue(4);
-    auto d5 = dynamicModel.peekSymbolFromValue(5);
-    auto d6 = dynamicModel.peekSymbolFromValue(6);
-    auto d7 = dynamicModel.peekSymbolFromValue(7);
-    auto d8 = dynamicModel.peekSymbolFromValue(8);
-    auto d9 = dynamicModel.peekSymbolFromValue(9);
-    auto d10 = dynamicModel.peekSymbolFromValue(10);
+    assert(s0 == MSymbol(0, 1, 21, 0));
+    assert(s1 == MSymbol(1, 2, 21, 1));
+    assert(s2 == MSymbol(2, 3, 21, 2));
+    assert(s3 == MSymbol(3, 4, 21, 3));
+    assert(s4 == MSymbol(4, 5, 21, 4));
+    assert(s5 == MSymbol(5, 6, 21, 5));
+    assert(s6 == MSymbol(6, 8, 21, 6));
+    assert(s7 == MSymbol(8, 10, 21,7));
+    assert(s8 == MSymbol(10, 12, 21, 8));
+    assert(s9 == MSymbol(12, 13, 21, 9));
+    assert(s10 == MSymbol(13, 14, 21, 10));
+    assert(s11 == MSymbol(14, 16, 21, 11));
+    assert(s12 == MSymbol(16, 17, 21, 12));
+    assert(s13 == MSymbol(17, 18, 21, 13));
+    assert(s14 == MSymbol(18, 19, 21, 14));
+    assert(s15 == MSymbol(19, 21, 21, 15));
 
-    assert(s0 == d0);
-    assert(s1 == d1);
-    assert(s2 == d2);
-    assert(s3 == d3);
-    assert(s4 == d4);
-    assert(s5 == d5);
-    assert(s6 == d6);
-    assert(s7 == d7);
-    assert(s8 == d8);
-    assert(s9 == d9);
-    assert(s10 == d10);
+    assert(s0 == dynamicModel.peekSymbolFromValue(0));
+    assert(s1 == dynamicModel.peekSymbolFromValue(1));
+    assert(s2 == dynamicModel.peekSymbolFromValue(2));
+    assert(s3 == dynamicModel.peekSymbolFromValue(3));
+    assert(s4 == dynamicModel.peekSymbolFromValue(4));
+    assert(s5 == dynamicModel.peekSymbolFromValue(5));
+    assert(s6 == dynamicModel.peekSymbolFromValue(6));
+    assert(s7 == dynamicModel.peekSymbolFromValue(7));
+    assert(s8 == dynamicModel.peekSymbolFromValue(8));
+    assert(s9 == dynamicModel.peekSymbolFromValue(9));
+    assert(s10 == dynamicModel.peekSymbolFromValue(10));
+    assert(s11 == dynamicModel.peekSymbolFromValue(11));
+    assert(s12 == dynamicModel.peekSymbolFromValue(12));
+    assert(s13 == dynamicModel.peekSymbolFromValue(13));
+    assert(s14 == dynamicModel.peekSymbolFromValue(14));
+    assert(s15 == dynamicModel.peekSymbolFromValue(15));
 
     auto sr0 = staticModel.getSymbolFromRange(0);
-    auto dr0 = dynamicModel.peekSymbolFromRange(0);
+    auto sr1 = staticModel.getSymbolFromRange(1);
+    auto sr2 = staticModel.getSymbolFromRange(2);
+    auto sr3 = staticModel.getSymbolFromRange(3);
+    auto sr4 = staticModel.getSymbolFromRange(4);
+    auto sr5 = staticModel.getSymbolFromRange(5);
+    auto sr6 = staticModel.getSymbolFromRange(6);
+    auto sr7 = staticModel.getSymbolFromRange(7);
+    auto sr8 = staticModel.getSymbolFromRange(8);
+    auto sr9 = staticModel.getSymbolFromRange(9);
+    auto sr10 = staticModel.getSymbolFromRange(10);
+    auto sr11 = staticModel.getSymbolFromRange(11);
+    auto sr12 = staticModel.getSymbolFromRange(12);
+    auto sr13 = staticModel.getSymbolFromRange(13);
+    auto sr14 = staticModel.getSymbolFromRange(14);
+    auto sr15 = staticModel.getSymbolFromRange(15);
+    auto sr16 = staticModel.getSymbolFromRange(16);
+    auto sr17 = staticModel.getSymbolFromRange(17);
+    auto sr18 = staticModel.getSymbolFromRange(18);
+    auto sr19 = staticModel.getSymbolFromRange(19);
+    auto sr20 = staticModel.getSymbolFromRange(20);
 
-    assert(sr0 == dr0);
+    assert(sr0 == MSymbol(0, 1, 21, 0));
+    assert(sr1 == MSymbol(1, 2, 21, 1));
+    assert(sr2 == MSymbol(2, 3, 21, 2));
+    assert(sr3 == MSymbol(3, 4, 21, 3));
+    assert(sr4 == MSymbol(4, 5, 21, 4));
+    assert(sr5 == MSymbol(5, 6, 21, 5));
+    assert(sr6 == MSymbol(6, 8, 21, 6));
+    assert(sr7 == MSymbol(6, 8, 21, 6));
+    assert(sr8 == MSymbol(8, 10, 21, 7));
+    assert(sr9 == MSymbol(8, 10, 21, 7));
+    assert(sr10 == MSymbol(10, 12, 21, 8));
+    assert(sr11 == MSymbol(10, 12, 21, 8));
+    assert(sr12 == MSymbol(12, 13, 21, 9));
+    assert(sr13 == MSymbol(13, 14, 21, 10));
+    assert(sr14 == MSymbol(14, 16, 21, 11));
+    assert(sr15 == MSymbol(14, 16, 21, 11));
+    assert(sr16 == MSymbol(16, 17, 21, 12));
+    assert(sr17 == MSymbol(17, 18, 21, 13));
+    assert(sr18 == MSymbol(18, 19, 21, 14));
+    assert(sr19 == MSymbol(19, 21, 21, 15));
+    assert(sr20 == MSymbol(19, 21, 21, 15));
+
+    assert(sr0 == dynamicModel.peekSymbolFromRange(0));
+    assert(sr1 == dynamicModel.peekSymbolFromRange(1));
+    assert(sr2 == dynamicModel.peekSymbolFromRange(2));
+    assert(sr3 == dynamicModel.peekSymbolFromRange(3));
+    assert(sr4 == dynamicModel.peekSymbolFromRange(4));
+    assert(sr5 == dynamicModel.peekSymbolFromRange(5));
+    assert(sr6 == dynamicModel.peekSymbolFromRange(6));
+    assert(sr7 == dynamicModel.peekSymbolFromRange(7));
+    assert(sr8 == dynamicModel.peekSymbolFromRange(8));
+    assert(sr9 == dynamicModel.peekSymbolFromRange(9));
+    assert(sr10 == dynamicModel.peekSymbolFromRange(10));
+    assert(sr11 == dynamicModel.peekSymbolFromRange(11));
+    assert(sr12 == dynamicModel.peekSymbolFromRange(12));
+    assert(sr13 == dynamicModel.peekSymbolFromRange(13));
+    assert(sr14 == dynamicModel.peekSymbolFromRange(14));
+    assert(sr15 == dynamicModel.peekSymbolFromRange(15));
+    assert(sr16 == dynamicModel.peekSymbolFromRange(16));
+    assert(sr17 == dynamicModel.peekSymbolFromRange(17));
+    assert(sr18 == dynamicModel.peekSymbolFromRange(18));
+    assert(sr19 == dynamicModel.peekSymbolFromRange(19));
+    assert(sr20 == dynamicModel.peekSymbolFromRange(20));
+
+    assert(staticModel.getScale() == 21);
+    assert(staticModel.getScale() == dynamicModel.getScale());
 }
 void testArithmeticCoder() {
     writefln("Testing ArithmeticCoder ---------------------------------");
+
+    StopWatch encodeTime;
+    StopWatch decodeTime;
 
     ulong[] _calcFrequences(ubyte[] data, uint scale) {
         ulong[] frequencies = new ulong[scale];
@@ -205,11 +420,13 @@ void testArithmeticCoder() {
         auto outStream = appender!(ubyte[]);
         auto w = new BitWriter((it) {numBits+=8; outStream~= it; });
 
+        encodeTime.start();
         coder.beginEncoding();
         foreach(b; data) {
             coder.encode(w, b);
         }
         coder.endEncoding(w);
+        encodeTime.stop();
         encodedData = outStream.data;
         return numBits;
     }
@@ -217,12 +434,14 @@ void testArithmeticCoder() {
         writefln("    decoding");
         auto br = new ByteReader(encodedData);
         auto r  = new BitReader(() { return br.read!ubyte; });
+        decodeTime.start();
         coder.beginDecoding(r);
         foreach(i; 0..originalData.length) {
             int value = coder.decode(r);
             assert(originalData[i] == cast(ubyte)value, "i=%s expected = %s, actual = %s".format(i, originalData[i], value));
         }
         coder.endDecoding();
+        decodeTime.stop();
         writefln("    decode succeeded");
     }
     void _doTest(T : EntropyModel)(string name, ubyte[] data) {
@@ -267,11 +486,18 @@ void testArithmeticCoder() {
         _doTest!Order0DynamicModel("single byte", data);
         data = [0,1,2,3];
         _doTest!Order0DynamicModel("short sequence", data);
+
         data = cast(ubyte[])read("testdata/bib");
         _doTest!Order0DynamicModel("bib", data);
+
+        data = cast(ubyte[])read("testdata/book2");
+        _doTest!Order0DynamicModel("book2", data);
     }
     _doStaticModelTests();
     _doDynamicModelTests();
+
+    writefln("encode time %s ms", encodeTime.peek().total!"nsecs"/1_000_000.0); // ~70 ms
+    writefln("decode time %s ms", decodeTime.peek().total!"nsecs"/1_000_000.0); // ~95 ms
 }
 void testHuffmanCoder() {
     writefln("Testing HuffmanCoder ---------------------------------");
