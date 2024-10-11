@@ -4,8 +4,10 @@ import resources.all;
 
 final class Order0DynamicModel : EntropyModel {
 public:
-    this(uint numSymbols) {
-        cumulativeWeights.length = numSymbols + 1;
+    this(uint numSymbols, ulong factor = 1) {
+        this.factor = factor;
+        this.cumulativeWeights.length = numSymbols + 1;
+        
         foreach(i; 0..numSymbols) {
             cumulativeWeights[i] = i;
         }
@@ -20,7 +22,7 @@ public:
     }
     /**
      * This currently uses a naive implementation.
-     * Improvement - change to a binary search
+     * Use FastOrder0DynamicModel for an optimised version of this class
      */
     override MSymbol getSymbolFromRange(ulong range) {
         MSymbol symbol;
@@ -67,13 +69,14 @@ public:
     }
 private:
     ulong[] cumulativeWeights;
+    ulong factor;
 
     /**
      * Improvement - change this to a hierarchical count algorithm.
      */
     void updateFrequencies(int value) {
         foreach(i; value+1..cumulativeWeights.length) {
-            cumulativeWeights[i]++;
+            cumulativeWeights[i] += factor;
         }
     }
 }

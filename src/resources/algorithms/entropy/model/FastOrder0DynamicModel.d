@@ -8,17 +8,18 @@ import resources.all;
  */
 final class FastOrder0DynamicModel : EntropyModel {
 public:
-    this(uint numSymbols) {
+    this(uint numSymbols, ulong factor = 1) {
+        this.factor = factor;
         this.counts = new CumulativeCounts(numSymbols, 1);
     }
     override MSymbol getSymbolFromIndex(uint index) {
         auto symbol = counts.getSymbolFromIndex(index);
-        counts.add(index);
+        counts.add(index, factor);
         return symbol;
     }
     override MSymbol getSymbolFromRange(ulong range) {
         MSymbol symbol = counts.getSymbolFromRange(range);
-        counts.add(symbol.value);
+        counts.add(symbol.value, factor);
         return symbol;
     }
     override ulong getScale() {
@@ -46,4 +47,5 @@ public:
     }
 private:
     CumulativeCounts counts;
+    ulong factor;
 }

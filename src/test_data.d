@@ -448,7 +448,6 @@ void testArithmeticCoder() {
         return frequencies;
     }
     ulong _encode(ArithmeticCoder coder, ubyte[] data, ref ubyte[] encodedData) {
-        writefln("    encoding");
         ulong numBits;
         auto outStream = appender!(ubyte[]);
         auto w = new BitWriter((it) {numBits+=8; outStream~= it; });
@@ -464,7 +463,6 @@ void testArithmeticCoder() {
         return numBits;
     }
     void _decode(ArithmeticCoder coder, ubyte[] originalData, ubyte[] encodedData) {
-        writefln("    decoding");
         auto br = new ByteReader(encodedData);
         auto r  = new BitReader(() { return br.read!ubyte; });
         decodeTime.start();
@@ -486,11 +484,11 @@ void testArithmeticCoder() {
             EntropyModel encodeModel = new FastOrder0StaticModel(_calcFrequences(data, 256));
             EntropyModel decodeModel = new FastOrder0StaticModel(_calcFrequences(data, 256));
         } else static if(is(T==FastOrder0DynamicModel)) {
-            EntropyModel encodeModel = new FastOrder0DynamicModel(256);
-            EntropyModel decodeModel = new FastOrder0DynamicModel(256);
+            EntropyModel encodeModel = new FastOrder0DynamicModel(256, 20);
+            EntropyModel decodeModel = new FastOrder0DynamicModel(256, 20);
         } else {
-            EntropyModel encodeModel = new Order0DynamicModel(256);
-            EntropyModel decodeModel = new Order0DynamicModel(256);
+            EntropyModel encodeModel = new Order0DynamicModel(256, 20);
+            EntropyModel decodeModel = new Order0DynamicModel(256, 20);
         }
 
         ArithmeticCoder encoder = new ArithmeticCoder(encodeModel);
@@ -502,7 +500,7 @@ void testArithmeticCoder() {
         ubyte[] encodedData;
         auto numBits = _encode(encoder, data, encodedData);
 
-        writefln("    coder entropy   = %s bits (%s bytes)", numBits, numBits/8);
+        writefln("    coder entropy = %s bits (%s bytes)", numBits, numBits/8);
 
         _decode(decoder, data, encodedData);
     }
