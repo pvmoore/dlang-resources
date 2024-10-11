@@ -34,9 +34,9 @@ public:
         this.code  = 0;
         this.numUnderflowBits = 0;
     }
-    void encode(BitWriter w, int value) {
+    void encode(BitWriter w, uint value) {
         assert(state == state.ENCODING);
-        auto s = model.getSymbolFromValue(value);
+        auto s = model.getSymbolFromIndex(value);
 
         ulong range = ( high-low ) + 1L;
 		high  	    = (low + (( range * s.high ) / s.scale - 1L) & MASK);

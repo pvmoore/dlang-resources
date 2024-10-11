@@ -38,7 +38,7 @@ public:
         return total; 
     }
     ulong[] peekCounts() {
-        return tree[$-NUM_COUNTS..$];
+        return tree[BOTTOM_ROW_OFFSET..$];
     }
 
     this(uint numCounts, ulong initialCount = 0) {
@@ -51,7 +51,7 @@ public:
         this.NUM_COUNTS_DIV = bsf(this.NUM_COUNTS) - 1; 
         createTree(initialCount);
     }
-    void add(uint value, uint count = 1) {
+    void add(uint value, ulong count = 1) {
         assert(value <= MAX_VALUE);
         
         uint offset = 0;
@@ -69,72 +69,65 @@ public:
         }
         total += count;
     }
-    ulong getCountByIndex(uint index) {
-        ulong count     = 0;
+    MSymbol getSymbolFromIndex(uint index) {
+        ulong low       = 0;
         uint treeOffset = 0;
         uint size       = 2;
-        uint window     = NUM_COUNTS;
+        uint shift      = NUM_COUNTS_DIV;  
         uint pivot      = NUM_COUNTS >>> 1;
+        uint window     = NUM_COUNTS >>> 2;
 
-        while(window > 1) {
-            // writefln("--------------------");
-            // writefln("pivot      = %s", pivot);
-            // writefln("treeOffset = %s", treeOffset);
-            // writefln("size       = %s", size);
-            // writefln("window     = %s", window);
+        while(size <= NUM_COUNTS) {
 
             if(index >= pivot) {
                 // go right
-                auto leftPos   = treeOffset + (pivot/window)*2;
-                auto leftValue = tree[leftPos];
-                count += leftValue;
-                pivot += window>>>2;
-                //writefln("leftPos    = %s", leftPos);
-                //writefln("go right (adding %s from tree[%s])", leftValue, leftPos);
-                
+                auto n     = (pivot >>> shift) & 0xffff_fffe;
+                auto value = tree[treeOffset + n];
+                low   += value;
+                pivot += window;
             } else {
                 // go left
-                pivot -= window>>>2;
+                pivot -= window;
             }
             treeOffset += size;
             size <<= 1;
-            window >>>= 1;
-        }
-
-        // add the final count
-        count += tree[tree.length-NUM_COUNTS+index];
-
-        return count;
-    }
-    ulong getCountByRange(uint range) { 
-        uint treeOffset = 0;
-        uint index  = 0;
-        ulong sum   = 0;
-        uint size   = 2;
-        uint window = NUM_COUNTS >>> 1;
-        uint shift  = NUM_COUNTS_DIV;
-
-        while(size <= NUM_COUNTS) {
-            uint n = index >>> shift;
-            ulong value = tree[treeOffset+n];
-            //writefln("size: %s, window: %s, index: %s, shift: %s, treeOffset: %s, n: %s", 
-            //    size, window, index, shift, treeOffset, n);
-            //writefln(" value = %s, sum = %s, (sum+value = %s)", value, sum, sum+value);
-
-            if(range >= sum + value) {
-                // go right
-                index += window;
-                sum += value;
-            } else {
-                // go left
-            }
-
             window >>>= 1;
             shift--;
+        }
+
+        ulong high = low + tree[BOTTOM_ROW_OFFSET+index];
+
+        return MSymbol(low, high, total, index);
+    }
+    MSymbol getSymbolFromRange(ulong range) { 
+        uint treeOffset = 0;
+        uint index      = 0;
+        ulong low       = 0;
+        uint size       = 2;
+        uint window     = NUM_COUNTS >>> 1;
+        uint shift      = NUM_COUNTS_DIV;
+
+        while(size <= NUM_COUNTS) {
+            uint n      = index >>> shift;
+            ulong value = tree[treeOffset + n];
+
+            if(range >= low + value) {
+                // go right
+                index += window;
+                low   += value;
+            } else {
+                // go left
+            }
+
             treeOffset += size;
             size <<= 1;
+            window >>>= 1;
+            shift--;
         }
-        return index;
+
+        ulong high = low + tree[BOTTOM_ROW_OFFSET+index];
+
+        return MSymbol(low, high, total, index);
     }
     void dumpTree() {
         uint num = 2;
@@ -150,9 +143,10 @@ public:
         }
     }
 private:
-    const uint MAX_VALUE;      // the 
-    const uint NUM_COUNTS;     // power of 2 number of counts
-    const uint NUM_COUNTS_DIV; // bsf(numCounts) - 1
+    const uint MAX_VALUE;       // the 
+    const uint NUM_COUNTS;      // power of 2 number of counts
+    const uint NUM_COUNTS_DIV;  // bsf(numCounts) - 1
+    uint BOTTOM_ROW_OFFSET;     // tree.length - NUM_COUNTS
     ulong[] tree;
     ulong total;
 
@@ -178,5 +172,6 @@ private:
             }
             total += initialCount * NUM_COUNTS;
         }
+        this.BOTTOM_ROW_OFFSET = tree.length.as!uint - NUM_COUNTS;
     }
 }

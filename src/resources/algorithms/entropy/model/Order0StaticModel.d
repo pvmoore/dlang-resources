@@ -13,7 +13,7 @@ public:
         }
         cumulativeWeights[$-1] = weight;
     }
-    override MSymbol getSymbolFromValue(int value) {
+    override MSymbol getSymbolFromIndex(uint value) {
         return MSymbol(cumulativeWeights[value], cumulativeWeights[value+1], getScale(), value);
     }
     /**

@@ -11,7 +11,7 @@ public:
         }
         cumulativeWeights[$-1] = numSymbols;
     }
-    override MSymbol getSymbolFromValue(int value) {
+    override MSymbol getSymbolFromIndex(uint value) {
         ulong low = cumulativeWeights[value];
         ulong high = cumulativeWeights[value+1];
         auto symbol = MSymbol(low, high, getScale(), value);
@@ -39,10 +39,10 @@ public:
 
     // debugging methods below here
 
-    MSymbol peekSymbolFromValue(int value) {
-        ulong low = cumulativeWeights[value];
-        ulong high = cumulativeWeights[value+1];
-        auto symbol = MSymbol(low, high, getScale(), value);
+    MSymbol peekSymbolFromIndex(uint index) {
+        ulong low = cumulativeWeights[index];
+        ulong high = cumulativeWeights[index+1];
+        auto symbol = MSymbol(low, high, getScale(), index);
         return symbol;
     }
     MSymbol peekSymbolFromRange(ulong range) {
