@@ -26,6 +26,7 @@ void testData() {
     //testZip();
     //testDedupe();
 
+    //testOrder1Model();
     //testCumulativeCounts();
     //testEntropyModel();
     testArithmeticCoder();
@@ -143,6 +144,24 @@ void testZip() {
     // f.close();
 
     zip.close();
+}
+void testOrder1Model() {
+    writefln("Testing Order1Model ---------------------------------");
+    
+    {
+        auto m = new Order1Model(16, 1);
+
+        auto s5 = m.getSymbolFromIndex(5);
+        assert(s5 == MSymbol(5,6,16,5));
+
+        auto s5_2 = m.getSymbolFromIndex(5);
+        assert(s5_2 == MSymbol(5,6,16,5));
+
+        auto s5_3 = m.getSymbolFromIndex(5);
+        assert(s5_3 == MSymbol(5,7,17,5));
+
+        writefln("%s", s5_3);
+    }
 }
 void testCumulativeCounts() {
     writefln("Testing CumulativeCounts ---------------------------------");
@@ -435,7 +454,7 @@ void testEntropyModel() {
     assert(staticModel.getScale() == dynamicModel.getScale());
 }
 void testArithmeticCoder() {
-    writefln("Testing ArithmeticCoder ---------------------------------");
+    writefln("Testing ArithmeticCoder ---------------------------------");  
 
     StopWatch encodeTime;
     StopWatch decodeTime;
@@ -486,9 +505,14 @@ void testArithmeticCoder() {
         } else static if(is(T==FastOrder0DynamicModel)) {
             EntropyModel encodeModel = new FastOrder0DynamicModel(256, 20);
             EntropyModel decodeModel = new FastOrder0DynamicModel(256, 20);
-        } else {
+        } else static if(is(T==Order0DynamicModel)) {
             EntropyModel encodeModel = new Order0DynamicModel(256, 20);
             EntropyModel decodeModel = new Order0DynamicModel(256, 20);
+        } else static if(is(T==Order1Model)) {
+            EntropyModel encodeModel = new Order1Model(256, 1);
+            EntropyModel decodeModel = new Order1Model(256, 1);
+        } else {
+            throwIf(true, "Unrecognised EntropyModel");
         }
 
         ArithmeticCoder encoder = new ArithmeticCoder(encodeModel);
@@ -528,6 +552,8 @@ void testArithmeticCoder() {
     writefln("Optimised version:");
     writefln("encode time %s ms", encodeTime.peek().total!"nsecs"/1_000_000.0); // ~82 ms
     writefln("decode time %s ms", decodeTime.peek().total!"nsecs"/1_000_000.0); // ~80 ms
+
+    _doTests!Order1Model();
 }
 void testHuffmanCoder() {
     writefln("Testing HuffmanCoder ---------------------------------");

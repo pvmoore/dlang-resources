@@ -79,14 +79,14 @@ public:
 
         while(size <= NUM_COUNTS) {
 
-            if(index >= pivot) {
-                // go right
+            bool goRight = index >= pivot;
+
+            if(goRight) {
                 auto n     = (pivot >>> shift) & 0xffff_fffe;
                 auto value = tree[treeOffset + n];
                 low   += value;
                 pivot += window;
             } else {
-                // go left
                 pivot -= window;
             }
             treeOffset += size;
@@ -108,16 +108,14 @@ public:
         uint shift      = NUM_COUNTS_DIV;
 
         while(size <= NUM_COUNTS) {
-            uint n      = index >>> shift;
-            ulong value = tree[treeOffset + n];
+            uint n       = index >>> shift;
+            ulong value  = tree[treeOffset + n];
+            bool goRight = range >= low + value; 
 
-            if(range >= low + value) {
-                // go right
+            if(goRight) {
                 index += window;
                 low   += value;
-            } else {
-                // go left
-            }
+            } 
 
             treeOffset += size;
             size <<= 1;
