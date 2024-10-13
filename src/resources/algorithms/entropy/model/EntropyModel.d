@@ -8,6 +8,7 @@ public import resources.algorithms.entropy.model.FastOrder0StaticModel;
 public import resources.algorithms.entropy.model.Order0StaticModel;
 public import resources.algorithms.entropy.model.Order0DynamicModel;
 public import resources.algorithms.entropy.model.Order1Model;
+public import resources.algorithms.entropy.model.LinearModel;
 
 struct MSymbol {
 	ulong low;

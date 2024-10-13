@@ -26,6 +26,7 @@ void testData() {
     //testZip();
     //testDedupe();
 
+    //testLinearModel();
     //testOrder1Model();
     //testCumulativeCounts();
     //testEntropyModel();
@@ -144,6 +145,20 @@ void testZip() {
     // f.close();
 
     zip.close();
+}
+void testLinearModel() {
+    writefln("Testing LinearModel ---------------------------------");
+    {
+        auto s = new Order0StaticModel([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]);
+        auto l  = new LinearModel(16);
+
+        assert(s.getScale() == l.getScale());
+
+        foreach(i; 0..16) {
+            assert(s.getSymbolFromIndex(i) == l.getSymbolFromIndex(i));
+            assert(s.getSymbolFromRange(i) == l.getSymbolFromRange(i));
+        }
+    }
 }
 void testOrder1Model() {
     writefln("Testing Order1Model ---------------------------------");
@@ -509,8 +524,8 @@ void testArithmeticCoder() {
             EntropyModel encodeModel = new Order0DynamicModel(256, 20);
             EntropyModel decodeModel = new Order0DynamicModel(256, 20);
         } else static if(is(T==Order1Model)) {
-            EntropyModel encodeModel = new Order1Model(256, 1);
-            EntropyModel decodeModel = new Order1Model(256, 1);
+            EntropyModel encodeModel = new Order1Model(256, 10);
+            EntropyModel decodeModel = new Order1Model(256, 10);
         } else {
             throwIf(true, "Unrecognised EntropyModel");
         }

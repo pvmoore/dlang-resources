@@ -48,9 +48,9 @@ private:
             currentCounts.add(index, factor);
 
             // Uncomment here to update order 0 probabilities
-            // foreach(i; 0..array.length) {
-            //     array[i].add(index, 1);
-            // }
+            foreach(i; 0..array.length) {
+                array[i].add(index, 20);
+            }
         }
         prevIndex = index;
     }
