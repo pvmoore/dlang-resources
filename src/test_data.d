@@ -20,7 +20,7 @@ void testData() {
     //testLZMA();
     //testPDC();
     //testPDC2();
-    //testPDC3();
+    testPDC3();
     //testLZ4();
     //testDeflate();
     //testZip();
@@ -30,7 +30,7 @@ void testData() {
     //testOrder1Model();
     //testCumulativeCounts();
     //testEntropyModel();
-    testArithmeticCoder();
+    //testArithmeticCoder();
 
     //testHuffmanCoder();
 }
@@ -159,6 +159,17 @@ void testLinearModel() {
             assert(s.getSymbolFromRange(i) == l.getSymbolFromRange(i));
         }
     }
+    {   // addSymbols
+        auto l  = new LinearModel(8);
+        assert(l.getScale() == 8);
+
+        l.addSymbols(2);
+        assert(l.getScale() == 10);
+
+        foreach(i; 0..10) {
+            assert(l.getSymbolFromIndex(i) == MSymbol(i, i+1, 10, i));
+        }
+    }
 }
 void testOrder1Model() {
     writefln("Testing Order1Model ---------------------------------");
@@ -181,7 +192,7 @@ void testOrder1Model() {
 void testCumulativeCounts() {
     writefln("Testing CumulativeCounts ---------------------------------");
     {
-        auto c = new CumulativeCounts(16); 
+        auto c = new CumulativeCounts(16, 0); 
         c.add(11);
         c.add(6);
         c.add(8);
@@ -238,7 +249,7 @@ void testCumulativeCounts() {
         assert(c.getSymbolFromIndex(15) == MSymbol(19, 21, 21, 15)); 
     }
     {   // check initialCount
-        auto c1 = new CumulativeCounts(8);
+        auto c1 = new CumulativeCounts(8, 0);
         foreach(i; 0..8) {
             c1.add(i);
         }
@@ -280,8 +291,8 @@ void testCumulativeCounts() {
         assert(c.getSymbolFromRange(20) == MSymbol(19, 21, 21, 15));
     }
     {   // check add() count > 1
-        auto c1 = new CumulativeCounts(8);
-        auto c2 = new CumulativeCounts(8);
+        auto c1 = new CumulativeCounts(8, 0);
+        auto c2 = new CumulativeCounts(8, 0);
         c1.add(3, 2);
         c2.add(3);
         c2.add(3);
@@ -291,7 +302,7 @@ void testCumulativeCounts() {
         assert(c1.peekCounts() == c2.peekCounts());
     }
     {   // total
-        auto c0 = new CumulativeCounts(8);
+        auto c0 = new CumulativeCounts(8, 0);
         assert(c0.getTotal() == 0);
 
         auto c1 = new CumulativeCounts(8, 1);
@@ -301,13 +312,58 @@ void testCumulativeCounts() {
         c2.add(3, 7);
         assert(c2.getTotal() == 8+7);
     }
+    {   // expandBy
+        auto c = new CumulativeCounts(9, 1);
+        assert(c.getNumCounts()==9);
+        assert(c.getCapacity()==16);
+        assert(c.getTotal() == 9);
+        assert(c.peekCounts()      == [1,1,1,1,1,1,1,1,1]);
+        assert(c.peekWeightsLow()  == [0,1,2,3,4,5,6,7,8]);
+        assert(c.peekWeightsHigh() == [1,2,3,4,5,6,7,8,9]);
+
+        c.expandBy(1, 0); 
+        c.dumpTree();
+        assert(c.getNumCounts()==10);
+        assert(c.getCapacity()==16);
+        assert(c.getTotal() == 9);
+        assert(c.peekCounts()      == [1,1,1,1, 1,1,1,1, 1,0]);
+        assert(c.peekWeightsLow()  == [0,1,2,3,4,5,6,7,8,9]);
+        assert(c.peekWeightsHigh() == [1,2,3,4,5,6,7,8,9,9]);
+
+        c.expandBy(1, 1);
+        c.dumpTree();
+        assert(c.getNumCounts()==11);
+        assert(c.getCapacity()==16);
+        assert(c.getTotal() == 10);
+        assert(c.peekCounts()      == [1,1,1,1, 1,1,1,1, 1,0,1]);
+        assert(c.peekWeightsLow()  == [0,1,2,3,4,5,6,7,8,9,9]);
+        assert(c.peekWeightsHigh() == [1,2,3,4,5,6,7,8,9,9,10]);
+
+        c.expandBy(5, 1);
+        c.dumpTree();
+        assert(c.getNumCounts()==16);
+        assert(c.getCapacity()==16);
+        assert(c.getTotal() == 15);
+        assert(c.peekCounts()      == [1,1,1,1, 1,1,1,1, 1, 0, 1, 1, 1, 1, 1, 1]);
+        assert(c.peekWeightsLow()  == [0,1,2,3, 4,5,6,7, 8, 9, 9,10,11,12,13,14]);
+        assert(c.peekWeightsHigh() == [1,2,3,4, 5,6,7,8, 9, 9,10,11,12,13,14,15]);
+
+        c.expandBy(3, 1);
+        c.dumpTree();
+        assert(c.getNumCounts()==19);
+        assert(c.getCapacity()==32);
+        assert(c.getTotal() == 18);
+        assert(c.peekCounts()      == [1,1,1,1, 1,1,1,1, 1, 0, 1, 1, 1, 1, 1, 1, 1,1,1]);
+        assert(c.peekWeightsLow()  == [0,1,2,3, 4,5,6,7, 8, 9, 9,10,11,12,13,14, 15,16,17]);
+        assert(c.peekWeightsHigh() == [1,2,3,4, 5,6,7,8, 9, 9,10,11,12,13,14,15, 16,17,18]);
+    }
     {
         // fuzz test
         writefln("################ Fuzz test ################");
         
         void _run(uint num) {
             ulong[] counts = new ulong[num];
-            auto c = new CumulativeCounts(num); 
+            auto c = new CumulativeCounts(num, 0); 
             foreach(i; 0..num*uniform(1,10)) {
                 uint index = uniform(0,num);
                 counts[index]++;
@@ -524,8 +580,8 @@ void testArithmeticCoder() {
             EntropyModel encodeModel = new Order0DynamicModel(256, 20);
             EntropyModel decodeModel = new Order0DynamicModel(256, 20);
         } else static if(is(T==Order1Model)) {
-            EntropyModel encodeModel = new Order1Model(256, 10);
-            EntropyModel decodeModel = new Order1Model(256, 10);
+            EntropyModel encodeModel = new Order1Model(256, 1);
+            EntropyModel decodeModel = new Order1Model(256, 1);
         } else {
             throwIf(true, "Unrecognised EntropyModel");
         }

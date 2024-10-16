@@ -25,11 +25,10 @@ import std.stdio    			: writef, writefln, File, SEEK_CUR;
 import std.file     			: exists, getSize;
 import std.path     			: baseName, extension;
 import std.string   			: splitLines, strip, toLower;
-import std.range    			: appender, array;
+import std.range    			: appender, array, iota;
 import std.regex    			: matchFirst;
-import std.typecons 			: tuple;
-import std.algorithm.iteration  : each, map;
-import std.algorithm.sorting    : sort;
+import std.typecons 			: tuple, Tuple;
+import std.algorithm  			: each, map, sort;
 
 enum chatty = false;
 

@@ -1,10 +1,10 @@
 module resources.algorithms.entropy.RangeCoder;
 
+import resources.all;
+
 /**
  *  https://en.wikipedia.org/wiki/Range_encoding
  */
-import resources.all;
-
 final class RangeCoder {
 private:
 

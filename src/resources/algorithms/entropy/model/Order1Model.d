@@ -4,8 +4,6 @@ import resources.all;
 
 /**
  * Tracks a 2 symbol history for all symbols.
- *
- *
  */
 final class Order1Model : EntropyModel {
 public:
@@ -48,9 +46,9 @@ private:
             currentCounts.add(index, factor);
 
             // Uncomment here to update order 0 probabilities
-            foreach(i; 0..array.length) {
-                array[i].add(index, 20);
-            }
+            // foreach(i; 0..array.length) {
+            //     array[i].add(index, 20);
+            // }
         }
         prevIndex = index;
     }

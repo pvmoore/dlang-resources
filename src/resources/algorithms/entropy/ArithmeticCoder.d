@@ -1,12 +1,12 @@
 module resources.algorithms.entropy.ArithmeticCoder;
 
+ import resources.all;
+
 /**
  *  https://en.wikipedia.org/wiki/Arithmetic_coding
  *  https://marknelson.us/posts/2014/10/19/data-compression-with-arithmetic-coding.html
  *
  */
- import resources.all;
-
 final class ArithmeticCoder {
 private:
     const ulong FULL     = 0x00000000_8000_0000L;
@@ -34,13 +34,15 @@ public:
         this.code  = 0;
         this.numUnderflowBits = 0;
     }
-    void encode(BitWriter w, uint value) {
+    void encode(BitWriter w, uint value, EntropyModel overrideModel = null) {
         assert(state == state.ENCODING);
-        auto s = model.getSymbolFromIndex(value);
+
+        auto theModel = overrideModel ? overrideModel : model;
+        auto symbol  = theModel.getSymbolFromIndex(value);
 
         ulong range = ( high-low ) + 1L;
-		high  	    = (low + (( range * s.high ) / s.scale - 1L) & MASK);
-		low   	    = (low + (( range * s.low )  / s.scale     ) & MASK);
+		high  	    = (low + (( range * symbol.high ) / symbol.scale - 1L) & MASK);
+		low   	    = (low + (( range * symbol.low )  / symbol.scale     ) & MASK);
    
         while(true) {
             if(( high & FULL ) == ( low & FULL )) {
@@ -94,16 +96,18 @@ public:
 			code  += r.read(1);
 		}
     }
-    int decode(BitReader r) {
+    int decode(BitReader r, EntropyModel overrideModel = null) {
         assert(state == State.DECODING);
-        ulong range = ( high - low ) + 1L;
-		ulong count = (((( ( code - low ) +1L) * model.getScale() - 1L) / range) & MASK);
-        MSymbol s   = model.getSymbolFromRange(count);
+
+        auto theModel  = overrideModel ? overrideModel : model;
+        ulong range    = ( high - low ) + 1L;
+		ulong count    = (((( ( code - low ) +1L) * theModel.getScale() - 1L) / range) & MASK);
+        MSymbol symbol = theModel.getSymbolFromRange(count);
 
         // Note that the scale used here must be the one from the symbol because in the case of the
         // dynamic model the previous scale will change after we get a symbol.
-		high      	= (low + (( range * s.high ) / s.scale -1L) & MASK);
-		low       	= (low + (( range * s.low )  / s.scale    ) & MASK);
+		high      	= (low + (( range * symbol.high ) / symbol.scale -1L) & MASK);
+		low       	= (low + (( range * symbol.low )  / symbol.scale    ) & MASK);
 
         while(true) {
             if((high & FULL) == (low & FULL)) {
@@ -113,7 +117,7 @@ public:
 				low   &= (HALF-1L);
 				high  |= HALF;
             } else {
-                return s.value;
+                return symbol.value;
             }
 
             low  <<= 1;

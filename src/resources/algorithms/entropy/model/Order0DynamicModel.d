@@ -13,6 +13,9 @@ public:
         }
         cumulativeWeights[$-1] = numSymbols;
     }
+    void addSymbols(uint count) {
+        todo();
+    }
     override MSymbol getSymbolFromIndex(uint value) {
         ulong low = cumulativeWeights[value];
         ulong high = cumulativeWeights[value+1];

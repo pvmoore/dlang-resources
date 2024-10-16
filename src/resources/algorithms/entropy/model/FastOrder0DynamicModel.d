@@ -8,9 +8,16 @@ import resources.all;
  */
 final class FastOrder0DynamicModel : EntropyModel {
 public:
+    uint getNumSymbols() {
+        return counts.getNumCounts();
+    }
+
     this(uint numSymbols, ulong factor = 1) {
         this.factor = factor;
         this.counts = new CumulativeCounts(numSymbols, 1);
+    }
+    void addSymbols(uint count) {
+        counts.expandBy(count, 1);
     }
     override MSymbol getSymbolFromIndex(uint index) {
         auto symbol = counts.getSymbolFromIndex(index);

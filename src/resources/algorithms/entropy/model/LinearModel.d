@@ -9,16 +9,21 @@ import resources.all;
  */
 final class LinearModel : EntropyModel {
 public:
+    uint getNumSymbols() { return numSymbols; }
+
     this(uint numSymbols) {
         this.numSymbols = numSymbols;
     }
-    MSymbol getSymbolFromIndex(uint index) {
+    void addSymbols(uint count) {
+        numSymbols += count;
+    }
+    override MSymbol getSymbolFromIndex(uint index) {
         return MSymbol(index, index+1, numSymbols, index);
     }
-    MSymbol getSymbolFromRange(ulong range) {
+    override MSymbol getSymbolFromRange(ulong range) {
         return MSymbol(range, range+1, numSymbols, range.as!int);
     }
-    ulong getScale() {
+    override ulong getScale() {
         return numSymbols;
     }
 private:

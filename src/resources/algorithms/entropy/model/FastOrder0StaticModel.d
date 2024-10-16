@@ -12,7 +12,7 @@ import resources.all;
 final class FastOrder0StaticModel : EntropyModel {
 public:
     this(ulong[] symbolFrequencies) {
-        this.counts = new CumulativeCounts(symbolFrequencies.length.as!uint);
+        this.counts = new CumulativeCounts(symbolFrequencies.length.as!uint, 0);
         foreach(i; 0..symbolFrequencies.length.as!uint) {
             counts.add(i, symbolFrequencies[i]);
         }

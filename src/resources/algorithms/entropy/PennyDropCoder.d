@@ -1,5 +1,7 @@
 module resources.algorithms.entropy.PennyDropCoder;
 
+ import resources.all;
+
 /**
  *           0 | 1
  *             |   0  | 1 
@@ -29,8 +31,6 @@ module resources.algorithms.entropy.PennyDropCoder;
  *  [round 4]
  *  num = 1 so the value is implied
  */
- import resources.all;
-
 struct Stats { 
     uint num;               // number of unique values in the range
     uint numToLeftOfCentre; // number of unique values to the left of mid

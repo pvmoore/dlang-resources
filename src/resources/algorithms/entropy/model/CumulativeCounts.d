@@ -30,35 +30,56 @@ import core.bitop : bsf, bsr, popcnt;
  * tree = [00                // row 0
  *         0000              // row 1
  *         00000000          // row 2
- *         0000000000000000] // row 3
+ *         0000000000000000] // row 3 (length = capacity)
  */
 final class CumulativeCounts {
 public:
     ulong getTotal() {
         return total; 
     }
+    uint getCapacity() {
+        return capacity;
+    }
+    uint getNumCounts() {
+        return numCounts;
+    }
     ulong[] peekCounts() {
-        return tree[BOTTOM_ROW_OFFSET..$];
+        return tree[bottomRowOffset..bottomRowOffset+numCounts];
+    }
+    ulong[] peekWeightsLow() {
+        return iota(0, numCounts).map!(it=>getSymbolFromIndex(it).low).array();
+    }
+    ulong[] peekWeightsHigh() {
+        return iota(0, numCounts).map!(it=>getSymbolFromIndex(it).high).array();
     }
 
-    this(uint numCounts, ulong initialCount = 0) {
-        this.MAX_VALUE = numCounts - 1;
-        if(popcnt(numCounts) == 1) {
-            this.NUM_COUNTS = numCounts;
+    this(uint numCounts, ulong initialCount) {
+        recreateTree(numCounts, initialCount);
+    }
+    /** Add 'num' more counts */
+    void expandBy(uint num, ulong initialCount) {
+        //writefln("numCounts = %s, capacity = %s", numCounts, capacity);
+        if(num == 0) return;
+        if(numCounts+num <= capacity) {
+            uint oldNumCounts = numCounts;
+            numCounts += num;
+            if(initialCount > 0) {
+                tree[bottomRowOffset+oldNumCounts..bottomRowOffset+numCounts] = initialCount;
+                total += initialCount*num;
+                propagateTree();
+            }
         } else {
-            this.NUM_COUNTS = 1 << (bsr(numCounts) + 1);
+            recreateTree(numCounts + num, initialCount);
         }
-        this.NUM_COUNTS_DIV = bsf(this.NUM_COUNTS) - 1; 
-        createTree(initialCount);
     }
     void add(uint value, ulong count = 1) {
-        assert(value <= MAX_VALUE);
+        assert(value < numCounts);
         
         uint offset = 0;
         uint num    = 2;
-        uint div    = NUM_COUNTS_DIV;
+        uint div    = capacityDiv;
 
-        while(num <= NUM_COUNTS) {
+        while(num <= capacity) {
             uint v = value >>> div;
 
             tree[offset+v] += count;
@@ -73,11 +94,11 @@ public:
         ulong low       = 0;
         uint treeOffset = 0;
         uint size       = 2;
-        uint shift      = NUM_COUNTS_DIV;  
-        uint pivot      = NUM_COUNTS >>> 1;
-        uint window     = NUM_COUNTS >>> 2;
+        uint shift      = capacityDiv;  
+        uint pivot      = capacity >>> 1;
+        uint window     = capacity >>> 2;
 
-        while(size <= NUM_COUNTS) {
+        while(size <= capacity) {
 
             bool goRight = index >= pivot;
 
@@ -95,7 +116,7 @@ public:
             shift--;
         }
 
-        ulong high = low + tree[BOTTOM_ROW_OFFSET+index];
+        ulong high = low + tree[bottomRowOffset+index];
 
         return MSymbol(low, high, total, index);
     }
@@ -104,10 +125,10 @@ public:
         uint index      = 0;
         ulong low       = 0;
         uint size       = 2;
-        uint window     = NUM_COUNTS >>> 1;
-        uint shift      = NUM_COUNTS_DIV;
+        uint window     = capacity >>> 1;
+        uint shift      = capacityDiv;
 
-        while(size <= NUM_COUNTS) {
+        while(size <= capacity) {
             uint n       = index >>> shift;
             ulong value  = tree[treeOffset + n];
             bool goRight = range >= low + value; 
@@ -123,14 +144,14 @@ public:
             shift--;
         }
 
-        ulong high = low + tree[BOTTOM_ROW_OFFSET+index];
+        ulong high = low + tree[bottomRowOffset+index];
 
         return MSymbol(low, high, total, index);
     }
     void dumpTree() {
         uint num = 2;
         uint prev = 0;
-        while(num <= NUM_COUNTS) {
+        while(num <= capacity) {
             writef("[%2s] ", prev);
             foreach(i; prev..prev+num) {
                 writef("%s ", tree[i]);
@@ -141,35 +162,71 @@ public:
         }
     }
 private:
-    const uint MAX_VALUE;       // the 
-    const uint NUM_COUNTS;      // power of 2 number of counts
-    const uint NUM_COUNTS_DIV;  // bsf(numCounts) - 1
-    uint BOTTOM_ROW_OFFSET;     // tree.length - NUM_COUNTS
+    // These should change rarely - only when the tree is created or is expanded
+    uint numCounts;         // Number of active counts in the array
+    uint capacity;          // Power of 2 number of counts (max counts we can hold before expanding the tree)
+    uint capacityDiv;       // bsf(numCounts) - 1
+    uint bottomRowOffset;   // Index of the start of the bottom row in the tree (tree.length - numCounts)
+
     ulong[] tree;
     ulong total;
 
-    void createTree(ulong initialCount) {
+    void recreateTree(uint newNumCounts, ulong initialCount) {
+        uint oldNumCounts = this.numCounts;
+        ulong[] oldCounts = oldNumCounts > 0 ? tree[bottomRowOffset..bottomRowOffset+oldNumCounts] : null;
+
+        this.numCounts = newNumCounts;
+        if(popcnt(numCounts) == 1) {
+            this.capacity = numCounts;
+        } else {
+            this.capacity = 1 << (bsr(numCounts) + 1);
+        }
+        this.capacityDiv = bsf(this.capacity) - 1; 
+
         uint length = 0;
         uint num = 2;
         do{ 
             length += num;
             num <<= 1;
-        }while(num <= NUM_COUNTS);
-        tree.length = length;
+        }while(num <= capacity);
+
+        // Create a new tree on the heap
+        this.tree = new ulong[length];
+        this.bottomRowOffset = tree.length.as!uint - capacity;
+
+        // Copy the old counts if there are any
+        if(oldNumCounts > 0) {
+            tree[bottomRowOffset..bottomRowOffset+oldNumCounts] = oldCounts;
+            assert(numCounts > oldNumCounts);
+
+            // Initialise the new counts
+            tree[bottomRowOffset+oldNumCounts..bottomRowOffset+numCounts] = initialCount;
+            total += initialCount * (numCounts-oldNumCounts);
+
+            propagateTree();
 
         // Set the initial counts if initialCount is not 0
-        if(initialCount > 0) {
-            ulong count = initialCount;
-            uint size = NUM_COUNTS;
-            auto index = tree.length-NUM_COUNTS;
-            while(size > 1) {
-                tree[index..index+size] = count;
-                count <<= 1;
-                size >>>= 1;
-                index -= size; 
-            }
-            total += initialCount * NUM_COUNTS;
+        } else if(initialCount > 0) {
+            // Initialise the new counts
+            tree[bottomRowOffset..bottomRowOffset+numCounts] = initialCount;
+            total += initialCount * numCounts;
+            
+            propagateTree();
         }
-        this.BOTTOM_ROW_OFFSET = tree.length.as!uint - NUM_COUNTS;
+    }
+    /** Iterate up the tree from the bottom, populating the counts of the upper tree nodes */
+    void propagateTree() {
+        uint size = capacity >>> 1;
+        auto srcIndex  = tree.length-capacity;
+        auto destIndex = srcIndex-size;
+
+        while(size > 1) {
+            foreach(i; 0..size) {
+                tree[destIndex+i] = tree[srcIndex+i*2] + tree[srcIndex+1+i*2];
+            }
+            size >>>= 1;
+            srcIndex = destIndex;
+            destIndex -= size; 
+        }
     }
 }
