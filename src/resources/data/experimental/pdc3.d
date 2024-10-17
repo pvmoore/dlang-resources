@@ -18,7 +18,7 @@ public:
 
         this.order0Model = new FastOrder0DynamicModel(257, 1);
         this.lengthModel = new FastOrder0DynamicModel(MAX_LENGTH-2);
-        this.hashIndexModel = new LinearModel(1); // 8144
+        this.hashIndexModel = new FastOrder0DynamicModel(1, 1); // 8144
         this.listIndexModel = new FastOrder0DynamicModel(1, 1); // 1030
         this.coder = new ArithmeticCoder(order0Model);
         this.bitWriter = new BitWriter((it) {numBitsWritten+=8; outStream ~= it; });
@@ -86,7 +86,7 @@ public:
         writefln("hashIndexModel.numSymbols = %s", hashIndexModel.getNumSymbols());
     }
 private:
-    enum MAX_LENGTH = 64;
+    enum MAX_LENGTH = 128;
 
     struct Value {
         uint index;
@@ -100,7 +100,7 @@ private:
     ArithmeticCoder coder;
     EntropyModel order0Model;
     EntropyModel lengthModel;
-    LinearModel hashIndexModel;
+    FastOrder0DynamicModel hashIndexModel;
     FastOrder0DynamicModel listIndexModel;
 
     ulong numBitsWritten;
