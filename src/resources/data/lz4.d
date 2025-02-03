@@ -18,7 +18,7 @@ final class LZ4 {
 
 private final class LZ4Decompresor {
     ByteReader reader;
-    Array!ubyte data;
+    ubyte[] data;
     string filename;
     File file;
     FLG flg;
@@ -28,7 +28,6 @@ private final class LZ4Decompresor {
     this(string filename) {
         this.filename = filename;
         this.reader   = new FileByteReader(filename);
-        this.data     = new Array!ubyte;
     }
     void destroy() {
         file.close();
@@ -95,7 +94,7 @@ private:
             if(isCompressed) {
                 decodeData(size);
             } else {
-                data.add(reader.readArray!ubyte(size));
+                data ~= reader.readArray!ubyte(size);
             }
         }
 
@@ -128,7 +127,7 @@ private:
         chat("literals=%s", literals); flushLog();
         if(literals>0) {
             auto d = reader.readArray!ubyte(literals);
-            data.add(d);
+            data ~= d;
         }
 
         // the last sequence ends after the literals
@@ -143,7 +142,7 @@ private:
             long pos  = data.length;
             long from = pos-offset;
             long to   = min(from+length, pos);
-            data.add(data[from..to]);
+            data ~= data[from..to];
 
             length -= (to-from);
         }

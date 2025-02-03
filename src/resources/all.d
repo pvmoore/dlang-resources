@@ -4,7 +4,7 @@ public:
 
 import resources;
 
-import common : Array, ArrayByteWriter, as, 
+import common : ArrayByteWriter, as, 
 				dbg, expect,  
 				flushConsole, makeLowPriorityQueue, 
 				BitReader, FileBitReader, ByteReader, FileByteReader,
