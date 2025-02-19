@@ -12,7 +12,7 @@ import common : ArrayByteWriter, as,
 				isSet, isUnset,
 				From, 
 				startsWith, StringBuffer,
-				throwIf, toArray, todo;
+				throwIf, toArray, toString, todo;
 
 import logging : log, flushLog;
 import maths;

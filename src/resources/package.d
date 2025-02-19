@@ -30,6 +30,7 @@ import resources.code.COFF;
 import resources.code.DLL;
 import resources.code.PDB;
 import resources.code.PE;
+import resources.code.spirv.SPIRV;
 
 import resources.models.model_data;
 import resources.models.obj;

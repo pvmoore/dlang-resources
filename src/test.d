@@ -11,7 +11,9 @@ import test_json5;
 void main() {
     writefln("Testing resources");
 
-    testData();
+    testSpirv();
+
+    //testData();
     //testJson5();
 
 
@@ -223,4 +225,17 @@ void testObj() {
     writefln("#######################################");
 
     auto obj = Obj.read("testdata/suzanne.obj.txt");
+}
+void testSpirv() {
+    writefln("#######################################");
+    writefln("Testing SPIRV");
+    writefln("#######################################");
+
+    //auto spirv = SPIRV.read("C:/pvmoore/d/libs/vulkan/resources/shaders/vulkan/quad/Quad.spv");
+    //auto spirv = SPIRV.read("C:\\pvmoore\\d\\apps\\blockie\\resources\\shaders\\pass1_marchM2_comp.spv");
+    
+    auto spirv = SPIRV.read("C:\\pvmoore\\d\\apps\\emerald\\resources\\shaders\\pathtracer_comp.spv");
+    
+    
+    writefln("spirv = %s", spirv);
 }
