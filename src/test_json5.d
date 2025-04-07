@@ -2,7 +2,8 @@ module test_json5;
 
 import resources.json5;
 
-import common : StringBuffer, as, isA, throwIfNotEqual;
+import common       : StringBuffer;
+import common.utils : as, isA, throwIfNotEqual;
 
 import std.stdio  : writefln;
 import std.format : format;

@@ -10,9 +10,9 @@ import std.algorithm            : minElement, maxElement, each, map, sum;
 import std.random               : uniform;
 import std.typecons             : tuple, Tuple;
 
-import maths     : entropyBits;
-import common    : as, className;
-import common.io : BitWriter, BitReader, ByteReader; 
+import maths        : entropyBits;
+import common.io    : BitWriter, BitReader, ByteReader; 
+import common.utils : as, className;
 
 import resources;
 

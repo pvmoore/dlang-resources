@@ -121,7 +121,7 @@ final class DeDupe {
         return true;
     }
     Match findBestMatch(ref uint bestMatchIndex) {
-        import common : getOrAdd;
+        import common.utils : getOrAdd;
         Match bestMatch;
         uint[][uint] hash;    // each pair contains a list of indexes
 

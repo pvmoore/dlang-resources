@@ -111,7 +111,7 @@ private:
         return pos+offset < bytes.length ? bytes[pos+offset] : 0;
     }
     void hash(ubyte value) {
-        import common : getOrAdd;
+        import common.utils : getOrAdd;
 
         historyKey <<= 8;
         historyKey |= value;

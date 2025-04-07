@@ -4,18 +4,14 @@ public:
 
 import resources;
 
-import common : as, 
-				expect, 
-				isSet, isUnset,
-				From, 
-				startsWith, StringBuffer,
-				throwIf, toArray, toString, todo;
+import common : StringBuffer;
 
 import common.containers : makeLowPriorityQueue;
 import common.io : ArrayByteWriter, 
 				   BitReader, FileBitReader, ByteReader, FileByteReader,
 				   BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
 				   flushConsole;
+import common.utils : as, From, expect,  isSet, isUnset, startsWith, throwIf, toArray, toString, todo;
 
 import logging : log, flushLog;
 import maths;
