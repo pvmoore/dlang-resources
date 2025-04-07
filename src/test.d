@@ -172,7 +172,7 @@ void testCOFF() {
     writefln("Testing COFF");
     writefln("#######################################");
 
-    import common : FileByteReader;
+    import common.io : FileByteReader;
     auto coff = new COFF("testdata/statics.obj");
     coff.readHeader();
     coff.readSections();

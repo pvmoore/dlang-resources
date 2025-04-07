@@ -4,17 +4,18 @@ public:
 
 import resources;
 
-import common : ArrayByteWriter, as, 
-				dbg, expect,  
-				flushConsole, 
-				BitReader, FileBitReader, ByteReader, FileByteReader,
-				BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
+import common : as, 
+				expect, 
 				isSet, isUnset,
 				From, 
 				startsWith, StringBuffer,
 				throwIf, toArray, toString, todo;
 
 import common.containers : makeLowPriorityQueue;
+import common.io : ArrayByteWriter, 
+				   BitReader, FileBitReader, ByteReader, FileByteReader,
+				   BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
+				   flushConsole;
 
 import logging : log, flushLog;
 import maths;
