@@ -5,14 +5,25 @@ module resources.code.DLL;
  *
  *
  */
-
 import resources.all;
+import std.stdio;
+import std.file;
 
 final class DLL {
-private:
-
 public:
-    this() {
+    this(string filename) {
+        this.filename = filename;
+    }
 
+    void read() {
+        data = cast(ubyte[])std.file.read(filename);
+    }
+
+private:
+    string filename;
+    ubyte[] data;
+
+    void bail(string msg = null) {
+        throwIf(true, msg !is null ? msg : "Something went wrong");
     }
 }

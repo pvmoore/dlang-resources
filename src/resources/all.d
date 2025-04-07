@@ -6,13 +6,15 @@ import resources;
 
 import common : ArrayByteWriter, as, 
 				dbg, expect,  
-				flushConsole, makeLowPriorityQueue, 
+				flushConsole, 
 				BitReader, FileBitReader, ByteReader, FileByteReader,
 				BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
 				isSet, isUnset,
 				From, 
 				startsWith, StringBuffer,
 				throwIf, toArray, toString, todo;
+
+import common.containers : makeLowPriorityQueue;
 
 import logging : log, flushLog;
 import maths;

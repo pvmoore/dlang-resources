@@ -15,7 +15,8 @@ import resources.json5.J5Lexer;
 import resources.json5.J5Parser;
 import resources.json5.J5Token;
 
-import common : contains, isA, as, isOneOf, StringBuffer, Stack, toHash;
+import common            : contains, isA, as, isOneOf, StringBuffer, toHash;
+import common.containers : Stack;
 
 bool isDigit(char c) {
     return c >= '0' && c <= '9';

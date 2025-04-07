@@ -11,14 +11,14 @@ import test_json5;
 void main() {
     writefln("Testing resources");
 
-    testSpirv();
+    //testSpirv();
 
     //testData();
     //testJson5();
 
 
     //testObj();
-    //testDLL();
+    testDLL();
 
     //testDDS();
 
