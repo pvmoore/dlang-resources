@@ -10,8 +10,6 @@ import resources.all;
 final class Obj : ModelData {
 private:
 public:
-
-
     static Obj read(string filename) {
         string data = From!"std.file".read(filename).as!string;
 

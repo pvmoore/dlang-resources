@@ -65,6 +65,7 @@ public:
         if(isObject()) return this.as!J5Object.map.get(key, J5NULL);
         return J5NULL;
     }
+
     // Only useful for J5Object
     // foreach(k,v; j.byKeyValue()) {}
     auto byKeyValue() {
@@ -100,6 +101,16 @@ public:
         if(isNull()) return 0;
         return 1;
     }
+
+    // Only useful for J5Object
+    J5Number getAsNumber(T)(string key, T defaultValue) {
+        if(isObject()) {
+            J5Value value = this.as!J5Object[key];
+            if(value.isNumber()) return value.as!J5Number;
+        }
+        return new J5Number(defaultValue.to!string);
+    }
+
 protected:
     Kind kind;
 }
@@ -222,6 +233,11 @@ public:
             this.value = value;
         }
     }
+
+    int getInt() { return value.to!int; }
+    long getLong() { return value.to!long; }
+    float getFloat() { return value.to!float; }
+    double getDouble() { return value.to!double; }
 
     bool isInteger() { return this !is J5NAN && this !is J5INFINITY && .isInteger(value); }
     bool isNaN() { return this is J5NAN; }

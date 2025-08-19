@@ -11,6 +11,8 @@ import test_json5;
 void main() {
     writefln("Testing resources");
 
+    testGltf();
+
     //testSpirv();
 
     //testData();
@@ -18,7 +20,7 @@ void main() {
 
 
     //testObj();
-    testDLL();
+    //testDLL();
 
     //testDDS();
 
@@ -224,7 +226,7 @@ void testObj() {
     writefln("Testing Obj");
     writefln("#######################################");
 
-    auto obj = Obj.read("testdata/suzanne.obj.txt");
+    auto obj = Obj.read("testdata/models/suzanne.obj.txt");
 }
 void testSpirv() {
     writefln("#######################################");
@@ -232,10 +234,155 @@ void testSpirv() {
     writefln("#######################################");
 
     //auto spirv = SPIRV.read("C:/pvmoore/d/libs/vulkan/resources/shaders/vulkan/quad/Quad.spv");
-    //auto spirv = SPIRV.read("C:\\pvmoore\\d\\apps\\blockie\\resources\\shaders\\pass1_marchM2_comp.spv");
+    //auto spirv = SPIRV.read("C://pvmoore//d//apps//blockie//resources//shaders//pass1_marchM2_comp.spv");
     
-    auto spirv = SPIRV.read("C:\\pvmoore\\d\\apps\\emerald\\resources\\shaders\\pathtracer_comp.spv");
+    auto spirv = SPIRV.read("C:/pvmoore/d/apps/emerald/resources/shaders/pathtracer_comp.spv");
     
     
     writefln("spirv = %s", spirv);
+}
+void testGltf() {
+    writefln("#######################################");
+    writefln("Testing GLTF");
+    writefln("#######################################");
+
+    import std.file;
+    import std.path;
+
+
+    // Download the sample glTF models from github
+    // https://github.com/KhronosGroup/glTF-Sample-Models
+    string modelsDir = "C:/Temp/glTF-Sample-Assets/Models/";
+
+    if(!exists(modelsDir)) {
+        writefln("Download the glTF sample models from https://github.com/KhronosGroup/glTF-Sample-Models");
+        return;
+    }
+
+    auto boxGltf = GLTF.read(modelsDir ~ "Box/glTF/Box.gltf");
+    auto boxEmbedded = GLTF.read(modelsDir ~ "Box/glTF-Embedded/Box.gltf");
+    auto boxGlb = GLTF.read(modelsDir ~ "Box/glTF-Binary/Box.glb");
+
+
+    // find all .glb files
+    // find all .gltf files
+    // foreach(e; dirEntries("c:/temp/", "*.glb", SpanMode.depth)) {
+    //     import std : replace;
+    //     if(e.isFile) {
+    //         writefln("    %s", e.replace("\\", "/"));
+    //     }
+    // }
+
+    auto glbFiles = [
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/meet_mat.glb",
+        "c:/temp/nvpro-samples/build_all/samples/nv_cluster_lod_builder/meshoptimizer/demo/pirate.glb",
+        "c:/temp/nvpro-samples/build_all/samples/nv_cluster_lod_builder/meshoptimizer/gltf/fuzz.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_animated_clusters/external/meshoptimizer/demo/pirate.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_animated_clusters/external/meshoptimizer/gltf/fuzz.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_denoise_nrd/media/meet_mat.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_lod_clusters/external/nv_cluster_lod_builder/meshoptimizer/demo/pirate.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_lod_clusters/external/nv_cluster_lod_builder/meshoptimizer/gltf/fuzz.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/meet_mat.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_optix_denoise/media/meet_mat.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_tessellated_clusters/external/meshoptimizer/demo/pirate.glb",
+        "c:/temp/nvpro-samples/build_all/samples/vk_tessellated_clusters/external/meshoptimizer/gltf/fuzz.glb",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/CesiumMan/glTF-Binary/CesiumMan.glb",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/retroufo.glb",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/retroufo_glow.glb",
+    ];
+
+    auto gltfFiles = [
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/cornellBox.gltf",
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/cube.gltf",
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/cubeTextured.gltf",
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/cubeTexturedKtx.gltf",
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/scenes/cornellBox.gltf",
+        "c:/temp/nvpro-samples/build_all/bin_x64/media/shader_ball.gltf",
+        "c:/temp/nvpro-samples/build_all/downloaded_resources/robot/robot.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_animated_clusters/_downloaded_resources/bunny_v2/bunny.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_denoise_nrd/media/cornellBox.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_denoise_nrd/media/cube.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_denoise_nrd/media/cubeTextured.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_denoise_nrd/media/cubeTexturedKtx.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_denoise_nrd/media/shader_ball.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_gltf_renderer/resources/shader_ball.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_lod_clusters/_downloaded_resources/bunny_v2/bunny.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/cornellBox.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/cube.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/cubeTextured.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/cubeTexturedKtx.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/plane.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/shader_ball.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_mini_samples/resources/teapot.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_optix_denoise/media/cornellBox.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_optix_denoise/media/cube.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_optix_denoise/media/cubeTextured.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_optix_denoise/media/cubeTexturedKtx.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_optix_denoise/media/shader_ball.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_raytracing_tutorial_KHR/media/scenes/cornellBox.gltf",
+        "c:/temp/nvpro-samples/build_all/samples/vk_tessellated_clusters/_downloaded_resources/bunny_v2/bunny.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/armor/armor.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/cerberus/cerberus.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/CesiumMan/glTF/CesiumMan.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/CesiumMan/glTF-Embedded/CesiumMan.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/chinesedragon.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/color_teapot_spheres.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/cube.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/deer.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/deferred_box.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/deferred_floor.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/displacement_plane.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/fireplace.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/FlightHelmet/glTF/FlightHelmet.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/glowsphere.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/gltf/glTF-Embedded/Buggy.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/lavaplanet.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/oaktree.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/plane.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/plane_circle.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/plane_z.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/plants.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/reflection_scene.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/retroufo.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/retroufo_glow.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/retroufo_red_lowpoly.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/rock01.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/samplebuilding.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/samplebuilding_glass.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/sampleroom.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/samplescene.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/shadowscene_fire.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/sibenik.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/sphere.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/sponza/sponza.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/suzanne.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/suzanne_lods.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/teapot.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/terrain_gridlines.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/torusknot.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/treasure_glow.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/treasure_smooth.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/tunnel_cylinder.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/venus.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/voyager.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/vulkanscenebackground.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/vulkanscenelogos.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/vulkanscenemodels.gltf",
+        "c:/temp/SaschaWillems/Vulkan/assets/models/vulkanscene_shadow.gltf",
+    ];
+
+    // writefln("Found %s gltf files", gltfFiles.length);
+    // writefln("Found %s glb files", glbFiles.length);
+
+    // foreach(i, file; glbFiles) {
+    //     if(true || i == 1) {
+    //         writefln("[%s] %s", i, file);
+    //         auto gltf = GLTF.read(file);
+    //     }
+    // }
+
+    //auto gltf = GLTF.read("C:/Temp/SaschaWillems/Vulkan/assets/models/suzanne.gltf");
+    //auto gltf = GLTF.read("C:/Temp/SaschaWillems/Vulkan/assets/models/samplebuilding.gltf");
+
+    //auto gltf = GLTF.read("c:/temp/SaschaWillems/Vulkan/assets/models/retroufo.glb");
 }
