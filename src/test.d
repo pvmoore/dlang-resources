@@ -246,6 +246,7 @@ void testGltf() {
     writefln("Testing GLTF");
     writefln("#######################################");
 
+    import resources.models.gltf;
     import std.file;
     import std.path;
 

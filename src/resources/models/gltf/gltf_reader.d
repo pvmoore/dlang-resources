@@ -4,7 +4,7 @@ module resources.models.gltf.gltf_reader;
  * https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#appendix-a-json-schema-reference
  */
 import resources.all;
-private import resources.models.gltf.gltf_common;
+private import resources.models.gltf;
 
 uint[] _uintArray(J5Array array) {
     uint[] result;
@@ -328,7 +328,6 @@ Mesh[] _meshes(J5Array array) {
                 case "primitives": {
                     foreach(p; v.as!J5Array) {
                         MeshPrimitive primitive;
-                        mesh.primitives ~= primitive;
 
                         foreach(k2,v2; p.as!J5Object) {
                             switch(k2) {
@@ -345,6 +344,7 @@ Mesh[] _meshes(J5Array array) {
                                 default: throwIf(true, "Unhandled mesh primitive key: %s", k2);
                             }
                         }
+                        mesh.primitives ~= primitive;
                     }
                     break;
                 }

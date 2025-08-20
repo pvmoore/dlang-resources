@@ -7,8 +7,8 @@ module resources.models.gltf.GLTF;
  */
 import resources.all;
 private {
+    import resources.models.gltf;
     import resources.models.gltf.glb_reader;
-    import resources.models.gltf.gltf_common;
     import resources.models.gltf.gltf_reader;
 }
 

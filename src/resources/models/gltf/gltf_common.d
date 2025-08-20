@@ -3,6 +3,7 @@ module resources.models.gltf.gltf_common;
 import resources.all;
 
 private {
+    import resources.models.gltf;
     import resources.models.gltf.meshopt.meshopt;
 }
 
@@ -233,6 +234,9 @@ struct TextureInfo {
     uint index;
     uint texCoord;
 }
+
+//──────────────────────────────────────────────────────────────────────────────────────────────────
+package:
 
 void fetchBufferData(GLTF gltf) {
     foreach(i, ref buffer; gltf.buffers) {

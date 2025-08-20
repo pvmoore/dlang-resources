@@ -5,7 +5,7 @@ module resources.models.gltf.meshopt.meshopt;
  */
 import resources.all;
 private {
-    import resources.models.gltf.gltf_common;
+    import resources.models.gltf;
     import resources.models.gltf.meshopt.meshopt_attributes;    // Mode.ATTRIBUTES
     import resources.models.gltf.meshopt.meshopt_triangles;     // Mode.TRIANGLES
     import resources.models.gltf.meshopt.meshopt_indices;       // Mode.INDICES

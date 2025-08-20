@@ -34,6 +34,5 @@ import resources.code.spirv.SPIRV;
 
 import resources.models.model_data;
 import resources.models.obj;
-import resources.models.gltf.GLTF;
 
 import resources.json5;
