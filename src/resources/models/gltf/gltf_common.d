@@ -3,7 +3,6 @@ module resources.models.gltf.gltf_common;
 import resources.all;
 
 private {
-    import resources.models.gltf.draco.draco;
     import resources.models.gltf.meshopt.meshopt;
 }
 

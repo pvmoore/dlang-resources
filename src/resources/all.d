@@ -30,7 +30,7 @@ import std.regex    			: matchFirst;
 import std.typecons 			: tuple, Tuple, Nullable, nullable;
 import std.algorithm  			: each, map, sort;
 
-enum chatty = true;
+enum chatty = false;
 
 void chat(A...)(string fmt, A args) {
 	static if(chatty) {
