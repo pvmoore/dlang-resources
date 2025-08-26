@@ -18,7 +18,7 @@ struct Accessor {
     }
     enum Type : string {
         SCALAR  = "SCALAR",
-        VEC2    = "VEC2",
+        VEC2    = "VEC2", 
         VEC3    = "VEC3",
         VEC4    = "VEC4",
         MAT2    = "MAT2",
@@ -33,6 +33,38 @@ struct Accessor {
     Type type;
     float[] maxValues;  // 0..16 values
     float[] minValues;  // 0..16 values
+
+    bool isScalarFloat() { return type == Type.SCALAR && componentType == ComponentType.FLOAT; }
+    bool isFloat2() { return type == Type.VEC2 && componentType == ComponentType.FLOAT; }
+    bool isFloat3() { return type == Type.VEC3 && componentType == ComponentType.FLOAT; }
+    bool isFloat4() { return type == Type.VEC4 && componentType == ComponentType.FLOAT; }
+    bool isFloatMat2() { return type == Type.MAT2 && componentType == ComponentType.FLOAT; }
+    bool isFloatMat3() { return type == Type.MAT3 && componentType == ComponentType.FLOAT; }
+    bool isFloatMat4() { return type == Type.MAT4 && componentType == ComponentType.FLOAT; }
+
+    uint componentStride() {
+        final switch(componentType) {
+            case ComponentType.BYTE:            
+            case ComponentType.UNSIGNED_BYTE:   return 1;
+            case ComponentType.SHORT:           
+            case ComponentType.UNSIGNED_SHORT:  return 2;
+            case ComponentType.UNSIGNED_INT:   
+            case ComponentType.FLOAT:           return 4;
+        }
+    }
+    uint stride() { 
+        uint i;
+        final switch(type) {
+            case Type.SCALAR:  i = 1; break;
+            case Type.VEC2:    i = 2; break;
+            case Type.VEC3:    i = 3; break;
+            case Type.VEC4:    i = 4; break;
+            case Type.MAT2:    i = 4; break;
+            case Type.MAT3:    i = 9; break;
+            case Type.MAT4:    i = 16; break;
+        }
+        return i * componentStride();
+    }
 }
 struct Animation {
     string name;
@@ -160,11 +192,19 @@ struct MeshPrimitive {
         TRIANGLE_STRIP  = 5,
         TRIANGLE_FAN    = 6
     }
-
-    uint[string] attributes;    // <semantic-name> to accessor index
-    Nullable!uint indices;      // accessor index
-    Nullable!uint material;     // material index
+    enum Semantic : string {
+        POSITION = "POSITION",
+        NORMAL   = "NORMAL",
+        // ... add more as needed
+    }
+    uint[string] attributes;      // <semantic-name> to accessor index
+    Nullable!uint indices;          // accessor index
+    Nullable!uint material;         // material index
     Mode mode = Mode.TRIANGLES;
+
+    bool hasAttribute(string attr) {
+        return (attr in attributes) !is null;
+    }
 }
 struct Node {
     string name;

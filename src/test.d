@@ -11,7 +11,7 @@ import test_json5;
 void main() {
     writefln("Testing resources");
 
-    testGltf();
+    //testGltf();
 
     //testSpirv();
 
@@ -39,7 +39,7 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-//    testPNG();
+    testPNG();
 //    testPerlin();
     //testHGT();
 }
@@ -119,9 +119,23 @@ void testBMP() {
 void testPNG() {
     writefln("Testing PNG");
 
+    {
+        // IHDR.colourType = 3
+        auto p = PNG.read("testdata/PNG/CesiumLogoFlat.png");
+        assert(p.bytesPerPixel == 3);
+
+        p.write("testdata/PNG/cesium_logo_out.png");
+
+        auto p2 = PNG.read("testdata/PNG/cesium_logo_out.png");
+        assert(p.width == p2.width);
+        assert(p.height == p2.height);
+        assert(p.bytesPerPixel == p2.bytesPerPixel);
+        assert(p.data[] == p2.data[]);
+    }
+
     // Read
     writefln("Reading logo.png");
-    auto logo = PNG.read("testdata/logo.png");
+    auto logo = PNG.read("testdata/PNG/logo.png");
     writefln("logo = %s", logo);
     
     assert(logo.width==128);
@@ -135,14 +149,12 @@ void testPNG() {
 
     // write
     writefln("Writing png to logo1.png ...");
-    logo.write("testdata/logo1.png");
+    logo.write("testdata/PNG/logo1.png");
 
-    auto logo1 = PNG.read("testdata/logo1.png");
+    auto logo1 = PNG.read("testdata/PNG/logo1.png");
 
     writefln("Checking data");
-    foreach(i; 0..logo.data.length) {
-        assert(logo.data[i] == logo1.data[i]);
-    }
+    assert(logo.data[] == logo1.data[]);
     writefln("OK");   
 }
 void testDDS() {

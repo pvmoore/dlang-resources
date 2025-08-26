@@ -24,6 +24,16 @@ abstract class Chunk {
     bool isPublic() { return name[1]!=name[1].toLower; }
 }
 
+private string stringOf(T)(T o) if(is(T : Chunk)) {
+    import common.utils : getAllProperties, className;
+    string s = "%s{".format(className!T);
+    static foreach(i, p; getAllProperties!T) {
+        if(i > 0) s ~= ",";
+        s ~= "\n  %s: %s".format(p, __traits(getMember, o, p));
+    }
+    return s ~ "\n}";
+}
+
 final class IHDR : Chunk { 
     uint width;
     uint height;
@@ -32,6 +42,8 @@ final class IHDR : Chunk {
     ubyte compressionMethod;
     ubyte filterMethod;
     ubyte interlaceMethod;
+
+    override string toString() { return stringOf!IHDR(this); }
 }
 final class IDAT : Chunk {
     ubyte[] data;
@@ -89,6 +101,10 @@ final class tIME : Chunk {
     ubyte hour;
     ubyte minute;
     ubyte second;
+}
+final class PLTE : Chunk {
+    static struct RGB { ubyte r,g,b; } 
+    RGB[] palette;
 }
 final class IEND : Chunk {
 }

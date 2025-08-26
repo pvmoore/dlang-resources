@@ -36,8 +36,11 @@ public:
 
         png.width  = ihdr.width;
         png.height = ihdr.height;
+
+        // colourType 2 = RGB, 3 = RGB, 6 = RGBA
         png.bytesPerPixel = ihdr.colourType==6 ? 4 : 3;
-        png.data   = unfilter(png, chunks, decompress(chunks));
+
+        png.data = unfilter(png, chunks, decompress(chunks));
 
         return png;
     }
@@ -73,6 +76,7 @@ private:
             case "cHRM" : return readcHRM(name, data);
             case "iCCP" : return readiCCP(name, data);
             case "iTXt" : return readiTXt(name, data);
+            case "PLTE" : return readPLTE(name, data);
             case "IEND" : return readIEND(name);
             default : throw new Error("Header %s not supported".format(name));
         }
@@ -94,13 +98,16 @@ private:
         c.interlaceMethod = bytes[12];
 
         // colourType 2 = truecolour
+        // colourType 3 = indexed colour (requires PLTE chunk)
         // colourType 6 = truecolour with alpha
+
+        chat("%s", c);
 
         throwIf(c.compressionMethod!=0, "Only compression method 0 supported");
         throwIf(c.filterMethod!=0, "Only filter method 0 supported");
         throwIf(c.interlaceMethod!=0, "Interlacing not supported");
         throwIf(c.bitDepth!=8, "Only bit depth 8 supported (This is %s)".format(c.bitDepth));
-        throwIf(c.colourType!=2 && c.colourType!=6, "Only truecolour supported (This is %s)".format(c.colourType));
+        throwIf(!c.colourType.isOneOf(2,3,6), "Unsupported IHDR.colorType %s".format(c.colourType));
         
         chat("  [%s,%s] Colourtype %s", c.width, c.height, c.colourType);
         return c;
@@ -215,6 +222,20 @@ private:
         chat("  Text: '%s'", c.text);
         return c;
     }
+    PLTE readPLTE(string name, ubyte[] bytes) {
+        PLTE c = new PLTE;
+        c.name = name;
+
+        throwIf(bytes.length%3!=0, "PLTE length is not a multiple of 3");
+        c.palette.length = bytes.length/3;
+
+        foreach(i; 0..c.palette.length) {
+            auto n = i*3;
+            c.palette[i] = PLTE.RGB(bytes[n+0], bytes[n+1], bytes[n+2]);
+        }
+
+        return c;
+    }
     ubyte[] decompress(Chunk[] chunks) {
         auto compressed =
             chunks.filter!(it=>it.name=="IDAT")
@@ -237,11 +258,20 @@ private:
 
         //bKGD bkgd = extractChunk!bKGD(chunks);
 
-        int bpp         = png.bytesPerPixel;
+        IHDR ihdr = chunks[0].as!IHDR;
+
+        int bpp = png.bytesPerPixel;
+
+        if(ihdr.colourType == 3) {
+            // Each src value is an index into the palette. 
+            // We need to filter first before expanding to RGB
+            bpp = 1;
+        }
+
         int scanlineLen = png.width*bpp;
         long lines      = filtered.length / (scanlineLen+1);
 
-        throwIf(lines!=png.height, "Expecting num lines to be %s".format(png.height));
+        throwIf(lines!=png.height, "Expecting num lines to be %s but is %s".format(png.height, lines));
         
         unfiltered.length = lines*scanlineLen;
 
@@ -272,6 +302,9 @@ private:
             uint paeth(int n) {
                 return paethPredictor(getA(n), getB(n), getC(n));
             }
+            void output(int n, int value) {
+                dest[n] = cast(ubyte)value;
+            }
 
             ubyte filter = *src++;
             switch(filter) {
@@ -283,28 +316,28 @@ private:
                     filterBitmap |= 2;
                     for(int n=0; n<scanlineLen; n++) {
                         ubyte x = src[n];
-                        dest[n] = cast(ubyte)((x + getA(n)) & 0xff);
+                        output(n, (x + getA(n)) & 0xff);
                     }
                     break;
                 case 2 /*Up*/ :
                     filterBitmap |= 4;
                     for(auto n=0; n<scanlineLen; n++) {
                         ubyte x = src[n];
-                        dest[n] = cast(ubyte) ((x + getB(n)) & 0xff);
+                        output(n, (x + getB(n)) & 0xff);
                     }
                     break;
                 case 3 /*Average*/ :
                     filterBitmap |= 8;
                     for(auto n=0; n<scanlineLen; n++) {
                         ubyte x = src[n];
-                        dest[n] = cast(ubyte)((x + (getA(n)+getB(n)) / 2) & 0xff);
+                        output(n, (x + (getA(n)+getB(n)) / 2) & 0xff);
                     }
                     break;
                 case 4 /*Paeth*/ :
                     filterBitmap |= 16;
                     for(auto n=0; n<scanlineLen; n++) {
                         ubyte x = src[n];
-                        dest[n] = cast(ubyte)((x + paeth(n)) & 0xff);
+                        output(n, (x + paeth(n)) & 0xff);
                     }
                     break;
                 default : throwIf(true, "Unsupported filter type %s", filter); break;
@@ -313,6 +346,22 @@ private:
             dest += scanlineLen;
         }
         chat("Filters used : %05b", filterBitmap);
+
+        // For colour type 3 we now need to convert the result into RGB values from the palette
+        if(ihdr.colourType == 3) {
+            PLTE plte = extractChunk!PLTE(chunks);
+            throwIf(plte is null, "Expected PLTE chunk");
+
+            ubyte[] rgb = new ubyte[unfiltered.length*3];
+            for(auto i=0; i<unfiltered.length; i++) {
+                auto n = i*3;
+                auto p = plte.palette[unfiltered[i]];
+                rgb[n+0] = p.r;
+                rgb[n+1] = p.g;
+                rgb[n+2] = p.b;
+            }
+            return rgb;
+        }
 
         return unfiltered;
     }
