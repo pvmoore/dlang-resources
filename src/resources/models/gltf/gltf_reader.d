@@ -276,6 +276,8 @@ Camera[] _cameras(J5Array array) {
     return cameras;
 }
 Image_[] _images(J5Array array) {
+    import std.uri : decode;
+
     Image_[] images;
     foreach(i; array) {
         Image_ image;
@@ -283,7 +285,7 @@ Image_[] _images(J5Array array) {
         foreach(k,v; i.as!J5Object) {
             switch(k) {
                 case "name": image.name = v.toString(); break;
-                case "uri": image.uri = v.toString(); break;
+                case "uri": image.uri = decode(v.toString()); break;
                 case "mimeType": image.mimeType = v.toString(); break;
                 case "bufferView": image.bufferView = v.as!J5Number.getInt(); break;
                 default: throwIf(true, "Unhandled image key: %s", k);
