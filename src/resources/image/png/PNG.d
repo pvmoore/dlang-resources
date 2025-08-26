@@ -33,6 +33,7 @@ public:
     PNG getAlpha() {
         if(bytesPerPixel==1) return this;
         if(bytesPerPixel!=4) throw new Error("No alpha channel");
+
         PNG p = new PNG;
         p.width = width;
         p.height = height;
@@ -49,6 +50,7 @@ public:
      */
     PNG getRed() {
         if(bytesPerPixel==1) return this;
+
         PNG p = new PNG;
         p.width  = width;
         p.height = height;
@@ -59,23 +61,6 @@ public:
             p.data[d] = data[s+0];
         }
         return p;
-    }
-    void addAlphaChannel(ubyte a) {
-        if(bytesPerPixel!=3) return;
-        bytesPerPixel = 4;
-        ubyte[] data2 = new ubyte[width*height*4];
-        ubyte* s = data.ptr;
-        ubyte* d  = data2.ptr;
-        foreach(y; 0..height)
-        foreach(x; 0..width) {
-            d[0] = s[0];
-            d[1] = s[1];
-            d[2] = s[2];
-            d[3] = a;
-            s+=3;
-            d+=4;
-        }
-        data = data2;
     }
 
     void set(uint x, uint y, ubyte r, ubyte g, ubyte b, ubyte a) {

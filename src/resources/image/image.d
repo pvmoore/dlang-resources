@@ -1,7 +1,5 @@
 module resources.image.image;
-/**
- *
- */
+
 import resources.all;
 import resources.image.converter;
 
@@ -12,24 +10,56 @@ public:
     uint bytesPerPixel;
     ubyte[] data; // width*height*bytesPerPixel bytes
 
-    static Image read(string filename) {
+    static struct ReadOptions {
+        bool forceRGBToRGBA = false;
+    }
+
+    void addAlphaChannel(ubyte a) {
+        if(bytesPerPixel!=3) return;
+        throwIfNot(this.isA!PNG || this.isA!BMP, "Unsupported operation");
+
+        bytesPerPixel = 4;
+        ubyte[] data2 = new ubyte[width*height*4];
+        ubyte* s = data.ptr;
+        ubyte* d  = data2.ptr;
+        foreach(y; 0..height)
+        foreach(x; 0..width) {
+            d[0] = s[0];
+            d[1] = s[1];
+            d[2] = s[2];
+            d[3] = a;
+            s+=3;
+            d+=4;
+        }
+        data = data2;
+    }
+
+    static Image read(string filename, ReadOptions options = ReadOptions()) {
         string ext = filename.extension.toLower;
+        Image img;
         switch(ext) {
             case ".png" :
-                return PNG.read(filename);
+                img = PNG.read(filename);
+                break;
             case ".bmp" :
-                return BMP.read(filename);
+                img = BMP.read(filename);
+                break;
             case ".r32":
-                return R32.read(filename);
+                img = R32.read(filename);
+                break;
             case ".dds":
-                return DDS.read(filename);    
+                img = DDS.read(filename);    
+                break;
             default :
-                throw new Exception("Unable to read image file with extension '%s'".format(ext));
+                throwIf(true, "Unable to read image file with extension '%s'", ext);
         }
-        assert(false);
+        if(options.forceRGBToRGBA) {
+            img.addAlphaChannel(255);
+        }
+        return img;
     }
     void write(string filename) {
-        throw new Exception("write is not yet supported for this Image type");
+        throwIf(true, "write is not yet supported for this Image type");
     }
 }
 

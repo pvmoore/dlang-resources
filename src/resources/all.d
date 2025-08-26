@@ -10,7 +10,7 @@ import common.io 		 : ArrayByteWriter,
 				   		   BitReader, FileBitReader, ByteReader, FileByteReader,
 				   		   BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
 				   		   flushConsole;
-import common.utils 	 : as, isA, isOneOf, From, expect,  isSet, isUnset, startsWith, throwIf, toArray, toString, 
+import common.utils 	 : as, isA, isOneOf, From, expect,  isSet, isUnset, startsWith, throwIf, throwIfNot, toArray, toString, 
 						   todo, containsKey;
 
 import logging 			 : log, flushLog;
