@@ -25,6 +25,7 @@ struct Accessor {
         MAT3    = "MAT3",
         MAT4    = "MAT4"
     }
+    string name;
     Nullable!uint bufferView;
     uint byteOffset = 0;
     ComponentType componentType;
@@ -193,8 +194,11 @@ struct MeshPrimitive {
         TRIANGLE_FAN    = 6
     }
     enum Semantic : string {
-        POSITION = "POSITION",
-        NORMAL   = "NORMAL",
+        POSITION   = "POSITION",
+        NORMAL     = "NORMAL",
+        TANGENT    = "TANGENT",
+        TEXCOORD_0 = "TEXCOORD_0",
+
         // ... add more as needed
     }
     uint[string] attributes;      // <semantic-name> to accessor index
@@ -211,13 +215,13 @@ struct Node {
     uint[] children;
     Nullable!uint camera;   
     Nullable!uint skin;  
-    float[16] matrix = [ 1.0, 0.0, 0.0, 0.0, 
-                            0.0, 1.0, 0.0, 0.0, 
-                            0.0, 0.0, 1.0, 0.0, 
-                            0.0, 0.0, 0.0, 1.0 ];
+    float[16] matrix     = [ 1.0, 0.0, 0.0, 0.0, 
+                             0.0, 1.0, 0.0, 0.0, 
+                             0.0, 0.0, 1.0, 0.0, 
+                             0.0, 0.0, 0.0, 1.0 ];
     Nullable!uint mesh;       
-    float[4] rotation = [ 0.0, 0.0, 0.0, 1.0 ];
-    float[3] scale = [ 1.0, 1.0, 1.0 ];
+    float[4] rotation    = [ 0.0, 0.0, 0.0, 1.0 ];
+    float[3] scale       = [ 1.0, 1.0, 1.0 ];
     float[3] translation = [ 0.0, 0.0, 0.0 ];
     uint[] weights;
     string[string] extras;

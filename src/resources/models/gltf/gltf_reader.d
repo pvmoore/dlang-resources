@@ -185,6 +185,7 @@ Accessor[] _accessors(J5Array array) {
 
         foreach(k,v; a.as!J5Object) {
             switch(k) {
+                case "name": accessor.name = v.toString(); break;
                 case "bufferView": accessor.bufferView = v.as!J5Number.getInt(); break;
                 case "byteOffset": accessor.byteOffset = v.as!J5Number.getInt(); break;
                 case "componentType": accessor.componentType = v.as!J5Number.getInt().to!(Accessor.ComponentType); break;
