@@ -38,9 +38,12 @@ private:
      */
     void writeIHDR() {
         ubyte bitDepth = 8;
+        // colourType 0 = R greyscale
         // colourType 2 = RGB
         // colourType 6 = RGBA
         ubyte colourType = png.bytesPerPixel == 3 ? 2 : 6;
+        if(png.bytesPerPixel == 1) colourType = 0;
+
         ubyte compressionMethod = 0;
         ubyte filterMethod = 0;
         ubyte interlaceMethod = 0;

@@ -37,8 +37,9 @@ public:
         png.width  = ihdr.width;
         png.height = ihdr.height;
 
-        // colourType 2 = RGB, 3 = RGB, 6 = RGBA
-        png.bytesPerPixel = ihdr.colourType==6 ? 4 : 3;
+        // colourType 0 = R, 2 = RGB, 3 = RGB, 6 = RGBA
+        png.bytesPerPixel = ihdr.colourType==6 ? 4 : 
+                            ihdr.colourType==0 ? 1 : 3;
 
         png.data = unfilter(png, chunks, decompress(chunks));
 
@@ -97,6 +98,7 @@ private:
         c.filterMethod = bytes[11];
         c.interlaceMethod = bytes[12];
 
+        // colourType 0 = greyscale (1,2,4,8 or 16 bits per pixel)
         // colourType 2 = truecolour
         // colourType 3 = indexed colour (requires PLTE chunk)
         // colourType 6 = truecolour with alpha
@@ -107,7 +109,7 @@ private:
         throwIf(c.filterMethod!=0, "Only filter method 0 supported");
         throwIf(c.interlaceMethod!=0, "Interlacing not supported");
         throwIf(c.bitDepth!=8, "Only bit depth 8 supported (This is %s)".format(c.bitDepth));
-        throwIf(!c.colourType.isOneOf(2,3,6), "Unsupported IHDR.colorType %s".format(c.colourType));
+        throwIf(!c.colourType.isOneOf(0,2,3,6), "Unsupported IHDR.colorType %s".format(c.colourType));
         
         chat("  [%s,%s] Colourtype %s", c.width, c.height, c.colourType);
         return c;

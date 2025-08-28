@@ -120,6 +120,18 @@ void testPNG() {
     writefln("Testing PNG");
 
     {
+        // IHDR.colourType = 0
+        auto p = PNG.read("testdata/PNG/ToyCar_clearcoat.png");
+        assert(p.bytesPerPixel == 1);
+        assert(p.width == 1024);
+        assert(p.height == 1024);
+
+        p.write("testdata/PNG/ToyCar_clearcoat_out.png");
+        auto p2 = PNG.read("testdata/PNG/ToyCar_clearcoat_out.png");
+        assert(p.data[] == p2.data[]);
+    }
+
+    {
         // IHDR.colourType = 3
         auto p = PNG.read("testdata/PNG/CesiumLogoFlat.png");
         assert(p.bytesPerPixel == 3);
