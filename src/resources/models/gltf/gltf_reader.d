@@ -128,6 +128,7 @@ OcculusionTextureInfo _occulusionTextureInfo(J5Object o) {
             case "index": oti.index = v.as!J5Number.getInt(); break;
             case "texCoord": oti.texCoord = v.as!J5Number.getInt(); break;
             case "strength": oti.strength = v.as!J5Number.getFloat(); break;
+            case "extensions": oti.extensions = _extensions(v.as!J5Object); break;
             default: throwIf(true, "Unhandled occulusionTextureInfo key: %s", k);
         }
     }
@@ -146,6 +147,7 @@ TextureInfo _textureInfo(J5Object o) {
         switch(k) {
             case "index": ti.index = v.as!J5Number.getInt(); break;
             case "texCoord": ti.texCoord = v.as!J5Number.getInt(); break;
+            case "extensions": ti.extensions = _extensions(v.as!J5Object); break;
             default: throwIf(true, "Unhandled textureInfo key: %s", k);
         }
     }
@@ -158,6 +160,7 @@ NormalTextureInfo _normalTextureInfo(J5Object o) {
             case "index": nti.index = v.as!J5Number.getInt(); break;
             case "texCoord": nti.texCoord = v.as!J5Number.getInt(); break;
             case "scale": nti.scale = v.as!J5Number.getFloat(); break;
+            case "extensions": nti.extensions = _extensions(v.as!J5Object); break;
             default: throwIf(true, "Unhandled normalTextureInfo key: %s", k);
         }
     }

@@ -231,11 +231,13 @@ struct NormalTextureInfo {
     uint index;
     uint texCoord;
     float scale = 1.0;
+    Extensions extensions;
 }
 struct OcculusionTextureInfo {
     uint index;
     uint texCoord;
     float strength = 1.0;
+    Extensions extensions;
 }
 struct Sampler {
     enum Filter {
@@ -277,6 +279,7 @@ struct Texture {
 struct TextureInfo {
     uint index;
     uint texCoord;
+    Extensions extensions;
 }
 
 //──────────────────────────────────────────────────────────────────────────────────────────────────
