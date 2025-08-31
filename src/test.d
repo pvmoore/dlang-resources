@@ -39,10 +39,10 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    //testPNG();
+    testPNG();
 //    testPerlin();
     //testHGT();
-    testJPEG();
+    //testJPEG();
 }
 void testPerlin() {
     /*import std.math : sin,cos,fmod;
@@ -134,6 +134,10 @@ void testJPEG() {
 }
 void testPNG() {
     writefln("Testing PNG");
+
+    {
+        auto  p = PNG.read("testdata/PNG/white.png");
+    }
 
     {
         // IHDR.colourType = 0

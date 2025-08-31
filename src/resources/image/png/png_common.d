@@ -55,6 +55,11 @@ final class tEXt : Chunk {
     string keyword;
     string value;
 }
+final class zTXt : Chunk {
+    string keyword;
+    ubyte compressionMethod;
+    string value;
+}
 final class iTXt : Chunk {
     string keyword;
     ubyte compressionFlag;

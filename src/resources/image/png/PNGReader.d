@@ -78,6 +78,7 @@ private:
             case "iCCP" : return readiCCP(name, data);
             case "iTXt" : return readiTXt(name, data);
             case "PLTE" : return readPLTE(name, data);
+            case "zTXt" : return readzTXt(name, data);
             case "IEND" : return readIEND(name);
             default : throw new Error("Header %s not supported".format(name));
         }
@@ -166,10 +167,31 @@ private:
     tEXt readtEXt(string name, ubyte[] bytes) {
         tEXt c = new tEXt;
         c.name = name;
+
         char* p = cast(char*)bytes.ptr;
         c.keyword = cast(string)fromStringz(p);
         c.value   = cast(string)p[c.keyword.length+1..bytes.length];
         chat("  '%s' = '%s'", c.keyword, c.value);
+        return c;
+    }
+    zTXt readzTXt(string name, ubyte[] bytes) {
+        zTXt c = new zTXt;
+        c.name = name;
+
+        char* p = cast(char*)bytes.ptr;
+        c.keyword = cast(string)fromStringz(p);
+
+        ubyte compressionMethod = bytes[c.keyword.length+1];
+        throwIf(compressionMethod!=0, "Only compression method 0 supported");
+
+        ubyte[] compressed = bytes[c.keyword.length+2..$];
+
+        import std.zlib : uncompress;
+        auto uncompressed = uncompress(compressed);
+
+        c.value = uncompressed.as!string;
+        chat("  '%s' = '%s'", c.keyword, c.value);
+
         return c;
     }
     gAMA readgAMA(string name, ubyte[] bytes) {

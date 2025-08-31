@@ -347,6 +347,7 @@ Mesh[] _meshes(J5Array array) {
                                 case "indices": primitive.indices = v2.as!J5Number.getInt(); break;
                                 case "material": primitive.material = v2.as!J5Number.getInt(); break;
                                 case "mode": primitive.mode = v2.as!J5Number.getInt().to!(MeshPrimitive.Mode); break;
+                                case "extensions": primitive.extensions = _extensions(v2.as!J5Object); break;
                                 default: throwIf(true, "Unhandled mesh primitive key: %s", k2);
                             }
                         }

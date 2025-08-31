@@ -16,15 +16,6 @@ import resources.all;
 
 final class BMP : Image {
 
-    PNG getPNG() {
-        auto b = new PNG;
-        b.width = width;
-        b.height = height;
-        b.bytesPerPixel = bytesPerPixel;
-        b.data = data.dup;
-        return b;
-    }
-
     static auto create_RGBA8888(uint w, uint h) {
         auto bmp          = new BMP();
         bmp.width         = w;

@@ -3,6 +3,10 @@ module resources.image.image;
 import resources.all;
 import resources.image.converter;
 
+/**
+ * Todo - This can be a simple struct. There is no benefit to having this as an extendable class.
+ *        In fact, it would be much easier to use if it was a simple struct.
+ */
 abstract class Image {
 public:
     uint width;
@@ -12,6 +16,16 @@ public:
 
     static struct ReadOptions {
         bool forceRGBToRGBA = false;
+    }
+
+    final PNG getPNG() {
+        if(this.isA!PNG) return this.as!PNG;
+        auto b = new PNG;
+        b.width = width;
+        b.height = height;
+        b.bytesPerPixel = bytesPerPixel;
+        b.data = data.dup;
+        return b;
     }
 
     void addAlphaChannel(ubyte a) {
@@ -50,10 +64,18 @@ public:
             case ".dds":
                 img = DDS.read(filename);    
                 break;
+            case ".jpg":
+            case ".jpeg":
+            case ".jfif":
+                img = JPEG.read(filename);
+                // For now, convert this to a PNG so that we can do useful things with it.
+                img = img.getPNG();
+                break;
             default :
                 throwIf(true, "Unable to read image file with extension '%s'", ext);
         }
         if(options.forceRGBToRGBA) {
+
             img.addAlphaChannel(255);
         }
         return img;

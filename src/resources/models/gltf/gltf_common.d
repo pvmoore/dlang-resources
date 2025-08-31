@@ -205,6 +205,7 @@ struct MeshPrimitive {
     Nullable!uint indices;          // accessor index
     Nullable!uint material;         // material index
     Mode mode = Mode.TRIANGLES;
+    Extensions extensions;
 
     bool hasAttribute(string attr) {
         return (attr in attributes) !is null;
