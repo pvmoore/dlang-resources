@@ -1,7 +1,5 @@
 module resources.image.converter;
-/**
- *
- */
+
 import resources.all;
 
 final class ImageConverter {

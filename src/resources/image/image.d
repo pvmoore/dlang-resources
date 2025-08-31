@@ -61,5 +61,17 @@ public:
     void write(string filename) {
         throwIf(true, "write is not yet supported for this Image type");
     }
+
+    final void writePNG(string filename) {
+        PNG png = this.as!PNG;
+        if(!png) {
+            png = new PNG;
+            png.width = width;
+            png.height = height;
+            png.bytesPerPixel = bytesPerPixel;
+            png.data = data.dup;
+        }
+        png.write(filename);
+    }
 }
 

@@ -7,7 +7,7 @@ import resources;
 import common  			 : StringBuffer;
 import common.containers : makeLowPriorityQueue;
 import common.io 		 : ArrayByteWriter, 
-				   		   BitReader, FileBitReader, ByteReader, FileByteReader,
+				   		   BitReader, ArrayBitReader, FileBitReader, ByteReader, FileByteReader,
 				   		   BitWriter, FileBitWriter, ByteWriter, FileByteWriter,
 				   		   flushConsole;
 import common.utils 	 : as, isA, isOneOf, From, expect,  isSet, isUnset, startsWith, throwIf, throwIfNot, toArray, toString, 
@@ -28,7 +28,7 @@ import std.string   			: splitLines, strip, toLower;
 import std.range    			: appender, array, iota;
 import std.regex    			: matchFirst;
 import std.typecons 			: tuple, Tuple, Nullable, nullable;
-import std.algorithm  			: each, map, sort;
+import std.algorithm  			: each, map, sort, maxElement;
 
 enum chatty = false;
 

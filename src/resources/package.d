@@ -12,6 +12,7 @@ import resources.image.r32;
 
 import resources.image.dds.DDS;
 import resources.image.png.PNG;
+import resources.image.jpeg.JPEG;
 
 import resources.algorithms.deflate;
 import resources.algorithms.lzma;

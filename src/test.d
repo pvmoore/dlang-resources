@@ -39,9 +39,10 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    testPNG();
+    //testPNG();
 //    testPerlin();
     //testHGT();
+    testJPEG();
 }
 void testPerlin() {
     /*import std.math : sin,cos,fmod;
@@ -115,6 +116,21 @@ void testBMP() {
 
     //auto abgr = BMP.read("/pvmoore/_assets/images/bmp/goddess_abgr.bmp");
     //abgr.write("goddess.bmp");
+}
+void testJPEG() {
+    writefln("Testing JPEG");
+
+    string[] filenames = [
+        "testdata/JPEG/screenshot-x150",
+        "testdata/JPEG/pineapple"
+    ];              
+
+    foreach(filename; filenames) {
+        writefln("Reading %s.jpg", filename);
+        auto j = JPEG.read(filename ~ ".jpg");
+        writefln("Writing %s.png", filename);
+        j.writePNG(filename ~ ".png");
+    }
 }
 void testPNG() {
     writefln("Testing PNG");
