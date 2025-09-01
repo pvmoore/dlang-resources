@@ -3,9 +3,9 @@ module resources.image.png.PNG;
  /**
   *  https://www.w3.org/TR/PNG/
   *
-  *  Only 8 bpp formats can be loaded (RGB or RGBA).
+  *  Only 8 bpp formats can be loaded (R, RGB or RGBA).
   *
-  *  Data is stored internally as either RGB888 or RGBA8888
+  *  Data is stored internally as either RGB8, RGB888 or RGBA8888
   *  and from top-left to bottom-right:
   *  eg.
   *  0--- x+
@@ -19,14 +19,6 @@ import resources.image.png.PNGWriter;
 
 final class PNG : Image {
 public:
-    BMP getBMP() {
-        auto b = new BMP;
-        b.width = width;
-        b.height = height;
-        b.bytesPerPixel = bytesPerPixel;
-        b.data = data.dup;
-        return b;
-    }
     /**
      *  Convert RGBA to a single alpha channel
      */

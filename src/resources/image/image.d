@@ -3,10 +3,6 @@ module resources.image.image;
 import resources.all;
 import resources.image.converter;
 
-/**
- * Todo - This can be a simple struct. There is no benefit to having this as an extendable class.
- *        In fact, it would be much easier to use if it was a simple struct.
- */
 abstract class Image {
 public:
     uint width;
@@ -21,6 +17,15 @@ public:
     final PNG getPNG() {
         if(this.isA!PNG) return this.as!PNG;
         auto b = new PNG;
+        b.width = width;
+        b.height = height;
+        b.bytesPerPixel = bytesPerPixel;
+        b.data = data.dup;
+        return b;
+    }
+    final BMP getBMP() {
+        if(this.isA!BMP) return this.as!BMP;
+        auto b = new BMP;
         b.width = width;
         b.height = height;
         b.bytesPerPixel = bytesPerPixel;
@@ -80,20 +85,26 @@ public:
         }
         return img;
     }
+
     void write(string filename) {
         throwIf(true, "write is not yet supported for this Image type");
     }
 
+    /**
+     * Write (almost) any Image as a PNG. Does not work for DDS
+     */
     final void writePNG(string filename) {
-        PNG png = this.as!PNG;
-        if(!png) {
-            png = new PNG;
-            png.width = width;
-            png.height = height;
-            png.bytesPerPixel = bytesPerPixel;
-            png.data = data.dup;
-        }
+        throwIf(this.isA!DDS, "writePNG does not work for DDS images because the data is compressed");
+        PNG png = getPNG();
         png.write(filename);
+    }
+    /**
+     * Write (almost) any Image as a BMP. Does not work for DDS
+     */
+    final void writeBMP(string filename) {
+        throwIf(this.isA!DDS, "writeBMP does not work for DDS images because the data is compressed");
+        BMP bmp = getBMP();
+        bmp.write(filename);
     }
 }
 
