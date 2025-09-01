@@ -19,7 +19,7 @@ public:
     int bitsPerSample()  { return fmt.bitsPerSample; }
 
     this(string filename) {
-        log("Loading wav file: '%s'", filename);
+        chat("Loading wav file: '%s'", filename);
         scope file = File(filename, "rb");
 
         //---------------------------------------------
@@ -32,20 +32,20 @@ public:
         {
             throw new Exception("Bad WAV file format");
         }
-        log("chunkSize=%s", riff.chunkSize);
+        chat("chunkSize=%s", riff.chunkSize);
 
         //---------------------------------------------
         // fmt subchunk
         //---------------------------------------------
         fmt  = file.rawRead(new FormatSubChunk[1])[0];
 
-        log("formatChunkHeader=%s", fmt.formatChunkHeader);
-        log("formatChunkSize=%s", fmt.formatChunkSize);
-        log("audioFormat=%s", fmt.audioFormat);
-        log("numChannels=%s", fmt.numChannels);
-        log("sampleRate=%s", fmt.sampleRate);
-        log("bitsPerSample=%s", fmt.bitsPerSample);
-        log("byteRate=%s", fmt.byteRate);
+        chat("formatChunkHeader=%s", fmt.formatChunkHeader);
+        chat("formatChunkSize=%s", fmt.formatChunkSize);
+        chat("audioFormat=%s", fmt.audioFormat);
+        chat("numChannels=%s", fmt.numChannels);
+        chat("sampleRate=%s", fmt.sampleRate);
+        chat("bitsPerSample=%s", fmt.bitsPerSample);
+        chat("byteRate=%s", fmt.byteRate);
 
         if(fmt.audioFormat!=1) {
             throw new Exception("Unsupported WAV format: %s".format(fmt.audioFormat));
@@ -59,7 +59,7 @@ public:
             // rewind 2 bytes
             file.seek(-2, SEEK_CUR);
         } else {
-            log("skipping extraParamSize which should not be here");
+            chat("skipping extraParamSize which should not be here");
         }
 
         //---------------------------------------------
@@ -67,8 +67,8 @@ public:
         //---------------------------------------------
         data = file.rawRead(new DataSubChunk[1])[0];
 
-        log("dataChunkHeader=%s", cast(char[4])data.chunkHeader);
-        log("dataChunkSize=%s", data.chunkSize);
+        chat("dataChunkHeader=%s", cast(char[4])data.chunkHeader);
+        chat("dataChunkSize=%s", data.chunkSize);
 
         if(fmt.bitsPerSample==8) {
             // unsigned bytes (0 to 255)
@@ -80,7 +80,7 @@ public:
             throw new Exception("Unsupported WAV bitsPerSample=%s".format(fmt.bitsPerSample));
         }
 
-        log("bytes.length=%s", bytes.length);
+        chat("bytes.length=%s", bytes.length);
     }
 }
 private:

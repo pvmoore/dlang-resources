@@ -124,7 +124,7 @@ private:
 
         // literals
         uint literals = getLength(hi);
-        chat("literals=%s", literals); flushLog();
+        chat("literals=%s", literals); 
         if(literals>0) {
             auto d = reader.readArray!ubyte(literals);
             data ~= d;

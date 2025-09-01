@@ -37,7 +37,7 @@ public:
             case FOURCC.DXT1 :
                 return readCompressed(8, VK_FORMAT_BC1_RGB_UNORM_BLOCK);
             case FOURCC.DXT3 :
-                log("WARN: Prefer DXT5 over DXT3 for RGBA images");
+                chat("WARN: Prefer DXT5 over DXT3 for RGBA images");
                 return readCompressed(16, VK_FORMAT_BC2_UNORM_BLOCK);
             case FOURCC.DXT5 :
                 return readCompressed(16, VK_FORMAT_BC3_UNORM_BLOCK);

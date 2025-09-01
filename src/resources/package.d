@@ -1,7 +1,5 @@
 module resources;
-/**
- *  Exported symbols
- */
+
 public:
 
 import resources.image.image;
@@ -9,7 +7,6 @@ import resources.image.converter;
 import resources.image.bmp;
 import resources.image.r16;
 import resources.image.r32;
-
 import resources.image.dds.DDS;
 import resources.image.png.PNG;
 import resources.image.jpeg.JPEG;

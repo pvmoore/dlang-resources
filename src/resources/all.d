@@ -13,8 +13,6 @@ import common.io 		 : ArrayByteWriter,
 import common.utils 	 : as, isA, isOneOf, From, expect,  isSet, isUnset, startsWith, throwIf, throwIfNot, toArray, toString, 
 						   todo, containsKey;
 
-import logging 			 : log, flushLog;
-
 import maths;
 
 import std.array    			: Appender, appender, split;
@@ -33,6 +31,7 @@ import std.algorithm  			: each, map, sort, maxElement;
 enum chatty = false;
 
 void chat(A...)(string fmt, A args) {
+	import logging : log, flushLog;
 	static if(chatty) {
 	    log(fmt, args);
 	    flushLog();
