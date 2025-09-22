@@ -15,7 +15,7 @@ void main() {
 
     //testSpirv();
 
-    //testData();
+    testData();
     //testJson5();
 
 
@@ -39,7 +39,7 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    testPNG();
+    //testPNG();
 //    testPerlin();
     //testHGT();
     //testJPEG();

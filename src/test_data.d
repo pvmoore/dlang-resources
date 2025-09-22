@@ -21,7 +21,7 @@ void testData() {
     //testLZMA();
     //testPDC();
     //testPDC2();
-    testPDC3();
+    //testPDC3();
     //testLZ4();
     //testDeflate();
     //testZip();
@@ -34,6 +34,9 @@ void testData() {
     //testArithmeticCoder();
 
     //testHuffmanCoder();
+
+    //testMoveToFront();
+    testDeltaEncoder();
 }
 
 private:
@@ -84,6 +87,9 @@ void testPDC3() {
     pdc3.encode();
 }
 void testLZ4() {
+    writefln("#######################################");
+    writefln("Testing LZ4");
+    writefln("#######################################");
     ubyte[] test1 = cast(ubyte[])read("testdata/test1.txt");
     ubyte[] test2 = cast(ubyte[])read("testdata/test2.txt");
     ubyte[] bib = cast(ubyte[])read("testdata/bib");
@@ -674,4 +680,64 @@ void testRangeCoder() {
 }
 void testPennyDropCoder() {
 
+}
+void testMoveToFront() {
+    writefln("Testing MoveToFront ---------------------------------");
+
+    {
+        auto mtf = new MoveToFront!ubyte;
+
+        ubyte[] data = [1,2,2,4,1,6,2,8,9,10];
+
+        auto encoded = mtf.encode(data, 0, 10);
+        writefln("encoded = %s", encoded);
+
+        auto decoded = mtf.decode(encoded, 0, 10);
+        writefln("decoded = %s", decoded);
+
+        assert(decoded[] == data[]);
+    }
+    {
+        auto mtf = new MoveToFront!int;
+
+        int[] data = [-3,-4,-3,-2,-1,0,1,2,3,4];
+
+        auto encoded = mtf.encode(data, -4, 4);
+        writefln("encoded = %s", encoded);
+
+        auto decoded = mtf.decode(encoded, -4, 4);
+        writefln("decoded = %s", decoded);
+
+        assert(decoded[] == data[]);
+    }
+}
+void testDeltaEncoder() {
+    writefln("Testing DeltaEncoder ---------------------------------");
+
+    {
+        auto de = new DeltaEncoder!ubyte;
+
+        ubyte[] data = [1,2,2,4,1,6,2,8,9,10];
+
+        auto encoded = de.encode(data);
+        writefln("encoded = %s", encoded);
+
+        auto decoded = de.decode(encoded);
+        writefln("decoded = %s", decoded);
+
+        assert(decoded[] == data[]);
+    }
+    {
+        auto de = new DeltaEncoder!int;
+
+        int[] data = [-3,-4,-3,-2,-1,0,1,2,3,4];
+
+        auto encoded = de.encode(data);
+        writefln("encoded = %s", encoded);
+
+        auto decoded = de.decode(encoded);
+        writefln("decoded = %s", decoded);
+
+        assert(decoded[] == data[]);
+    }
 }

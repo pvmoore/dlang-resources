@@ -13,6 +13,8 @@ import resources.image.jpeg.JPEG;
 
 import resources.algorithms.deflate;
 import resources.algorithms.lzma;
+import resources.algorithms.transforms.DeltaEncoder;
+import resources.algorithms.transforms.MoveToFront;
 
 import resources.data.lz4;
 import resources.data.lzp;

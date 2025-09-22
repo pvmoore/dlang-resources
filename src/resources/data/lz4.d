@@ -16,7 +16,10 @@ final class LZ4 {
     }
 }
 
-private final class LZ4Decompresor {
+//──────────────────────────────────────────────────────────────────────────────────────────────────
+private:
+
+final class LZ4Decompresor {
     ByteReader reader;
     ubyte[] data;
     string filename;
@@ -164,7 +167,7 @@ private:
     }
 }
 
-private struct FLG {
+struct FLG {
     ubyte version_;
     bool blockIndependence;
     bool blockChecksum;
@@ -188,7 +191,7 @@ private struct FLG {
             "]";
     }
 }
-private struct BD {
+struct BD {
     ubyte blockMaxSize;
     uint kb;
     
