@@ -17,6 +17,8 @@ configuration "test" {
 configuration "library" {
 	targetType "library"
 	excludedSourceFiles "src/test.d" "src/test*.d"
+	copyFiles "bzip2.lib"
+	extraDependencyFiles "bzip2.lib"
 }
 
 // Disable all warnings when the preprocessor is called

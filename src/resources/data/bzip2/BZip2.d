@@ -10,7 +10,7 @@ pragma(lib, "bzip2");
 /**
  *  https://en.wikipedia.org/wiki/Bzip2
  */
-final class BZip2 {
+final class BZip2 { 
 public:
     static string versionString() {
         return BZ2_bzlibVersion().fromStringz().as!string;
