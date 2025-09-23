@@ -9,6 +9,7 @@ import std.range                : array;
 import std.algorithm            : minElement, maxElement, each, map, sum;
 import std.random               : uniform;
 import std.typecons             : tuple, Tuple;
+import std.string               : toStringz, fromStringz;
 
 import maths        : entropyBits;
 import common.io    : BitWriter, BitReader, ByteReader; 
@@ -36,7 +37,9 @@ void testData() {
     //testHuffmanCoder();
 
     //testMoveToFront();
-    testDeltaEncoder();
+    //testDeltaEncoder();
+
+    testBzip2();
 }
 
 private:
@@ -740,4 +743,30 @@ void testDeltaEncoder() {
 
         assert(decoded[] == data[]);
     }
+}
+void testBzip2() {
+    writefln("Testing Bzip2 ---------------------------------");
+
+    import resources.data.bzip2;
+
+    {
+        string version_ = BZip2.versionString();
+        writefln("version = %s", version_);
+    }
+    void compressAndDecompress(string filename) {
+        writefln("Compress and decompressing %s", filename);
+        ubyte[] original = cast(ubyte[])read(filename);
+
+        ubyte[] compressed = BZip2.compress(original);
+        writefln("compressed = %s", compressed.length);
+
+        ubyte[] decompressed = BZip2.decompress(compressed);
+        writefln("decompressed = %s", decompressed.length);
+
+        assert(decompressed[] == original[]);
+    }
+
+    compressAndDecompress("testdata/bib");
+    compressAndDecompress("testdata/book2");
+    compressAndDecompress("testdata/test0.txt");
 }

@@ -16,3 +16,5 @@ bin/
 testdata/*
 
 temp.json
+
+external/bzip2/bzip2*

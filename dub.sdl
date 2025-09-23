@@ -19,6 +19,9 @@ configuration "library" {
 	excludedSourceFiles "src/test.d" "src/test*.d"
 }
 
+// Disable all warnings when the preprocessor is called
+dflags "-P=/w"
+
 # internal
 dependency "common" version="~master"
 dependency "maths" version="~master"

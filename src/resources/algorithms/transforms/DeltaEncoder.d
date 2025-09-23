@@ -1,6 +1,6 @@
 module resources.algorithms.transforms.DeltaEncoder;
 
-import resources.all;
+import common.utils : as;
 
 final class DeltaEncoder(T) {
 public:

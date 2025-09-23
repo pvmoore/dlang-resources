@@ -1,6 +1,6 @@
 module resources.algorithms.transforms.MoveToFront;
 
-import resources.all;
+import common.utils : as;
 
 final class MoveToFront(T) {
 public:
