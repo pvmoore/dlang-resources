@@ -21,7 +21,7 @@ import resources.data.lzp;
 import resources.data.zip;
 import resources.data._7z;
 import resources.data.lzma;
-import resources.data.bzip2;
+import resources.data.bzip;
 
 import resources.sound.wav;
 

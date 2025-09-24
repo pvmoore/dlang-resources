@@ -40,6 +40,7 @@ void testData() {
     //testDeltaEncoder();
 
     testBzip2();
+    testBzip3();
 }
 
 private:
@@ -745,28 +746,61 @@ void testDeltaEncoder() {
     }
 }
 void testBzip2() {
-    writefln("Testing Bzip2 ---------------------------------");
+    writefln("Testing Bzip2 --------------------------------------------------");
 
-    import resources.data.bzip2;
-
-    {
-        string version_ = BZip2.versionString();
-        writefln("version = %s", version_);
-    }
+    string version_ = BZip2.versionString();
+    writefln("version = %s", version_);
+    
     void compressAndDecompress(string filename) {
-        writefln("Compress and decompressing %s", filename);
+        StopWatch w = StopWatch(AutoStart.yes);
+        writefln("Compress and decompressing '%s'", filename);
+
         ubyte[] original = cast(ubyte[])read(filename);
-
         ubyte[] compressed = BZip2.compress(original);
-        writefln("compressed = %s", compressed.length);
-
         ubyte[] decompressed = BZip2.decompress(compressed);
-        writefln("decompressed = %s", decompressed.length);
 
+        w.stop();
         assert(decompressed[] == original[]);
+
+        writefln("original     = %s", original.length);
+        writefln("compressed   = %s", compressed.length);
+        writefln("decompressed = %s", decompressed.length);
+        writefln("time         = %s ms", w.peek().total!"nsecs"/1_000_000.0);
     }
 
     compressAndDecompress("testdata/bib");
     compressAndDecompress("testdata/book2");
     compressAndDecompress("testdata/test0.txt");
+    compressAndDecompress("testdata/kennedy.xls");
+    compressAndDecompress("testdata/bible.txt");
+}
+void testBzip3() {
+    writefln("Testing Bzip3 --------------------------------------------------");
+
+    string version_ = BZip3.versionString();
+    writefln("version = %s", version_);
+
+    void compressAndDecompress(string filename) {
+        writefln("Compress and decompressing '%s'", filename);
+        StopWatch w = StopWatch(AutoStart.yes);
+
+        ubyte[] original = cast(ubyte[])read(filename);
+        ubyte[] compressed = BZip3.compress(original, 8);
+        ubyte[] decompressed = BZip3.decompress(compressed);
+
+        w.stop();
+        assert(decompressed[] == original[]);
+
+        writefln("original     = %s", original.length);
+        writefln("compressed   = %s", compressed.length);
+        writefln("decompressed = %s", decompressed.length);
+        writefln("time         = %s ms", w.peek().total!"nsecs"/1_000_000.0);
+    }
+
+    compressAndDecompress("testdata/bib");
+    compressAndDecompress("testdata/book2");
+    compressAndDecompress("testdata/test0.txt");
+    compressAndDecompress("testdata/kennedy.xls");
+    compressAndDecompress("testdata/bible.txt");
+
 }

@@ -18,3 +18,4 @@ testdata/*
 temp.json
 
 external/bzip2/bzip2*
+external/bzip3/bzip3*

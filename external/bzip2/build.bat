@@ -4,7 +4,7 @@ pushd .
 
 cd bzip2
 
-set FILES=bzlib.c bzip2.c blocksort.c crctable.c huffman.c randtable.c compress.c decompress.c
+set FILES=bzlib.c blocksort.c crctable.c huffman.c randtable.c compress.c decompress.c
 
 cl %FILES% /nologo /utf-8 /arch:AVX2 /TC /std:c11 /O2 /c
 

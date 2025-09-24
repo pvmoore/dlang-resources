@@ -1,8 +1,8 @@
-module resources.data.bzip2.BZip2;
+module resources.data.bzip.BZip2;
 
 private import std.string   : fromStringz;
 private import common.utils : as, throwIf;
-private import resources.data.bzip2.bzip2_api;
+private import resources.data.bzip.bzip2_api;
 
 // Link in bzip2.lib
 pragma(lib, "bzip2");
