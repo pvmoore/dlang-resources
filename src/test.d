@@ -6,16 +6,20 @@ import maths : uvec4;
 import std.stdio : writefln;
 
 import test_data;
+import test_models;
 import test_json5;
 
 void main() {
     writefln("Testing resources");
 
+    //testData();
+
+    testModels();
+    
     //testGltf();
 
     //testSpirv();
 
-    testData();
     //testJson5();
 
 
