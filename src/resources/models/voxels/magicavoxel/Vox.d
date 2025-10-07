@@ -1,4 +1,4 @@
-module resources.models.magicavoxel.Vox;
+module resources.models.voxels.magicavoxel.Vox;
 
 import maths        : int3, uint3, float4;
 import common.utils : as, throwIf;

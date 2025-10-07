@@ -9,10 +9,7 @@
             "windows": {
                 "command": "dub run --build=debug --config=test --compiler=dmd --arch=x86_64",
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
@@ -25,6 +22,7 @@
             "windows": {
                 "command": "run_release_build.bat test",
             },
+            "group": "build",
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
