@@ -171,6 +171,7 @@ struct Material {
     float alphaCutoff = 0.5;
     bool doubleSided = false;
     Extensions extensions;
+    string[string] extras;
 }
 struct MaterialPBRMetalicRoughness {
     float[] baseColorFactor = [ 1.0, 1.0, 1.0, 1.0 ];

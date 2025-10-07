@@ -316,6 +316,7 @@ Material[] _materials(J5Array array) {
                 case "alphaCutoff": material.alphaCutoff = v.as!J5Number.getFloat(); break;
                 case "doubleSided": material.doubleSided = v.as!J5Boolean.value; break;
                 case "extensions": material.extensions = _extensions(v.as!J5Object); break;
+                case "extras": material.extras = _map(v.as!J5Object); break;
                 default: throwIf(true, "Unhandled material key: %s", k);
             }
         }

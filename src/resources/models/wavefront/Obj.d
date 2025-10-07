@@ -1,4 +1,4 @@
-module resources.models.obj;
+module resources.models.wavefront.Obj;
 
 import resources.all;
 
@@ -8,7 +8,6 @@ import resources.all;
  * https://en.wikipedia.org/wiki/Wavefront_.obj_file
  */
 final class Obj : ModelData {
-private:
 public:
     static Obj read(string filename) {
         string data = From!"std.file".read(filename).as!string;

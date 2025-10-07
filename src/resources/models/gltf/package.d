@@ -11,6 +11,46 @@ private {
     AttributeData NO_ATTRIBUTE_DATA = AttributeData();
 }
 
+/**
+ *Get ushort or uint index data and return it as uint[]
+ */
+uint[] getIndicesArray(GLTF gltf, MeshPrimitive prim) {
+    auto indexData = getIndices(gltf, prim);
+    throwIfNot(indexData.hasData(), "No indices");
+
+    if(indexData.stride == 2) {
+        ushort* ptr = indexData.data.ptr.as!(ushort*);
+        return ptr[0..indexData.count()].map!(a => a.as!uint).array();
+    }
+    if(indexData.stride == 4) {
+        return indexData.data.ptr.as!(uint*)[0..indexData.count()];
+    }
+    throwIf(true, "Unsupported index stride %s", indexData.stride);
+    return null;
+}
+/**
+ * Get attribute data and return it as T[] 
+ */
+T[] getAttributeDataArray(T)(GLTF gltf, MeshPrimitive prim, string attributeName) {
+    auto attrs = getAttributeData(gltf, prim, attributeName);
+    if(attrs.hasData()) {
+        Accessor a = gltf.accessors[attrs.accessorIndex];
+
+        static if(is(T == float2)) {
+            throwIfNot(a.isFloat2(), "Expecting float2 type");
+        }
+        static if(is(T == float3)) {
+            throwIfNot(a.isFloat3(), "Expecting float3 type");
+        }
+        static if(is(T == float4)) {
+            throwIfNot(a.isFloat4(), "Expecting float4 type");
+        }
+
+        return attrs.data.ptr.as!(T*)[0..a.count];
+    }
+    return null;
+}
+
 struct IndexData {
     uint accessorIndex;
     uint stride;

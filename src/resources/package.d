@@ -34,6 +34,6 @@ import resources.code.PE;
 import resources.code.spirv.SPIRV;
 
 import resources.models.model_data;
-import resources.models.obj;
+import resources.models.wavefront.Obj;
 
 import resources.json5;
