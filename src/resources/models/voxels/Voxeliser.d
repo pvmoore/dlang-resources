@@ -37,7 +37,7 @@ public:
     }
 
     void addFace(Triangle t, float4 colour) {
-        addFace(Face(t, colour, getColourIndex(colour)));
+        addFace(Face(t, colour, getPaletteIndex(colour)));
     }
     void addGeometry(Obj obj) {
         foreach(f; obj.faces) {
@@ -164,7 +164,7 @@ private:
     static struct Face {
         Triangle t;
         float4 colour;
-        uint colourIndex;
+        ubyte paletteIndex;
         //int textureIndex;   // todo
         //float2 uv;          // todo
     }
@@ -181,14 +181,14 @@ private:
             }
         }
     }
-    uint getColourIndex(float4 colour) {
+    ubyte getPaletteIndex(float4 colour) {
         float lowestDistance = float.max;
-        uint lowestIndex = 0;
+        ubyte lowestIndex = 0;
         foreach(i, c; palette) {
             float dist = (c - colour).magnitude();
             if(dist < lowestDistance) {
                 lowestDistance = dist;
-                lowestIndex = i.as!uint;
+                lowestIndex = i.as!ubyte;
             }
         }
         //writefln("estimated colour %s as %s %s", colour, lowestIndex, palette[lowestIndex]);
@@ -237,8 +237,10 @@ private:
             float3 innerDelta = c / numInnerSteps;
 
             foreach(j; 0..numInnerSteps) {
-                // todo - get the colour sample from f.colour or texture
-                write(p, 1);
+                // todo - get the colour sample from the texture if there is one
+                ubyte voxel = f.paletteIndex;
+
+                write(p, voxel);
                 p += innerDelta;
             }
 

@@ -5,6 +5,7 @@ import maths            : uint3, float4;
 import common.utils     : as, throwIf;
 import std.format       : format;
 import std.stdio        : File;
+import std.typecons     : Tuple, tuple;
 
 /**
  * Represent a block of 1 byte voxels of arbitrary size.
@@ -25,14 +26,13 @@ public:
     void clear(ubyte value) {
         voxels[] = value;
     }
-    /** Return the number of voxels with the given value */
-    uint count(ubyte value) {
-        import std.algorithm : count;
-        return voxels.count(value).as!uint;
-    }
     /** Return true if the voxel at pos has the given value */
     bool isValue(uint3 pos, ubyte value) {
         return voxels[toIndex(pos)] == value;
+    }
+    /** Return the voxel at pos */
+    ubyte get(uint3 pos) {
+        return voxels[toIndex(pos)];
     }
     /** Set the voxel at pos to value */
     void set(uint3 pos, ubyte value) {
@@ -40,7 +40,6 @@ public:
     }
     /** Set all voxels in the range [offset, offset+size) to value */
     void set(uint3 offset, uint size, ubyte value) {
-        assert(size > 0, "size must be > 0");
         assert((offset+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset, size));
 
         uint indexZ = toIndex(offset);
@@ -63,7 +62,6 @@ public:
     }
     /** Return true if any voxel in the range [offset, offset+size) is not 0 */
     bool anySet(uint3 offset, uint size) {
-        assert(size > 0, "size must be > 0");
         assert((offset+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset, size));
 
         uint indexZ = toIndex(offset);
@@ -83,7 +81,6 @@ public:
     }
     /** Return true if all voxels in the range [offset, offset+size) are not 0 */
     bool allSet(uint3 offset, uint size) {
-        assert(size > 0, "size must be > 0");
         assert((offset+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset, size));
 
         uint indexZ = toIndex(offset);
@@ -103,7 +100,6 @@ public:
     }
     /** Return true if all voxels in the range [offset1, offset1+size) are equal to the voxels in the range [offset2, offset2+size) */
     bool areaEqual(uint3 offset1, uint3 offset2, uint size) {
-        assert(size > 0, "size must be > 0");
         assert((offset1+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset1, size));
         assert((offset2+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset2, size));
 
@@ -127,6 +123,95 @@ public:
             index2Z += Z();
         }
         return true;
+    }
+    /** 
+     * Return true if all voxels in the range [offset1, offset1+size) have the same bitmap
+     * ie. the zeroes match. Zeroes are unset, voxel values > 0 are counted as set
+     */
+    bool areaBitmapEqual(uint3 offset1, uint3 offset2, uint size) {
+        assert((offset1+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset1, size));
+        assert((offset2+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset2, size));
+
+        uint index1Z = toIndex(offset1);
+        uint index2Z = toIndex(offset2);
+        foreach(z; 0..size) {
+            uint index1Y = index1Z;
+            uint index2Y = index2Z;
+            foreach(y; 0..size) {
+                uint index1X = index1Y;
+                uint index2X = index2Y;
+                foreach(x; 0..size) {
+                    bool a = voxels[index1X] == 0;
+                    bool b = voxels[index2X] == 0; 
+                    if(a != b) return false;
+                    index1X++;
+                    index2X++;
+                }
+                index1Y += Y();
+                index2Y += Y();
+            }
+            index1Z += Z();
+            index2Z += Z();
+        }
+        return true;
+    }
+    /** Return the number of voxels with the given value */
+    uint count(ubyte value) {
+        import std.algorithm : count;
+        return voxels.count(value).as!uint;
+    }
+    /** 
+     * Return the number of unique voxels in the range [offset, offset+size) ignoring 0. 
+     * If breakOn is reached then return immediately. This is useful for quickly checking if an area 
+     * contains at least 'breakOn' unique non-zero values.
+     */
+    uint countUniqueNonZero(uint3 offset, uint size, uint breakOn = 255) {
+        assert((offset+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset, size));
+
+        bool[ubyte] seen;
+
+        uint indexZ = toIndex(offset);
+    outer:
+        foreach(z; 0..size) {
+            uint indexY = indexZ;
+            foreach(y; 0..size) {
+                uint indexX = indexY;
+                foreach(x; 0..size) {
+                    ubyte v = voxels[indexX];
+                    if(v != 0) {
+                        seen[v] = true;
+                        if(seen.length >= breakOn) break outer;
+                    }
+                    indexX++;
+                }
+                indexY += Y();
+            }
+            indexZ += Z();
+        }
+        return seen.length.as!uint;
+    }
+    /**
+     * Return the position and value of the first non-zero voxel in the range [offset, offset+size)
+     * Returns (offset, 0) if there are no non-zero voxels
+     */
+    Tuple!(uint3, "position", ubyte, "value") findFirstNonZero(uint3 offset, uint size) {
+        assert((offset+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset, size));
+
+        uint indexZ = toIndex(offset);
+        foreach(z; 0..size) {
+            uint indexY = indexZ;
+            foreach(y; 0..size) {
+                uint indexX = indexY;
+                foreach(x; 0..size) {
+                    ubyte v = voxels[indexX];
+                    if(v != 0) return tuple!("position", "value")(uint3(x,y,z), v);
+                    indexX++;
+                }
+                indexY += Y();
+            }
+            indexZ += Z();
+        }
+        return tuple!("position", "value")(offset, 0.as!ubyte);
     }
 
     /**
