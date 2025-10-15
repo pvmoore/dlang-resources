@@ -161,6 +161,34 @@ public:
         return voxels.count(value).as!uint;
     }
     /** 
+     * Return the number of unique voxels in the range [offset, offset+size). 
+     * If breakOn is reached then return immediately. This is useful for quickly checking if an area 
+     * contains at least 'breakOn' unique values.
+     */
+    uint countUnique(uint3 offset, uint size, uint breakOn = 255) {
+        assert((offset+size).allLTE(this.size), "%s+%s is outside of the voxel grid".format(offset, size));
+
+        bool[ubyte] seen;
+
+        uint indexZ = toIndex(offset);
+    outer:
+        foreach(z; 0..size) {
+            uint indexY = indexZ;
+            foreach(y; 0..size) {
+                uint indexX = indexY;
+                foreach(x; 0..size) {
+                    ubyte v = voxels[indexX];
+                    seen[v] = true;
+                    if(seen.length >= breakOn) break outer;
+                    indexX++;
+                }
+                indexY += Y();
+            }
+            indexZ += Z();
+        }
+        return seen.length.as!uint;
+    }
+    /** 
      * Return the number of unique voxels in the range [offset, offset+size) ignoring 0. 
      * If breakOn is reached then return immediately. This is useful for quickly checking if an area 
      * contains at least 'breakOn' unique non-zero values.
@@ -212,6 +240,20 @@ public:
             indexZ += Z();
         }
         return tuple!("position", "value")(offset, 0.as!ubyte);
+    }
+
+    ubyte getPaletteIndex(float4 colour) {
+        float lowestDistance = float.max;
+        ubyte lowestIndex = 0;
+        foreach(i, c; palette) {
+            float dist = (c - colour).magnitude();
+            if(dist < lowestDistance) {
+                lowestDistance = dist;
+                lowestIndex = i.as!ubyte;
+            }
+        }
+        //writefln("estimated colour %s as %s %s", colour, lowestIndex, palette[lowestIndex]);
+        return lowestIndex;
     }
 
     /**
