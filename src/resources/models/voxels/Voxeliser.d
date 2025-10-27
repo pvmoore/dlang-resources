@@ -41,7 +41,7 @@ public:
     }
     void addGeometry(Obj obj) {
         foreach(f; obj.faces) {
-            addFace(Triangle(obj.vertex(f, 0), obj.vertex(f, 1), obj.vertex(f, 2)), float4(1,0,0,1));
+            addFace(Triangle(obj.vertex(f, 0), obj.vertex(f, 1), obj.vertex(f, 2)), obj.colour(f, 0));
         }
     }
     void addGeometry(GLTF gltf) {

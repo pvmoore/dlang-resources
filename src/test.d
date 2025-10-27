@@ -14,13 +14,13 @@ void main() {
 
     //testData();
 
-    testModels();
+    //testModels();
     
     //testGltf();
 
     //testSpirv();
 
-    //testJson5();
+    testJson5();
 
 
     //testObj();

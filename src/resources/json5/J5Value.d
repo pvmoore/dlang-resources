@@ -179,6 +179,31 @@ public:
     }
 
     /**
+     * Extract the values to a new standard array
+     * eg.
+     *  int[] a = j5a.extract!int();
+     */
+    T[] extract(T)() if(is(T==int) || is(T==long) || is(T==float) || is(T==double) || is(T==string) || is(T==bool)) {
+        auto result = new T[array.length];
+        foreach(i, v; array) {
+            static if(is(T==int)) {
+                result[i] = v.as!J5Number.getInt();
+            } else static if(is(T==long)) {
+                result[i] = v.as!J5Number.getLong();
+            } else static if(is(T==float)) {
+                result[i] = v.as!J5Number.getFloat();
+            } else static if(is(T==double)) {
+                result[i] = v.as!J5Number.getDouble();
+            } else static if(is(T==string)) {
+                result[i] = v.toString();
+            } else static if(is(T==bool)) {
+                result[i] = v.as!J5Boolean.value;
+            } 
+        }
+        return result;
+    }
+
+    /**
      * foreach(v; o.as!J5Array) {}
      */
     override int opApply(int delegate(J5Value) dg) {
@@ -203,7 +228,13 @@ public:
 
     override bool isEmpty() { return array.length==0; }
     override uint length() { return array.length.as!uint; }
-    override J5Value opIndex(int i) { return array[i]; }
+    
+    /**
+     * auto v = array[i]
+     */
+    override J5Value opIndex(int i) { 
+        return array[i]; 
+    }
 
     alias opEquals = J5Value.opEquals;
     override bool opEquals(Object other) {

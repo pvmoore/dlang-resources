@@ -107,9 +107,9 @@ void testVoxeliser() {
     // v.addFace(Triangle(float3(0,0,0), float3(100,0,0), float3(100,0,100)), float4(1,0,0,1));
     // v.addFace(Triangle(float3(0,0,0), float3(100,0,100), float3(0,0,100)), float4(1,0,0,1));
 
-    //v.addGeometry(Obj.read("testdata/models/suzanne.obj.txt"));
+    v.addGeometry(Obj.read("testdata/models/suzanne.obj.txt"));
 
-    v.addGeometry(GLTF.read("testdata/models/gltf/cat.glb"));
+    //v.addGeometry(GLTF.read("testdata/models/gltf/cat.glb"));
     //v.addGeometry(GLTF.read("testdata/models/gltf/chicken.glb"));
     //v.addGeometry(GLTF.read("testdata/models/gltf/mushnub evolved.glb"));
     //v.addGeometry(GLTF.read("testdata/models/gltf/Locomotive Front.glb"));

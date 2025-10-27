@@ -131,6 +131,18 @@ void testJson5Array() {
             writefln("[%s] %s", i, v);
         }
     }
+    {   // extract int
+        auto j = JSON5.fromFile("testdata2/json5/array/array4.json5");
+        int[] a = j.as!J5Array.extract!int();
+        writefln("a = %s", a);
+        assert(a == [1,3,5,7,9]);
+    }
+    {   // extract string
+        auto j = JSON5.fromFile("testdata2/json5/array/array4a.json5");
+        string[] a = j.as!J5Array.extract!string();
+        writefln("a = %s", a);
+        assert(a == ["one", "two", "three", "four", "five"]);
+    }
 }
 
 void testJson5Number() {
