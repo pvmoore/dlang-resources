@@ -6,6 +6,7 @@ import maths : uvec4;
 import std.stdio : writefln;
 
 import test_data;
+import test_images;
 import test_models;
 import test_json5;
 
@@ -20,7 +21,9 @@ void main() {
 
     //testSpirv();
 
-    testJson5();
+    //testJson5();
+
+    testWebP();
 
 
     //testObj();
