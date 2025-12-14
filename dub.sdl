@@ -8,6 +8,9 @@ buildType "debug" {
 buildType "release" {
 	buildOptions "releaseMode" "optimize" "inline" "noBoundsCheck" 
 }
+buildType "release_g" {
+	buildOptions "releaseMode" "debugInfo" "optimize" "inline" "noBoundsCheck" 
+}
 
 configuration "test" {
 	mainSourceFile "src/test.d"
@@ -24,6 +27,7 @@ configuration "library" {
 dflags "-P=/w"
 
 # internal
+
 dependency "common" version="~master"
 dependency "maths" version="~master"
 dependency "logging" version="~master"

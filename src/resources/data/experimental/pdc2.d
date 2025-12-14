@@ -63,7 +63,7 @@ public:
 
         foreach(i; 0..2000) {
             if(tokens.length<4) break;
-            chat("Iteration %s ------------- length = %s (%s)", i, tokens.length, numUniqueTokens);
+            writefln("Iteration %s ------------- length = %s (%s)", i, tokens.length, numUniqueTokens);
             auto match = findBestDuplicateRegion();
 
             rewriteTokens(match);
@@ -73,11 +73,11 @@ public:
     }
 private:
     void rewriteTokens(Match match) {
-        chat("Rewriting tokens %s", match);
+        writefln("Rewriting tokens %s", match);
 
         ushort[] temp  = new ushort[tokens.length];
         uint[] offsets = match.offsets.sort().array;
-        chat("offsets[%08x] = %s", match.hash, offsets);
+        writefln("offsets[%08x] = %s", match.hash, offsets);
         assert(offsets.length>1);
 
         uint src  = 0;
@@ -114,25 +114,25 @@ private:
         numUniqueTokens++;
     }
     Match findBestDuplicateRegion() {
-        chat("Finding best duplicate region...");
+        writefln("Finding best duplicate region...");
 
         calculateHashes();
 
         Match bestMatch;
 
         foreach(k,v; hashes) {
-            //chat("%08x = %s", k, v);
+            //writefln("%08x = %s", k, v);
 
             if(v.list.length>1) {
                 Match match = compareHashRegions(k, v.list);
-                //chat("  match = %s", match);
+                //writefln("  match = %s", match);
 
                 if(match.isBetterThan(bestMatch)) {
                     bestMatch = match;
                 }
             }
         }
-        //chat("  Best region = %s", bestMatch);
+        //writefln("  Best region = %s", bestMatch);
         return bestMatch;
     }
     void calculateHashes() {
@@ -142,7 +142,7 @@ private:
 
         import core.bitop : bsr;
         uint bitsRequired = bsr(numUniqueTokens-1)+1;
-        //chat("  bitsRequired = %s", bitsRequired);
+        //writefln("  bitsRequired = %s", bitsRequired);
 
         foreach(i; 0..tokens.length-3) {
             uint hash =
@@ -159,12 +159,12 @@ private:
                 hashes[hash] = o;
             }
         }
-        chat("  Hashes length = %s", hashes.length);
+        writefln("  Hashes length = %s", hashes.length);
     }
     Match compareHashRegions(uint hash, uint[] offsets) {
         expect(offsets.length>1);
 
-        //chat("  Comparing regions for hash %08x --> %s", hash, offsets);
+        //writefln("  Comparing regions for hash %08x --> %s", hash, offsets);
 
         // The first 3 tokens should all be the same
 
@@ -176,11 +176,11 @@ private:
         uint[][uint] lengths; // key = length, value = list of indices
 
         for(uint index1 = 0; index1<size-1; index1++) {
-            //chat("    -----------------------------------");
+            //writefln("    -----------------------------------");
             lengths.clear();
 
             for(uint index2 = index1+1; index2<size; index2++) {
-                //chat("    Index %s vs %s", index1, index2);
+                //writefln("    Index %s vs %s", index1, index2);
 
                 auto len = compareTokenStreams(offsets[index1], offsets[index2]);
 
@@ -205,12 +205,12 @@ private:
 
         Match match = Match(hash, offsets[bestIndex], bestLengthCount.length, bestLengthCount.count, bestIndices);
 
-        //chat("    Best match %s %s", hash, offsets);
+        //writefln("    Best match %s %s", hash, offsets);
 
         return match;
     }
     uint compareTokenStreams(uint offset1, uint offset2) {
-        //chat("    comparing stream offsets (%s,%s)", offset1, offset2);
+        //writefln("    comparing stream offsets (%s,%s)", offset1, offset2);
         static import maths;
         static import std.math;
 
@@ -221,22 +221,22 @@ private:
             tokens.length-offset2,
             diff);
 
-        // chat("    diff          = %s", diff);
-        // chat("    maxLength     = %s", maxLength);
+        // writefln("    diff          = %s", diff);
+        // writefln("    maxLength     = %s", maxLength);
 
         auto p1 = tokens.ptr+offset1;
         auto p2 = tokens.ptr+offset2;
         auto i  = 0;
 
         for(i = 0; i<maxLength; i++) {
-            //chat("%s %s", *p1, *p2);
+            //writefln("%s %s", *p1, *p2);
             if(*p1 != *p2) break;
             p1++;
             p2++;
         }
-        //chat("    match length  = %s", i);
-        // chat("    match        = %s", tokens[offset1..offset1+i+1]);
-        // chat("    match        = %s", tokens[offset2..offset2+i+1]);
+        //writefln("    match length  = %s", i);
+        // writefln("    match        = %s", tokens[offset1..offset1+i+1]);
+        // writefln("    match        = %s", tokens[offset2..offset2+i+1]);
 
         return i;
     }
@@ -248,6 +248,6 @@ private:
         }
         numUniqueTokens = 256;
 
-        chat("Loaded %s tokens", tokens.length);
+        writefln("Loaded %s tokens", tokens.length);
     }
 }

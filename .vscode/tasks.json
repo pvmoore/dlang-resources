@@ -4,12 +4,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "**** Test ****",
+            "label": "**** Test (DMD Debug) ****",
             "type": "shell",
             "windows": {
-                "command": "dub run --build=debug --config=test --compiler=dmd --arch=x86_64",
+                "command": "scripts/run_build.bat dmd debug test"
             },
-            "group": "build",
+            "group": {
+                "kind": "build"
+            },
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"
@@ -20,7 +22,20 @@
             "label": "**** Test release (LDC)****",
             "type": "shell",
             "windows": {
-                "command": "run_release_build.bat test",
+                "command": "scripts/run_build.bat ldc2 release test",
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "**** Test release with debug info (LDC)****",
+            "type": "shell",
+            "windows": {
+                "command": "scripts/run_build.bat ldc2 release_g test",
             },
             "group": "build",
             "presentation": {

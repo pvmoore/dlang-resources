@@ -9,11 +9,14 @@ import test_data;
 import test_images;
 import test_models;
 import test_json5;
+import test_lz77;
 
 void main() {
     writefln("Testing resources");
 
     //testData();
+
+    testLZ77();
 
     //testModels();
     
@@ -23,7 +26,7 @@ void main() {
 
     //testJson5();
 
-    testWebP();
+    //testWebP();
 
 
     //testObj();

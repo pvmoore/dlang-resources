@@ -39,8 +39,8 @@ void testData() {
     //testMoveToFront();
     //testDeltaEncoder();
 
-    testBzip2();
-    testBzip3();
+    //testBzip2();
+    //testBzip3();
 }
 
 private:

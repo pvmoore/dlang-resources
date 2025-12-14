@@ -41,8 +41,8 @@ private:
 
     ulong getHash(ulong a, ulong b) {
         ulong h = 5381;
-        h   = ((h << 13)) + a;
-        h  ^= ((h << 17)) + b;
+        h   = (h << 13) + a;
+        h  ^= (h << 17) + b;
         // reserve the 0-255 range
         if(h<256) h += 256;
         return h;
@@ -50,12 +50,12 @@ private:
     void encode() {
         file.open(srcFilename, "rb");
         scope(exit) file.close();
-        chat("Encoding file '%s' length %s", srcFilename, file.size);
+        writefln("Encoding file '%s' length %s", srcFilename, file.size);
 
         // todo - handle length==0
 
         Entry* findEntry(ulong leftHash, ubyte byt, ref ulong hash) {
-            chat("  findEntry('%s','%s')", dumpHash(leftHash), cast(char)byt);
+            writefln("  findEntry('%s','%s')", dumpHash(leftHash), cast(char)byt);
             hash = getHash(leftHash, byt);
 
             return hash in entries;
@@ -66,8 +66,8 @@ private:
         ubyte curr = reader.read!ubyte;
 
         while(!reader.eof) {
-            chat("----");
-            chat("'%s'", cast(char)curr);
+            writefln("----");
+            writefln("'%s'", cast(char)curr);
             // assume basic entry
             ulong leftHash = curr;
 
@@ -78,25 +78,25 @@ private:
             while(!reader.eof) {
                 consumeLast = true;
                 curr = reader.read!ubyte;
-                chat("  '%s'", cast(char)curr);
+                writefln("  '%s'", cast(char)curr);
                 entry = findEntry(leftHash, curr, hash);
                 if(entry is null) {
                     break;
                 }
-                chat("  Found '%s'", dumpEntry(*entry));
+                writefln("  Found '%s'", dumpEntry(*entry));
                 leftHash = hash;
                 consumeLast = false;
             }
-            //chat("  consumeLast=%s", consumeLast);
+            //writefln("  consumeLast=%s", consumeLast);
 
-            chat("  Writing '%s'", dumpHash(leftHash));
+            writefln("  Writing '%s'", dumpHash(leftHash));
             // todo - use Huffman rather than bitsRequired bits
             //writer.write(b, bitsRequired);
             bitsWritten += bitsRequired;
 
             if(reader.eof) {
                 if(consumeLast) {
-                    chat("  Writing last char '%s'", dumpHash(curr));
+                    writefln("  Writing last char '%s'", dumpHash(curr));
                     // todo - use Huffman rather than bitsRequired bits
                     //writer.write(b, bitsRequired);
                     bitsWritten += bitsRequired;
@@ -104,14 +104,14 @@ private:
             } else {
                 // add the latest hash
                 auto newEntry = Entry(leftHash, curr);
-                chat("  new entry '%s' (%s)", dumpEntry(newEntry), hash);
+                writefln("  new entry '%s' (%s)", dumpEntry(newEntry), hash);
 
                 entries[hash] = newEntry;
                 bitsRequired = entropyBits(1, cast(int)entries.length+256);
-                chat("  bitsRequired = %s", bitsRequired);
+                writefln("  bitsRequired = %s", bitsRequired);
             }
         }
-        chat("Finished writing %s bits", bitsWritten);
+        writefln("Finished writing %s bits", bitsWritten);
     }
 }
 

@@ -3,6 +3,9 @@ module resources.algorithms.deflate.Deflate;
 import resources.algorithms.deflate;
 import resources.all;
 
+/**
+ * https://en.wikipedia.org/wiki/Deflate
+ */
 final class Deflate {
 private:
 
