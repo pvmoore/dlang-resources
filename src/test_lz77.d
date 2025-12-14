@@ -12,10 +12,10 @@ void testLZ77() {
     writefln("Testing LZ77");
     writefln("#######################################");
 
-    //enum STRATEGY = LZ77Strategy.NAIVE;
-    //enum STRATEGY = LZ77Strategy.LARGE_HASH;
-    //enum STRATEGY = LZ77Strategy.HASH_AND_LINKS_2;
-    enum STRATEGY = LZ77Strategy.HASH_AND_LINKS_3;
+    //enum STRATEGY = LZ77Strategy.NAIVE;                 // 13600ms
+    //enum STRATEGY = LZ77Strategy.LARGE_HASH;          // 950ms
+    //enum STRATEGY = LZ77Strategy.HASH_AND_LINKS_2;    // 720ms
+    enum STRATEGY = LZ77Strategy.HASH_AND_LINKS_3;    // 330ms
 
     foreach(s; EnumMembers!LZ77Strategy) {
         writefln("Testing %s", s);
@@ -36,8 +36,8 @@ void benchmark(LZ77Strategy STRATEGY)() {
     writefln("Benchmarking LZ77");
     import std.datetime.stopwatch : StopWatch, AutoStart;
 
-    enum WINDOW_SIZE         = 16384;
-    enum MAX_MATCH_LENGTH    = 16384;
+    enum WINDOW_SIZE         = 32768;
+    enum MAX_MATCH_LENGTH    = 32768;
     enum MAX_LITERALS_LENGTH = 32;
 
     auto lz = new LZ77!STRATEGY(WINDOW_SIZE, MAX_MATCH_LENGTH, MAX_LITERALS_LENGTH, (index, distance, length) { return length; }, (index, literals) {});
