@@ -39,7 +39,7 @@ void testData() {
     //testMoveToFront();
     //testDeltaEncoder();
 
-    //testBzip2();
+    testBzip2();
     //testBzip3();
 }
 
@@ -750,6 +750,18 @@ void testBzip2() {
 
     string version_ = BZip2.versionString();
     writefln("version = %s", version_);
+
+    {  
+        // ubyte[] original = cast(ubyte[])read("testdata2/random/random.dat");
+        // ubyte[] compressed = BZip2.compress(original);
+        // import std.file : write;
+        // write("testdata2/random/random.bz2", compressed);
+
+        ubyte[] compressed = cast(ubyte[])read("testdata2/random/random.bz2");
+        ubyte[] decompressed = BZip2.decompress(compressed);
+
+        assert(decompressed.length == 1_048_576);
+    }
     
     void compressAndDecompress(string filename) {
         StopWatch w = StopWatch(AutoStart.yes);

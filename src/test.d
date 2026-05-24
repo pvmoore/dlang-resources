@@ -14,9 +14,9 @@ import test_lz77;
 void main() {
     writefln("Testing resources");
 
-    //testData();
+    testData();
 
-    testLZ77();
+    //testLZ77();
 
     //testModels();
     
