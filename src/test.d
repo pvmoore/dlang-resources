@@ -14,15 +14,15 @@ import test_lz77;
 void main() {
     writefln("Testing resources");
 
-    testData();
+    // testData();
 
     //testLZ77();
 
     //testModels();
-    
+
     //testGltf();
 
-    //testSpirv();
+    testSpirv();
 
     //testJson5();
 
@@ -133,7 +133,7 @@ void testJPEG() {
     string[] filenames = [
         "testdata/JPEG/screenshot-x150",
         "testdata/JPEG/pineapple"
-    ];              
+    ];
 
     foreach(filename; filenames) {
         writefln("Reading %s.jpg", filename);
@@ -179,7 +179,7 @@ void testPNG() {
     writefln("Reading logo.png");
     auto logo = PNG.read("testdata/PNG/logo.png");
     writefln("logo = %s", logo);
-    
+
     assert(logo.width==128);
     assert(logo.height==128);
     assert(logo.bytesPerPixel==4);
@@ -197,7 +197,7 @@ void testPNG() {
 
     writefln("Checking data");
     assert(logo.data[] == logo1.data[]);
-    writefln("OK");   
+    writefln("OK");
 }
 void testDDS() {
     writefln("Testing DDS");
@@ -289,10 +289,11 @@ void testSpirv() {
 
     //auto spirv = SPIRV.read("C:/pvmoore/d/libs/vulkan/resources/shaders/vulkan/quad/Quad.spv");
     //auto spirv = SPIRV.read("C://pvmoore//d//apps//blockie//resources//shaders//pass1_marchM2_comp.spv");
-    
-    auto spirv = SPIRV.read("C:/pvmoore/d/apps/emerald/resources/shaders/pathtracer_comp.spv");
-    
-    
+    // auto spirv = SPIRV.read("C:/pvmoore/d/apps/emerald/resources/shaders/pathtracer_comp.spv");
+    auto spirv = SPIRV.read("C:/pvmoore/d/apps/GalacticTrader1984/resources/shaders_spv/static-quads.spv");
+
+
+
     writefln("spirv = %s", spirv);
 }
 void testGltf() {

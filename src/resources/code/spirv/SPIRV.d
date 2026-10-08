@@ -11,14 +11,14 @@ import resources.code.spirv.spirv_types;
 /**
  * A class for reading and parsing SPIR-V binary files.
  *
- * Supports Up to and including version 1.6 
+ * Supports Up to and including version 1.6
  *
  * https://github.com/KhronosGroup/SPIRV-Headers/blob/main/include/spirv/unified1/spirv.h
  * https://registry.khronos.org/SPIR-V/specs/unified1/SPIRV.html#PhysicalLayout
  */
 final class SPIRV {
-public:    
-    static SPIRV read(string filename) { 
+public:
+    static SPIRV read(string filename) {
         auto spirv = new SPIRV();
         spirv.doRead(filename);
         return spirv;
@@ -31,7 +31,7 @@ private:
         uint wordCount;
     }
 
-    void doRead(string filename) { 
+    void doRead(string filename) {
         reader = new FileByteReader(filename);
         scope(exit) reader.close();
 
@@ -62,7 +62,7 @@ private:
     }
     /**
      * Note: This is not an exhaustive list of instructions. Add more as necessary.
-     * 
+     *
      * At the moment all we do is log
      */
     void readInstructions() {
@@ -70,8 +70,8 @@ private:
         while(!reader.eof()) {
             uint i = reader.read!uint;
             int wordCount = (i >>> 16) & 0xffff;
-            uint opcode = i & 0xffff;
-            //chat("Instruction: op: %s, Word Count: %s", opcode.as!SpvOp, wordCount);
+            uint opcode   = i & 0xffff;
+            // chat("Instruction: op: %s, Word Count: %s", opcode.as!SpvOp, wordCount);
 
             switch(opcode) with(SpvOp) {
                 case AccessChain: {
@@ -79,8 +79,8 @@ private:
                     uint resultId = reader.read!uint;
                     uint base = reader.read!uint;
                     uint[] indices = reader.readArray!uint(wordCount-4);
-                    
-                    chat("  @%s = AccessChain: resultType:@%s, base:@%s, indices:%s", 
+
+                    chat("  @%s = AccessChain: resultType:@%s, base:@%s, indices:%s",
                         resultId, resultType, base, indices.map!(it=>"@%s".format(it)));
                     break;
                 }
@@ -146,13 +146,13 @@ private:
                 case Capability: {
                     SpvCapability cap = reader.read!uint.as!SpvCapability;
                     chat("  Capability: %s", cap);
-                    break;   
+                    break;
                 }
                 case CompositeConstruct: {
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
                     uint[] constituents = reader.readArray!uint(wordCount-3);
-                    chat("  @%s = CompositeConstruct: resultType:@%s, constituents:%s", 
+                    chat("  @%s = CompositeConstruct: resultType:@%s, constituents:%s",
                         resultId, resultType, constituents.map!(it=>"@%s".format(it)));
                     break;
                 }
@@ -161,7 +161,7 @@ private:
                     uint resultId = reader.read!uint;
                     uint composite = reader.read!uint;
                     uint[] indices = reader.readArray!uint(wordCount-4);
-                    chat("  @%s = CompositeExtract: resultType:@%s, composite:@%s, indices:%s", 
+                    chat("  @%s = CompositeExtract: resultType:@%s, composite:@%s, indices:%s",
                         resultId, resultType, composite, indices);
                     break;
                 }
@@ -171,7 +171,7 @@ private:
                     uint object = reader.read!uint;
                     uint composite = reader.read!uint;
                     uint[] indices = reader.readArray!uint(wordCount-5);
-                    chat("  @%s = CompositeInsert: resultType:@%s, object:@%s, composite:@%s, indices:%s", 
+                    chat("  @%s = CompositeInsert: resultType:@%s, object:@%s, composite:@%s, indices:%s",
                         resultId, resultType, object, composite, indices);
                     break;
                 }
@@ -184,12 +184,12 @@ private:
                     }
                     chat("  @%s = Constant: type:@%s, value:%s", resultId, type, value);
                     break;
-                }    
+                }
                 case ConstantComposite: {
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
                     uint[] constituents = reader.readArray!uint(wordCount-3);
-                    chat("  @%s = ConstantComposite: resultType:@%s, constituents:%s", 
+                    chat("  @%s = ConstantComposite: resultType:@%s, constituents:%s",
                         resultId, resultType, constituents.map!(it=>"@%s".format(it)));
                     break;
                 }
@@ -240,12 +240,23 @@ private:
                     break;
                 }
                 case Decorate: {
+                    // +2 words
                     uint targetId = reader.read!uint;
                     SpvDecoration decoration = reader.read!uint.as!SpvDecoration;
+                    // +variable words
                     uint[] params = reader.readArray!uint(wordCount-3);
                     chat("  Decorate: @%s = %s %s", targetId, decoration, params);
                     break;
-                }    
+                }
+                case DecorateId: {
+                    // +2 words
+                    uint targetId = reader.read!uint;
+                    SpvDecoration decoration = reader.read!uint.as!SpvDecoration;
+                    // +variable words
+                    uint[] params = reader.readArray!uint(wordCount-3);
+                    chat("  DecorateId: @%s = %s %s", targetId, decoration, params);
+                    break;
+                }
                 case Dot: {
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
@@ -269,18 +280,23 @@ private:
                     auto name = readLiteralString();
                     wordCount -= name.wordCount;
                     uint[] params = reader.readArray!uint(wordCount);
-                    chat("  EntryPoint: %s, functionId:%s, '%s' params = %s", exec, entryPoint, name.value, params);
+                    chat("  EntryPoint: %s, functionId @%s, '%s' params = %s", exec, entryPoint, name.value, params);
                     break;
                 }
-                case ExecutionMode: {   
+                case ExecutionMode: {
                     uint entryPoint = reader.read!uint;
                     SpvExecutionMode mode = reader.read!uint.as!SpvExecutionMode;
                     wordCount -= 3;
-                    chat("  ExecutionMode: entryPointId:%s, mode:%s", entryPoint, mode);
+                    chat("  ExecutionMode: entryPointId @%s, mode:%s", entryPoint, mode);
                     foreach(n; 0..wordCount) {
                         uint w = reader.read!uint;
                         chat("   -- param: %s", w);
                     }
+                    break;
+                }
+                case Extension: {
+                    auto name = readLiteralString();
+                    chat("  Extension: %s", name);
                     break;
                 }
                 case ExtInst: { // Execute an instruction in an imported set of extended instructions
@@ -289,7 +305,7 @@ private:
                     uint set = reader.read!uint;
                     uint instruction = reader.read!uint;
                     uint[] operands = reader.readArray!uint(wordCount-5);
-                    chat("  @%s = ExtInst: resultType:@%s, set:@%s, instruction:%s, operands:%s", 
+                    chat("  @%s = ExtInst: resultType:@%s, set:@%s, instruction:%s, operands:%s",
                         resultId, resultType, set, instruction, operands.map!(it=>"@%s".format(it)));
                     break;
                 }
@@ -365,7 +381,7 @@ private:
                 case FOrdLessThan: { // Floating-point comparison if operands are ordered and Operand 1 is less than Operand 2
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
-                    uint operand1 = reader.read!uint;    
+                    uint operand1 = reader.read!uint;
                     uint operand2 = reader.read!uint;
                     chat("  @%s = FOrdLessThan: resultType:@%s, operand1:@%s, operand2:@%s", resultId, resultType, operand1, operand2);
                     break;
@@ -451,8 +467,8 @@ private:
                     uint imageOperands = reader.read!uint;
                     uint[] ops = reader.readArray!uint(wordCount-6);
 
-                    chat("  @%s = ImageSampleExplicitLod: resultType:@%s, sampledImage:@%s, coordinate:@%s, operands:%s %s", 
-                        resultId, resultType, sampledImage, coordinate, 
+                    chat("  @%s = ImageSampleExplicitLod: resultType:@%s, sampledImage:@%s, coordinate:@%s, operands:%s %s",
+                        resultId, resultType, sampledImage, coordinate,
                         imageOperandsToString(imageOperands), ops);
                     break;
                 }
@@ -469,8 +485,8 @@ private:
                         ops = reader.readArray!uint(wordCount-6);
                     }
 
-                    chat("  @%s = ImageSampleImplicitLod: resultType:@%s, sampledImage:@%s, coordinate:@%s, operands:%s %s", 
-                        resultId, resultType, sampledImage, coordinate, 
+                    chat("  @%s = ImageSampleImplicitLod: resultType:@%s, sampledImage:@%s, coordinate:@%s, operands:%s %s",
+                        resultId, resultType, sampledImage, coordinate,
                         imageOperandsToString(imageOperands), ops);
                     break;
                 }
@@ -485,7 +501,7 @@ private:
                         ops = reader.readArray!uint(wordCount-5);
                     }
 
-                    chat("  ImageWrite: image:@%s, coordinate:@%s, texel:@%s, operands:%s %s", 
+                    chat("  ImageWrite: image:@%s, coordinate:@%s, texel:@%s, operands:%s %s",
                         image, coordinate, texel, imageOperandsToString(imageOperands), ops);
                     break;
                 }
@@ -531,7 +547,7 @@ private:
                     if(wordCount > 4) {
                        memoryAccess = reader.read!uint;
                     }
-                    chat("  @%s = Load: resultType:@%s, pointer:@%s, memoryAccess:%s", 
+                    chat("  @%s = Load: resultType:@%s, pointer:@%s, memoryAccess:%s",
                         resultId, resultType, pointer, .toString!SpvMemoryAccess(memoryAccess, null, null));
                     break;
                 }
@@ -563,7 +579,7 @@ private:
                     uint continueTarget = reader.read!uint;
                     SpvLoopControl control = reader.read!uint.as!SpvLoopControl;
                     uint[] params = reader.readArray!uint(wordCount-4);
-                    chat("  LoopMerge: mergeBlock:@%s, continueTarget:@%s, control:%s, params:%s", 
+                    chat("  LoopMerge: mergeBlock:@%s, continueTarget:@%s, control:%s, params:%s",
                         mergeBlock, continueTarget, .toArray!SpvLoopControl(control), params);
                     break;
                 }
@@ -572,7 +588,7 @@ private:
                     uint resultId = reader.read!uint;
                     uint leftMatrix = reader.read!uint;
                     uint rightMatrix = reader.read!uint;
-                    chat("  @%s = MatrixTimesMatrix: resultType:@%s, leftMatrix:@%s, rightMatrix:@%s", 
+                    chat("  @%s = MatrixTimesMatrix: resultType:@%s, leftMatrix:@%s, rightMatrix:@%s",
                         resultId, resultType, leftMatrix, rightMatrix);
                     break;
                 }
@@ -581,16 +597,18 @@ private:
                     uint resultId = reader.read!uint;
                     uint matrix = reader.read!uint;
                     uint vector = reader.read!uint;
-                    chat("  @%s = MatrixTimesVector: resultType:@%s, matrix:@%s, vector:@%s", 
+                    chat("  @%s = MatrixTimesVector: resultType:@%s, matrix:@%s, vector:@%s",
                         resultId, resultType, matrix, vector);
                     break;
                 }
                 case MemberDecorate: {
+                    // +3 words
                     uint structId = reader.read!uint;
-                    uint index = reader.read!uint;
+                    uint member = reader.read!uint;
                     SpvDecoration decoration = reader.read!uint.as!SpvDecoration;
-                    uint[] params = reader.readArray!uint(wordCount-4);
-                    chat("  MemberDecorate: structId:%s, index:%s, %s %s", structId, index, decoration, params);
+                    // +variable length
+                    uint[] literals = reader.readArray!uint(wordCount-4);
+                    chat("  MemberDecorate: structId @%s, member:%s, %s %s", structId, member, decoration, literals);
                     break;
                 }
                 case MemberName: { // struct member name
@@ -600,7 +618,7 @@ private:
                     chat("  MemberName: structId:%s, index:%s, name:'%s'", structId, member, name.value);
                     break;
                 }
-                case MemoryModel: 
+                case MemoryModel:
                     SpvAddressingModel addr = reader.read!uint.as!SpvAddressingModel;
                     SpvMemoryModel mem = reader.read!uint.as!SpvMemoryModel;
                     chat("  MemoryModel: %s, %s", addr, mem);
@@ -610,7 +628,7 @@ private:
                     auto name = readLiteralString();
                     chat("  Name: @%s = '%s'", targetId, name.value);
                     break;
-                }    
+                }
                 case Phi: {
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
@@ -633,7 +651,7 @@ private:
                     uint condition = reader.read!uint;
                     uint objectTrue = reader.read!uint;
                     uint objectFalse = reader.read!uint;
-                    chat("  @%s = Select: resultType:@%s, condition:@%s, objectTrue:@%s, objectFalse:@%s", 
+                    chat("  @%s = Select: resultType:@%s, condition:@%s, objectTrue:@%s, objectFalse:@%s",
                         resultId, resultType, condition, objectTrue, objectFalse);
                     break;
                 }
@@ -732,7 +750,7 @@ private:
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
                     uint[] constituents = reader.readArray!uint(wordCount-3);
-                    chat("  @%s = SpecConstantComposite: resultType:@%s, constituents:%s", 
+                    chat("  @%s = SpecConstantComposite: resultType:@%s, constituents:%s",
                         resultId, resultType, constituents.map!(it=>"@%s".format(it)));
                     break;
                 }
@@ -743,7 +761,7 @@ private:
                     if(wordCount > 3) {
                        memoryAccess = reader.read!uint;
                     }
-                    chat("  Store: pointer:@%s, object:@%s, memoryAccess:%s", 
+                    chat("  Store: pointer:@%s, object:@%s, memoryAccess:%s",
                         pointer, object, .toString!SpvMemoryAccess(memoryAccess, null, null));
                     break;
                 }
@@ -795,8 +813,8 @@ private:
                     if(wordCount > 9) {
                         access = reader.read!uint.as!SpvAccessQualifier;
                     }
-                    chat("  @%s = TypeImage: sampledType:@%s, dim:%s, depth:%s, arrayed:%s, ms:%s, sampled:%s, format:%s, access:%s", 
-                        resultId, sampledType, dim, depthToString(depth), arrayedToString(arrayed), 
+                    chat("  @%s = TypeImage: sampledType:@%s, dim:%s, depth:%s, arrayed:%s, ms:%s, sampled:%s, format:%s, access:%s",
+                        resultId, sampledType, dim, depthToString(depth), arrayedToString(arrayed),
                         msToString(ms), sampledToString(sampled), format, accessToString(access));
                     break;
                 }
@@ -905,8 +923,8 @@ private:
                     if(wordCount > 4) {
                         initializer = reader.read!uint;
                     }
-                    chat("  @%s = Variable: storageClass:%s, resultType:@%s, initialiser:%s", 
-                        resultId, storageClass, resultType, 
+                    chat("  @%s = Variable: storageClass:%s, resultType:@%s, initialiser:%s",
+                        resultId, storageClass, resultType,
                         initializer == -1 ? "none" : "@%s".format(initializer));
                     break;
                 }
@@ -935,15 +953,15 @@ private:
                     chat("  @%s = VectorTimesScalar: resultType:@%s, vector:@%s, scalar:@%s", resultId, resultType, vector, scalar);
                     break;
                 }
-                
-                
-                
-                
-                
-                
-                
-                
-                
+
+
+
+
+
+
+
+
+
 
                 default: {
                     chat(" !!! Unhandled opcode: %s (%s words)", opcode.as!SpvOp, wordCount);
@@ -953,7 +971,7 @@ private:
                     }
                     chat("Exiting...");
                     return;
-                } 
+                }
             }
         }
     }
