@@ -49,7 +49,7 @@ void main() {
 
     //testImageConverter();
 //    testBMP();
-    //testPNG();
+//    testPNG();
 //    testPerlin();
     //testHGT();
     //testJPEG();
@@ -290,7 +290,9 @@ void testSpirv() {
     //auto spirv = SPIRV.read("C:/pvmoore/d/libs/vulkan/resources/shaders/vulkan/quad/Quad.spv");
     //auto spirv = SPIRV.read("C://pvmoore//d//apps//blockie//resources//shaders//pass1_marchM2_comp.spv");
     // auto spirv = SPIRV.read("C:/pvmoore/d/apps/emerald/resources/shaders/pathtracer_comp.spv");
-    auto spirv = SPIRV.read("C:/pvmoore/d/apps/GalacticTrader1984/resources/shaders_spv/static-quads.spv");
+    // auto spirv = SPIRV.read("C:/pvmoore/d/apps/GalacticTrader1984/resources/shaders_spv/static-quads.spv");
+
+    auto spirv = SPIRV.read("C:/pvmoore/d/libs/vulkan-latest/resources/shaders_spv/example_raytracing.spv");
 
 
 

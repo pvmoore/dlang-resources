@@ -1,15 +1,18 @@
 
 name "resources"
 platforms "windows"
-	
+
 buildType "debug" {
+	dflags "-preview=fastdfa" platform="dmd"
+    dflags "-check=nullderef=on" platform="dmd"
+
 	buildOptions "debugMode" "debugInfo" "alwaysStackFrame" "stackStomping" "warningsAsErrors"
 }
 buildType "release" {
-	buildOptions "releaseMode" "optimize" "inline" "noBoundsCheck" 
+	buildOptions "releaseMode" "optimize" "inline" "noBoundsCheck"
 }
 buildType "release_g" {
-	buildOptions "releaseMode" "debugInfo" "optimize" "inline" "noBoundsCheck" 
+	buildOptions "releaseMode" "debugInfo" "optimize" "inline" "noBoundsCheck"
 }
 
 configuration "test" {

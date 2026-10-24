@@ -71,7 +71,7 @@ private:
             uint i = reader.read!uint;
             int wordCount = (i >>> 16) & 0xffff;
             uint opcode   = i & 0xffff;
-            // chat("Instruction: op: %s, Word Count: %s", opcode.as!SpvOp, wordCount);
+            chat("Instruction: op: %s, Word Count: %s", opcode.as!SpvOp, wordCount);
 
             switch(opcode) with(SpvOp) {
                 case AccessChain: {
@@ -203,6 +203,13 @@ private:
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
                     chat("  @%s = ConstantNull: resultType:@%s", resultId, resultType);
+                    break;
+                }
+                case ConstantSizeOfEXT: {
+                    uint resultTypeId = reader.read!uint;
+                    uint resultId = reader.read!uint;
+                    uint typeId = reader.read!uint;
+                    chat("  @%s = ConstantSizeOfEXT: resultType:@%s, type:@%s", resultId, resultTypeId, typeId);
                     break;
                 }
                 case ConstantTrue: {
@@ -857,6 +864,12 @@ private:
                     chat("  @%s = TypeStruct: memberTypes = %s", resultId, memberTypes);
                     break;
                 }
+                case TypeUntypedPointerKHR: {
+                    uint resultId = reader.read!uint;
+                    SpvStorageClass storageClass = reader.read!uint.as!SpvStorageClass;
+                    chat("  @%s = TypeUntypedPointerKHR: storageClass: %s", resultId, storageClass);
+                    break;
+                }
                 case TypeVector: {
                     uint resultId = reader.read!uint;
                     uint componentType = reader.read!uint;
@@ -913,6 +926,33 @@ private:
                     uint resultType = reader.read!uint;
                     uint resultId = reader.read!uint;
                     chat("  @%s = Undef: resultType:@%s", resultId, resultType);
+                    break;
+                }
+                case UntypedAccessChainKHR: {
+                    // +4 words
+                    uint resultTypeId = reader.read!uint;
+                    uint resultId = reader.read!uint;
+                    uint baseTypeId = reader.read!uint;
+                    uint baseId = reader.read!uint;
+                    // +variable length
+                    uint[] indexes = reader.readArray!uint(wordCount-5);
+                    chat("  @%s = UntypedAccessChainKHR: resultTypeId:@%s, baseTypeId:@%s, baseId:@%s, indexes:@%s", resultId, resultTypeId, baseTypeId, baseId, indexes);
+                    break;
+                }
+                case UntypedVariableKHR: {
+                    // +3 words
+                    uint resultTypeId = reader.read!uint;
+                    uint resultId = reader.read!uint;
+                    SpvStorageClass storageClass = reader.read!uint.as!SpvStorageClass;
+                    // +variable length
+                    wordCount -= 4;
+                    if(wordCount > 0) {
+                        todo("handle UntypedVariableKHR optional words");
+                    }
+                    // while(wordCount > 0) {
+
+                    // }
+                    chat("  @%s = UntypedVariableKHR: resultType:@%s, storageClass:%s", resultId, resultTypeId, storageClass);
                     break;
                 }
                 case Variable: {

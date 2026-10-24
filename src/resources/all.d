@@ -6,11 +6,11 @@ import resources;
 
 import common  			 : StringBuffer;
 import common.containers : makeLowPriorityQueue;
-import common.io 		 : ArrayByteWriter, 
+import common.io 		 : ArrayByteWriter,
 				   		   BitReader, ArrayBitReader, FileBitReader, ByteReader, FileByteReader,
 				   		   BitWriter, ArrayBitWriter, FileBitWriter, ByteWriter, FileByteWriter,
 				   		   flushConsole;
-import common.utils 	 : as, isA, isOneOf, From, expect,  isSet, isUnset, startsWith, throwIf, throwIfNot, toArray, toString, 
+import common.utils 	 : as, isA, isOneOf, From, expect,  isSet, isUnset, startsWith, throwIf, throwIfNot, toArray, toString,
 						   todo, containsKey;
 
 import maths;
